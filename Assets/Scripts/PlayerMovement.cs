@@ -40,22 +40,23 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private Vector2 GetHeldInput()
-    {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            return Vector2.up;
+   {
+    Vector2 input = Vector2.zero;
 
-        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-            return Vector2.down;
+    if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        input += Vector2.up;
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            return Vector2.left;
+    if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        input += Vector2.down;
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            return Vector2.right;
+    if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        input += Vector2.left;
 
-        return Vector2.zero;
-    }
+    if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        input += Vector2.right;
 
+    return input.normalized;
+}
     private float GetCurrentSpeed()
     {
         return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
