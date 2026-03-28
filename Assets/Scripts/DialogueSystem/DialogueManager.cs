@@ -9,7 +9,9 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance { get; private set; }
     private Queue<DialogueTurn> dialogueTurnsQueue;
 
-    // Dialogue UI
+    public bool IsDialogueActive { get; private set; }
+    private bool advanceRequested = false;
+
     [SerializeField] private RectTransform dialogBox;
     [SerializeField] private Image characterPhoto;
     [SerializeField] private TextMeshProUGUI characterName;
@@ -27,8 +29,14 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(DialogueCoroutine());
     }
 
+    public void RequestAdvance()
+    {
+        advanceRequested = true;
+    }
+
     private IEnumerator DialogueCoroutine()
     {
+        IsDialogueActive = true;
         ShowDialogBox();
 
         while (dialogueTurnsQueue.Count > 0)
@@ -38,10 +46,12 @@ public class DialogueManager : MonoBehaviour
             ClearDialogArea();
             dialogArea.text = currentTurn.DialogueLine;
 
-            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return));
+            advanceRequested = false;
+            yield return new WaitUntil(() => advanceRequested);
             yield return null;
         }
 
+        IsDialogueActive = false;
         HideDialogBox();
     }
 

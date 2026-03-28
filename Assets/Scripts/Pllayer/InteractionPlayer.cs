@@ -12,7 +12,14 @@ public class InteractionPlayer : MonoBehaviour
     {
         if (Input.GetKeyDown(interactionKey) && currentNPC != null)
         {
-            currentNPC.TriggerDialogue();
+            if (DialogueManager.Instance.IsDialogueActive)
+            {
+                DialogueManager.Instance.RequestAdvance();
+            }
+            else
+            {
+                currentNPC.TriggerDialogue();
+            }
         }
     }
 
@@ -25,10 +32,14 @@ public class InteractionPlayer : MonoBehaviour
     }
 
     private void OnTriggerExit2D(Collider2D collision)
+{
+    if (collision.CompareTag("NPC"))
     {
-        if (collision.CompareTag("NPC"))
+        // ✅ Solo soltamos el NPC si no hay diálogo en curso
+        if (!DialogueManager.Instance.IsDialogueActive)
         {
             currentNPC = null;
         }
     }
+}
 }
