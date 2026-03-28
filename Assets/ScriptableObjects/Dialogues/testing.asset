@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1c8a2e72477ead40906b8179d60c71b, type: 3}
+  m_Name: testing
+  m_EditorClassIdentifier: 
+  dialogueTurnsList:
+  - <Character>k__BackingField: {fileID: 11400000, guid: 1e7026ef7fc74a542a59cb22191717e9, type: 2}
+    dialogueLine: Hola como estas
+  - <Character>k__BackingField: {fileID: 11400000, guid: 9c5d9d4b2dbc6bc4abaf2dffaea918af, type: 2}
+    dialogueLine: Bien gracias
