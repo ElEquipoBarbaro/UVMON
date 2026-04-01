@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
+    public static PauseManager Instance { get; private set; }
+
     [Header("UI")]
     [SerializeField] private GameObject pauseOverlay;
 
@@ -16,26 +18,48 @@ public class PauseManager : MonoBehaviour
 
     private bool isPaused;
 
+    // Escenas donde NO debe aparecer el menú de pausa
+    private readonly string[] scenesWithoutPause = { "MainMenu" };
+
     private void Awake()
     {
-        // Esto evita que se empiece en pausa por accidente
+        // Patrón Singleton: si ya existe uno, destruye este duplicado
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject); // Sobrevive al cambiar de escena
+
         if (pauseOverlay != null)
             pauseOverlay.SetActive(false);
 
         Time.timeScale = 1f;
         isPaused = false;
 
-        if (logActions) Debug.Log("PauseManager Awake OK");
+        if (logActions) Debug.Log("PauseManager Awake OK - DontDestroyOnLoad activado");
     }
 
     private void Update()
     {
-        // OJO: en Play, se hace click en la pestaña Game para que reciba teclado
+        // No permite pausar en ciertas escenas (ej: MainMenu)
+        if (IsSceneWithoutPause()) return;
+
         if (Input.GetKeyDown(pauseKey))
         {
             if (logActions) Debug.Log("ESC detectado -> TogglePause()");
             TogglePause();
         }
+    }
+
+    private bool IsSceneWithoutPause()
+    {
+        string current = SceneManager.GetActiveScene().name;
+        foreach (string s in scenesWithoutPause)
+            if (current == s) return true;
+        return false;
     }
 
     public void TogglePause()
@@ -58,7 +82,6 @@ public class PauseManager : MonoBehaviour
             AudioListener.pause = isPaused;
     }
 
-    // --- Botones ---
     public void Resume()
     {
         SetPaused(false);
@@ -68,15 +91,12 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (pauseAudio) AudioListener.pause = false;
-
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void MainMenu()
     {
-        Time.timeScale = 1f;
-        if (pauseAudio) AudioListener.pause = false;
-
+        SetPaused(false); // Limpia pausa antes de cambiar
         SceneManager.LoadScene(mainMenuSceneName);
     }
 
@@ -84,13 +104,6 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (pauseAudio) AudioListener.pause = false;
-
         Application.Quit();
-    }
-
-    private void OnDestroy()
-    {
-        Time.timeScale = 1f;
-        if (pauseAudio) AudioListener.pause = false;
     }
 }
