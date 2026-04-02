@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isMoving) return;
 
+        if (Time.timeScale == 0f) return;
+
         Vector2 input = GetHeldInput();
 
         if (input != Vector2.zero && Time.time >= nextMoveTime)
