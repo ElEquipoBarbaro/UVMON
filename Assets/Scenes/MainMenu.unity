@@ -1056,7 +1056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ae4212330b9a6843b03246345f72c62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameSceneName: Game
+  gameSceneName: SampleScene
   mainWindow: {fileID: 520668707}
   optionsPanel: {fileID: 1352003344}
   logActions: 1
