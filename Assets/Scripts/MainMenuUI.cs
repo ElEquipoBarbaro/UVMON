@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class MainMenuUI : MonoBehaviour
 {
     [Header("Scenes")]
-    [SerializeField] private string gameSceneName = "SampleScene";
+    [SerializeField] private string gameSceneName = "jardinconocimiento";
 
     [Header("Optional Panels")]
     [SerializeField] private GameObject mainWindow;     // El MainWindow
