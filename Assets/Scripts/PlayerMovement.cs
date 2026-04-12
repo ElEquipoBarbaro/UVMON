@@ -9,6 +9,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float tileSize = 1f;
     [SerializeField] private float repeatDelay = 0.15f;
 
+    public Animator animator;
+
     [Header("Collision Settings")]
     [SerializeField] private LayerMask obstacleLayer;
 
@@ -22,9 +24,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (isMoving) return;
+        if (Time.timeScale == 0f) return;
 
         Vector2 input = GetHeldInput();
+
+        // Actualizar parámetros del Animator según input
+        UpdateAnimatorParameters(input);
+
+        if (isMoving) return;
 
         if (input != Vector2.zero && Time.time >= nextMoveTime)
         {
@@ -37,6 +44,25 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(MoveTo(targetPosition));
             }
         }
+    }
+
+    private void UpdateAnimatorParameters(Vector2 input)
+    {
+        // Resetear todos a 0
+        animator.SetFloat("up",    0f);
+        animator.SetFloat("down",  0f);
+        animator.SetFloat("lefht", 0f);
+        animator.SetFloat("right", 0f);
+
+        // Activar solo el que corresponde (valor > 0 para disparar la transición)
+        if (input == Vector2.up)
+            animator.SetFloat("up", 1f);
+        else if (input == Vector2.down)
+            animator.SetFloat("down", 1f);
+        else if (input == Vector2.left)
+            animator.SetFloat("lefht", 1f);
+        else if (input == Vector2.right)
+            animator.SetFloat("right", 1f);
     }
 
     private Vector2 GetHeldInput()
