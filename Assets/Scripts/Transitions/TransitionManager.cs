@@ -85,7 +85,7 @@ public class TransitionManager : MonoBehaviour
         op.allowSceneActivation = false;
 
         // Espera a que cargue (y al menos X segundos para que se vea la pantalla)
-        float minWait = 1.5f;
+        float minWait = 2.5f;
         float elapsed = 0f;
         while (!op.isDone)
         {

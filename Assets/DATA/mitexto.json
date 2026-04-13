@@ -1,16 +1,8 @@
 {
   "messages": [
     {
-      "banner": "INFORMACIÓN",
-      "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    },
-    {
       "banner": "CONSEJO",
       "content": "Recuerda guardar tu progreso antes de salir."
-    },
-    {
-      "banner": "DATO CURIOSO",
-      "content": "El jardín tiene más de 50 especies de plantas distintas."
     }
   ]
 }
