@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6578330e10fab27419a4a778f6ce3032, type: 3}
+  m_Name: Jack Malo
+  m_EditorClassIdentifier: 
+  creatureName: Jack Malo
+  maxHP: 100
+  attack: 100
+  defense: 100
+  speed: 100
+  moves:
+  - {fileID: 11400000, guid: 4b1333483eee58e4ab46e9de8221d802, type: 2}
+  - {fileID: 11400000, guid: efe1de857fd09034a9b51e63faebc885, type: 2}
