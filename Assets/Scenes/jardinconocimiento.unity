@@ -24158,7 +24158,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 300741230044746779, guid: aa663f7866b0c67438520e5687021fee, type: 3}
       propertyPath: targetSceneName
-      value: MainMenu
+      value: UVG_Classroom
       objectReference: {fileID: 0}
     - target: {fileID: 1353537550115112896, guid: aa663f7866b0c67438520e5687021fee, type: 3}
       propertyPath: m_Name
