@@ -11,6 +11,7 @@ public class DialogueManager : MonoBehaviour
 
     public bool IsDialogueActive { get; private set; }
     private bool advanceRequested = false;
+    public event System.Action OnDialogueEnded;
 
     [SerializeField] private RectTransform dialogBox;
     [SerializeField] private Image characterPhoto;
@@ -53,6 +54,7 @@ public class DialogueManager : MonoBehaviour
 
         IsDialogueActive = false;
         HideDialogBox();
+        OnDialogueEnded?.Invoke();
     }
 
     public void ShowDialogBox()

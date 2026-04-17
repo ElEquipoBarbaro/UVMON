@@ -35,7 +35,6 @@ public class InteractionPlayer : MonoBehaviour
 {
     if (collision.CompareTag("NPC"))
     {
-        // ✅ Solo soltamos el NPC si no hay diálogo en curso
         if (!DialogueManager.Instance.IsDialogueActive)
         {
             currentNPC = null;
