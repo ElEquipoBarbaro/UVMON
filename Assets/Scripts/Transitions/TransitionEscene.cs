@@ -21,9 +21,8 @@ public class TransitionEscene : MonoBehaviour
         }
 
         if (logActions) Debug.Log($"TransitionEscene: Cargando '{targetSceneName}'");
-        
-        // ← Solo este cambio
-        TransitionManager.Instance.GoToScene(targetSceneName);
+
+        SceneManager.LoadScene(targetSceneName);
     }
 
     private void OnDrawGizmos()
