@@ -10,15 +10,18 @@ public class InteractionPlayer : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(interactionKey) && currentNPC != null)
+        if (Input.GetKeyDown(interactionKey))
         {
-            if (DialogueManager.Instance.IsDialogueActive)
+            if (currentNPC != null)
             {
-                DialogueManager.Instance.RequestAdvance();
-            }
-            else
-            {
-                currentNPC.TriggerDialogue();
+                if (DialogueManager.Instance.IsDialogueActive)
+                {
+                    DialogueManager.Instance.RequestAdvance();
+                }
+                else
+                {
+                    currentNPC.TriggerDialogue();
+                }
             }
         }
     }
@@ -27,18 +30,18 @@ public class InteractionPlayer : MonoBehaviour
     {
         if (collision.CompareTag("NPC"))
         {
-            currentNPC = collision.GetComponent<DialogueTrigger>();
+            currentNPC = collision.GetComponentInParent<DialogueTrigger>();
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
-{
-    if (collision.CompareTag("NPC"))
     {
-        if (!DialogueManager.Instance.IsDialogueActive)
+        if (collision.CompareTag("NPC"))
         {
-            currentNPC = null;
+            if (!DialogueManager.Instance.IsDialogueActive)
+            {
+                currentNPC = null;
+            }
         }
     }
-}
 }
