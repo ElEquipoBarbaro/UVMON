@@ -1,0 +1,1519 @@
+fileFormatVersion: 2
+guid: f4e07316274236949b9edb8d9e22e587
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 128
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_0
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 1094
+        width: 130
+        height: 135
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6831f7b93b48cda4eac75a018906d688
+      internalID: 529568531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_1
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c62f7606e2f0794b9116cf231e5ce5d
+      internalID: 1657196600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_2
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d31fd6cd229e054abcc58c652d60901
+      internalID: -84288153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_3
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13956e71a3408cd47bd4c56b71242b18
+      internalID: -800639189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_4
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b01c3f4a1edbf9846a2af456ec2cfd31
+      internalID: -256122818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_5
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c694151b78cd354479e9fe23a33ed474
+      internalID: 1077280946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_6
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09a1ebd514586014b8c0f38060034ff8
+      internalID: 953279960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_7
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 1078
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a96e2121e6239641acedc04c2943984
+      internalID: 66200827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_8
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fa7ffb165e45784692ea734bab91c96
+      internalID: 637160179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_9
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c40b0ebf30751d247a95fced358fb17d
+      internalID: 383114679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_10
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42962b98f2bc7284681ce1f1580a8e72
+      internalID: -1666929824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_11
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e470bd231d7fa3e41a649ce04523628a
+      internalID: -7470522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_12
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 930eca8e4009f6e4e90323ac16a072f8
+      internalID: -1526446922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_13
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9fbbf873947d0848b189c9ff01b380e
+      internalID: 383876763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_14
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0e6ba6dac7d17140aa93f90788097d2
+      internalID: 2116354939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_15
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 927
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7174cb9fdaa9b9146a671dc0c99f0432
+      internalID: -2080968876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_16
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 803f0e5eb0d94a346a2f4b298f211554
+      internalID: -700297515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_17
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2dfce48f385dda45936b0c01d58c907
+      internalID: -1516319315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_18
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70fd4cabc4687654f90b72e8d7fc4e87
+      internalID: 548287321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_19
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d53a3f02dd15994b971ebb6544afeae
+      internalID: -2101938530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_20
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e366aa6953175d443aa72e49b1043a0c
+      internalID: -2106496289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_21
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 289fa65f67cfb3648bd17e780f5f3d16
+      internalID: -607265148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_22
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fba179069d3f702488b84fdbf0619f29
+      internalID: -328991123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_23
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 776
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 668602cb29755a34d9c24ebff2e04ff4
+      internalID: -416008078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_24
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 636
+        width: 180
+        height: 113
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 7, z: 0, w: 27}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5f7f315d41256564f8c34f6d0c975a1a
+      internalID: -1468754666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_25
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7677f5e9d5413b145b8a6b258f49d04d
+      internalID: -1847363801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_26
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb26d0802907bd7449bffda50e23f513
+      internalID: -1921097083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_27
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f67f2f299c8c99f43b0e209fc253c5e9
+      internalID: -877288527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_28
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01d86ebb75cef3f4e9e7b0d629890117
+      internalID: -425435885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_29
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 010f23c6537b47b46beb6cf282d5af23
+      internalID: 229666563
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_30
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72d97ed8fc5531b46b36b53e589761fe
+      internalID: 1776525295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_31
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 625
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c96f3ec0e4cc524a801e36a517d3c7b
+      internalID: -361524946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_32
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d26b5a6af9daa840af598e8cc0dc6db
+      internalID: 1980855829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_33
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8593ba265e549a24399b1b983d9998ba
+      internalID: -208020175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_34
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de20a4520c72a7148bcfa369f25d2435
+      internalID: 1644170374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_35
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a1b538c47d57c44ca5942da01dd6edb
+      internalID: 1291655987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_36
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30bf8b0479f7de84cb9fdf99e2717b33
+      internalID: 993495154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_37
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53fff431fc5e22c48afe30fc42ea35fc
+      internalID: -805558062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_38
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d44f039789c70844b631c1398fbc4cb
+      internalID: -1168035694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_39
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 474
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0380a1ba987abb47932a84bb729dd02
+      internalID: -1883160197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_40
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cebe19525da41143bf22136ecafdede
+      internalID: 1769004363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_41
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0cd51d9c3b1c00439020c57e20b8ab5
+      internalID: -432010567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_42
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a122757823966054d86ed3e211c3f107
+      internalID: -447932904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_43
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f98cd8852bab5304186cb2ae00fbafc6
+      internalID: -813471556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_44
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8158d121d5cc86f44baffaedef9a4f06
+      internalID: -271532689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_45
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 757200642e60d594d853f7af74a31711
+      internalID: 672745823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_46
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cde5ccb224cb3b24096d3bf1809cd8e7
+      internalID: 1435740486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_47
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 323
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d83167283011bec488f52d0623206a35
+      internalID: 244874000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_48
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bd9b7959e5fda746bbdf6b44c504c1e
+      internalID: -613858732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_49
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32acd5d8f17c8bc47a34f399dd99207c
+      internalID: -179279858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_50
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d81751bab784114088113f5a0280379
+      internalID: -220134541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_51
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a479a96df4bc5c84b98b8c8091e209e2
+      internalID: 2136859539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_52
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bc6d89774a746fb4287a586cc116f5c8
+      internalID: 1567202581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_53
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2da000752b89f8748944881556196928
+      internalID: 178427205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_54
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fce597be32db00446b6e1d6a4738e5d6
+      internalID: 22978666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_55
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 172
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97bb3cd67db9a3e46a866e4379d52b20
+      internalID: -1025047061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_56
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28e8e781a94e6f9428c21cb698a6ef1a
+      internalID: 7064083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_57
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 966e084a383e23e429342c4608c2b373
+      internalID: 272671708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_58
+      rect:
+        serializedVersion: 2
+        x: 327
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd20bac7df22ad84eb64e3d5e98fa26f
+      internalID: -762319382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_59
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0be9918849f23d746bad4882bebc4fb6
+      internalID: -868170031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_60
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d4cbc56d56bcb24a9cb8d091f27896e
+      internalID: 2113176552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_61
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 09144fc04b2e4a64e8243e901e25a322
+      internalID: -1489310797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_62
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1d082f8317636194b87a08143778b136
+      internalID: -181708168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JardinDefinitivoV2_63
+      rect:
+        serializedVersion: 2
+        x: 1082
+        y: 21
+        width: 151
+        height: 151
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43be996310849664884feac9235a2e83
+      internalID: 462040551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      JardinDefinitivoV2_0: 529568531
+      JardinDefinitivoV2_1: 1657196600
+      JardinDefinitivoV2_10: -1666929824
+      JardinDefinitivoV2_11: -7470522
+      JardinDefinitivoV2_12: -1526446922
+      JardinDefinitivoV2_13: 383876763
+      JardinDefinitivoV2_14: 2116354939
+      JardinDefinitivoV2_15: -2080968876
+      JardinDefinitivoV2_16: -700297515
+      JardinDefinitivoV2_17: -1516319315
+      JardinDefinitivoV2_18: 548287321
+      JardinDefinitivoV2_19: -2101938530
+      JardinDefinitivoV2_2: -84288153
+      JardinDefinitivoV2_20: -2106496289
+      JardinDefinitivoV2_21: -607265148
+      JardinDefinitivoV2_22: -328991123
+      JardinDefinitivoV2_23: -416008078
+      JardinDefinitivoV2_24: -1468754666
+      JardinDefinitivoV2_25: -1847363801
+      JardinDefinitivoV2_26: -1921097083
+      JardinDefinitivoV2_27: -877288527
+      JardinDefinitivoV2_28: -425435885
+      JardinDefinitivoV2_29: 229666563
+      JardinDefinitivoV2_3: -800639189
+      JardinDefinitivoV2_30: 1776525295
+      JardinDefinitivoV2_31: -361524946
+      JardinDefinitivoV2_32: 1980855829
+      JardinDefinitivoV2_33: -208020175
+      JardinDefinitivoV2_34: 1644170374
+      JardinDefinitivoV2_35: 1291655987
+      JardinDefinitivoV2_36: 993495154
+      JardinDefinitivoV2_37: -805558062
+      JardinDefinitivoV2_38: -1168035694
+      JardinDefinitivoV2_39: -1883160197
+      JardinDefinitivoV2_4: -256122818
+      JardinDefinitivoV2_40: 1769004363
+      JardinDefinitivoV2_41: -432010567
+      JardinDefinitivoV2_42: -447932904
+      JardinDefinitivoV2_43: -813471556
+      JardinDefinitivoV2_44: -271532689
+      JardinDefinitivoV2_45: 672745823
+      JardinDefinitivoV2_46: 1435740486
+      JardinDefinitivoV2_47: 244874000
+      JardinDefinitivoV2_48: -613858732
+      JardinDefinitivoV2_49: -179279858
+      JardinDefinitivoV2_5: 1077280946
+      JardinDefinitivoV2_50: -220134541
+      JardinDefinitivoV2_51: 2136859539
+      JardinDefinitivoV2_52: 1567202581
+      JardinDefinitivoV2_53: 178427205
+      JardinDefinitivoV2_54: 22978666
+      JardinDefinitivoV2_55: -1025047061
+      JardinDefinitivoV2_56: 7064083
+      JardinDefinitivoV2_57: 272671708
+      JardinDefinitivoV2_58: -762319382
+      JardinDefinitivoV2_59: -868170031
+      JardinDefinitivoV2_6: 953279960
+      JardinDefinitivoV2_60: 2113176552
+      JardinDefinitivoV2_61: -1489310797
+      JardinDefinitivoV2_62: -181708168
+      JardinDefinitivoV2_63: 462040551
+      JardinDefinitivoV2_7: 66200827
+      JardinDefinitivoV2_8: 637160179
+      JardinDefinitivoV2_9: 383114679
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
