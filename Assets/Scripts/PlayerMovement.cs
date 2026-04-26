@@ -47,23 +47,11 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void UpdateAnimatorParameters(Vector2 input)
-    {
-        // Resetear todos a 0
-        animator.SetFloat("up",    0f);
-        animator.SetFloat("down",  0f);
-        animator.SetFloat("lefht", 0f);
-        animator.SetFloat("right", 0f);
-
-        // Activar solo el que corresponde (valor > 0 para disparar la transición)
-        if (input == Vector2.up)
-            animator.SetFloat("up", 1f);
-        else if (input == Vector2.down)
-            animator.SetFloat("down", 1f);
-        else if (input == Vector2.left)
-            animator.SetFloat("lefht", 1f);
-        else if (input == Vector2.right)
-            animator.SetFloat("right", 1f);
-    }
+{
+    animator.SetFloat("moveX", input.x);
+    animator.SetFloat("moveY", input.y);
+    animator.SetFloat("Speed", input.sqrMagnitude);
+}
 
     private Vector2 GetHeldInput()
     {
