@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/UVG_Classroom.unity
     guid: 7dc889b60150407439602b008c34da09
+  - enabled: 1
+    path: Assets/Scenes/jardinDefinitivo.unity
+    guid: cbb5377f157ea82458e8ec48a11fc25a
   m_configObjects: {}
