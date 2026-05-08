@@ -17,16 +17,15 @@ public class UIInventoryPage : MonoBehaviour
 
     List<UIInventoryItem> listOfUIItems = new List<UIInventoryItem>();
 
-    public Sprite image;
-
-    [SerializeField]
-    public Sprite image2;
-    public int quantity;
-
-    public string title, description;
+    
 
     private int currentlyDraggedItemIndex = -1;
 
+    public event Action<int> OnDescriptionRequested,
+                OnItemActionRequested,
+                OnStartDragging;
+
+    public event Action<int, int> OnSwapItems;
 
     [SerializeField]
     private UIInventoryDescription itemDescription;
@@ -54,6 +53,21 @@ public class UIInventoryPage : MonoBehaviour
 }
         }
 
+    public void UpdateData(int itemIndex,
+            Sprite itemImage, int itemQuantity)
+        {
+            if (listOfUIItems.Count > itemIndex)
+            {
+                listOfUIItems[itemIndex].SetData(itemImage, itemQuantity);
+            }
+        }
+
+     private void ResetDraggedItem()
+        {
+            mouseFollower.Toggle(false);
+            currentlyDraggedItemIndex = -1;
+        }
+
       private void HandleShowItemActions(UIInventoryItem inventoryItemUI)
         {
            
@@ -61,7 +75,7 @@ public class UIInventoryPage : MonoBehaviour
 
         private void HandleEndDrag(UIInventoryItem inventoryItemUI)
         {
-           mouseFollower.Toggle(false);
+           ResetDraggedItem();
         }
 
         private void HandleSwap(UIInventoryItem inventoryItemUI)
@@ -69,15 +83,11 @@ public class UIInventoryPage : MonoBehaviour
              int index = listOfUIItems.IndexOf(inventoryItemUI);
             if (index == -1)
             {
-                mouseFollower.Toggle(false);
-                currentlyDraggedItemIndex = -1;
+                
                 return;
             }
 
-            listOfUIItems[currentlyDraggedItemIndex].SetData(index == 0 ? image: image2, quantity);
-            listOfUIItems[index].SetData(currentlyDraggedItemIndex == 0 ? image: image2, quantity);
-            mouseFollower.Toggle(false);
-            currentlyDraggedItemIndex = -1;
+            OnSwapItems?.Invoke(currentlyDraggedItemIndex, index);
            
         }
 
@@ -87,30 +97,60 @@ public class UIInventoryPage : MonoBehaviour
             if (index == -1)
                 return;
             currentlyDraggedItemIndex = index;
-            mouseFollower.Toggle(true);
-            mouseFollower.SetData(index == 0 ? image: image2, quantity);
+            HandleItemSelection(inventoryItemUI);
+            OnStartDragging?.Invoke(index);
+             
         }
+
+        public void CreateDraggedItem(Sprite sprite, int quantity)
+        {
+            mouseFollower.Toggle(true);
+            mouseFollower.SetData(sprite, quantity);
+        }
+
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
         {
 
-            itemDescription.SetDescription(image, title, description);
-            listOfUIItems[0].Select();
+            int index = listOfUIItems.IndexOf(inventoryItemUI);
+            if (index == -1)
+                return;
+            OnDescriptionRequested?.Invoke(index);
 
+        }
+
+        internal void UpdateDescription(int itemIndex, 
+        Sprite itemImage, string name, string description)
+        {
+            itemDescription.SetDescription(itemImage, name, description);
+            DeselectAllItems();
+            listOfUIItems[itemIndex].Select();
         }
 
     public void Show()
         {
             gameObject.SetActive(true);
-            itemDescription.ResetDescription();
-            listOfUIItems[0].SetData(image, quantity);
-            listOfUIItems[1].SetData(image2, quantity);
+            ResetSelection();
           
+        }
+    public void ResetSelection()
+        {
+            itemDescription.ResetDescription();
+            DeselectAllItems();
+        }
+
+    private void DeselectAllItems()
+        {
+            foreach (UIInventoryItem item in listOfUIItems)
+            {
+                item.Deselect();
+            }
         }
 
     public void Hide()
         {
           
             gameObject.SetActive(false);
+            ResetDraggedItem();
         
         }
 }

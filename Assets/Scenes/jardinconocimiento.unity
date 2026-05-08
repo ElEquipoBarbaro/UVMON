@@ -21228,19 +21228,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 26.5012
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -14.79675
       objectReference: {fileID: 0}
     - target: {fileID: 4287493059984785402, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMax.y
@@ -21266,7 +21266,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4167619560800187140, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
 --- !u!1 &1070223570
 GameObject:
@@ -21466,7 +21467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventoryUI: {fileID: 6791999622695395522}
-  inventorysize: 10
+  inventoryData: {fileID: 11400000, guid: 3901d3cf1d819ce44bb0c6eb769d9e80, type: 2}
 --- !u!1 &1134447500
 GameObject:
   m_ObjectHideFlags: 0
@@ -24665,6 +24666,10 @@ PrefabInstance:
       propertyPath: image
       value: 
       objectReference: {fileID: 21300000, guid: d4bd0df0a7e2bd44d90f112ea9064ab1, type: 3}
+    - target: {fileID: 5159072431070150707, guid: 488a338ae48db4241bd218360632d42b, type: 3}
+      propertyPath: image2
+      value: 
+      objectReference: {fileID: 21300000, guid: b3ba54a5e90540f4c8f0d5b8a88daa58, type: 3}
     - target: {fileID: 5159072431070150707, guid: 488a338ae48db4241bd218360632d42b, type: 3}
       propertyPath: itemPrefab
       value: 
