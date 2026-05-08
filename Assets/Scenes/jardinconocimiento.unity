@@ -24662,6 +24662,10 @@ PrefabInstance:
       value: -19.03845
       objectReference: {fileID: 0}
     - target: {fileID: 5159072431070150707, guid: 488a338ae48db4241bd218360632d42b, type: 3}
+      propertyPath: image
+      value: 
+      objectReference: {fileID: 21300000, guid: d4bd0df0a7e2bd44d90f112ea9064ab1, type: 3}
+    - target: {fileID: 5159072431070150707, guid: 488a338ae48db4241bd218360632d42b, type: 3}
       propertyPath: itemPrefab
       value: 
       objectReference: {fileID: 805483527}

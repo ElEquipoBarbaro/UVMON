@@ -18,9 +18,14 @@ public class UIInventoryPage : MonoBehaviour
     List<UIInventoryItem> listOfUIItems = new List<UIInventoryItem>();
 
     public Sprite image;
+
+    [SerializeField]
+    public Sprite image2;
     public int quantity;
 
     public string title, description;
+
+    private int currentlyDraggedItemIndex = -1;
 
 
     [SerializeField]
@@ -61,13 +66,29 @@ public class UIInventoryPage : MonoBehaviour
 
         private void HandleSwap(UIInventoryItem inventoryItemUI)
         {
+             int index = listOfUIItems.IndexOf(inventoryItemUI);
+            if (index == -1)
+            {
+                mouseFollower.Toggle(false);
+                currentlyDraggedItemIndex = -1;
+                return;
+            }
+
+            listOfUIItems[currentlyDraggedItemIndex].SetData(index == 0 ? image: image2, quantity);
+            listOfUIItems[index].SetData(currentlyDraggedItemIndex == 0 ? image: image2, quantity);
+            mouseFollower.Toggle(false);
+            currentlyDraggedItemIndex = -1;
            
         }
 
          private void HandleBeginDrag(UIInventoryItem inventoryItemUI)
         {
+            int index = listOfUIItems.IndexOf(inventoryItemUI);
+            if (index == -1)
+                return;
+            currentlyDraggedItemIndex = index;
             mouseFollower.Toggle(true);
-            mouseFollower.SetData(image, quantity);
+            mouseFollower.SetData(index == 0 ? image: image2, quantity);
         }
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
         {
@@ -82,6 +103,7 @@ public class UIInventoryPage : MonoBehaviour
             gameObject.SetActive(true);
             itemDescription.ResetDescription();
             listOfUIItems[0].SetData(image, quantity);
+            listOfUIItems[1].SetData(image2, quantity);
           
         }
 
