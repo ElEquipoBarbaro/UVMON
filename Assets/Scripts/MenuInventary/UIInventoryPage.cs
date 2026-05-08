@@ -12,6 +12,9 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField]
     private RectTransform contentPanel;
 
+    [SerializeField]
+        private MouseFollower mouseFollower;
+
     List<UIInventoryItem> listOfUIItems = new List<UIInventoryItem>();
 
     public Sprite image;
@@ -26,7 +29,7 @@ public class UIInventoryPage : MonoBehaviour
     private void Awake()
     {
         Hide();
-
+        mouseFollower.Toggle(false);
         itemDescription.ResetDescription();
     }
     public void InitializeInventoryUI(int inventorysize)
@@ -53,7 +56,7 @@ public class UIInventoryPage : MonoBehaviour
 
         private void HandleEndDrag(UIInventoryItem inventoryItemUI)
         {
-           
+           mouseFollower.Toggle(false);
         }
 
         private void HandleSwap(UIInventoryItem inventoryItemUI)
@@ -63,7 +66,8 @@ public class UIInventoryPage : MonoBehaviour
 
          private void HandleBeginDrag(UIInventoryItem inventoryItemUI)
         {
-         
+            mouseFollower.Toggle(true);
+            mouseFollower.SetData(image, quantity);
         }
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
         {
