@@ -32,18 +32,18 @@ public class UIInventoryPage : MonoBehaviour
     public void InitializeInventoryUI(int inventorysize)
         {
             for (int i = 0; i < inventorysize; i++)
-            {
-                UIInventoryItem uiItem =
-                    Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
-                uiItem.transform.SetParent(contentPanel);
-                listOfUIItems.Add(uiItem);
-                 uiItem.OnItemClicked += HandleItemSelection;
-                uiItem.OnItemBeginDrag += HandleBeginDrag;
-                uiItem.OnItemDroppedOn += HandleSwap;
-                uiItem.OnItemEndDrag += HandleEndDrag;
-                uiItem.OnRightMouseBtnClick += HandleShowItemActions;
-                
-            }
+{
+    UIInventoryItem uiItem =
+        Instantiate(itemPrefab, contentPanel);
+    uiItem.transform.localScale = Vector3.one;
+    uiItem.transform.localPosition = Vector3.zero;
+    listOfUIItems.Add(uiItem);
+    uiItem.OnItemClicked += HandleItemSelection;
+    uiItem.OnItemBeginDrag += HandleBeginDrag;
+    uiItem.OnItemDroppedOn += HandleSwap;
+    uiItem.OnItemEndDrag += HandleEndDrag;
+    uiItem.OnRightMouseBtnClick += HandleShowItemActions;
+}
         }
 
       private void HandleShowItemActions(UIInventoryItem inventoryItemUI)
