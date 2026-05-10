@@ -21228,19 +21228,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 26.5012
       objectReference: {fileID: 0}
     - target: {fileID: 3995153281573518647, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -14.79675
       objectReference: {fileID: 0}
     - target: {fileID: 4287493059984785402, guid: 71431e2dc1bf54041975980f2baf9843, type: 3}
       propertyPath: m_AnchorMax.y
@@ -21468,6 +21468,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventoryUI: {fileID: 6791999622695395522}
   inventoryData: {fileID: 11400000, guid: 3901d3cf1d819ce44bb0c6eb769d9e80, type: 2}
+  initialItems:
+  - quantity: 1
+    item: {fileID: 11400000, guid: c38860610aefbf845884b910dd81171d, type: 2}
+  - quantity: 2
+    item: {fileID: 11400000, guid: 97c9c9607220a6643b8bd23607f8e586, type: 2}
+  - quantity: 3
+    item: {fileID: 11400000, guid: 97c9c9607220a6643b8bd23607f8e586, type: 2}
 --- !u!1 &1134447500
 GameObject:
   m_ObjectHideFlags: 0
