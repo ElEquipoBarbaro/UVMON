@@ -88,6 +88,7 @@ public class UIInventoryPage : MonoBehaviour
             }
 
             OnSwapItems?.Invoke(currentlyDraggedItemIndex, index);
+            HandleItemSelection(inventoryItemUI);
            
         }
 
@@ -107,6 +108,15 @@ public class UIInventoryPage : MonoBehaviour
             mouseFollower.Toggle(true);
             mouseFollower.SetData(sprite, quantity);
         }
+        internal void ResetAllItems()
+        {
+            foreach (var item in listOfUIItems)
+            {
+                item.ResetData();
+                item.Deselect();
+            }
+        }
+
 
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
         {

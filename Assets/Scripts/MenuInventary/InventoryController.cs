@@ -24,15 +24,41 @@ public class InventoryController : MonoBehaviour
     [SerializeField]
     private InventorySO inventoryData;
 
-    
+    public List<InventoryItem> initialItems = new List<InventoryItem>();
+
      private void Start()
         {
             PrepareUI();
-            //inventoryData.Initialize();
+            PrepareInventoryData();
+
         }
 
+    private void PrepareInventoryData()
+    {
+        inventoryData.Initialize();
+        inventoryData.OnInventoryUpdated+=UpdateInventoryUI;
+        foreach ( var item in initialItems)
+        {
+            if (item.IsEmpty)
+            {
+                continue;
+                
+            }
+            inventoryData.AddItem(item.item, item.quantity);
+
+        }
+    }
     // para inicializar todo
 
+     private void UpdateInventoryUI(Dictionary<int, InventoryItem> inventoryState)
+        {
+            inventoryUI.ResetAllItems();
+            foreach (var item in inventoryState)
+            {
+                inventoryUI.UpdateData(item.Key, item.Value.item.ItemImage, 
+                    item.Value.quantity);
+            }
+        }
     private void HandleDescriptionRequest(int itemIndex)
     {
         InventoryItem inventoryItem = inventoryData.GetItemAt(itemIndex);
@@ -48,11 +74,18 @@ public class InventoryController : MonoBehaviour
     }
     private void HandleSwapItems(int itemIndex_1, int itemIndex_2)
     {
-            
+            inventoryData.SwapItems(itemIndex_1, itemIndex_2);
     }
 
     private void HandleDragging(int itemIndex)
     {
+        InventoryItem inventoryitem = inventoryData.GetItemAt(itemIndex);
+        if (inventoryitem.IsEmpty)
+        {
+            return;
+        }
+        inventoryUI.CreateDraggedItem(inventoryitem.item.ItemImage, inventoryitem.quantity);
+
         
     }
     private void HandleItemActionRequest(int itemIndex)
