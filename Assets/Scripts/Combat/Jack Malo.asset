@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6578330e10fab27419a4a778f6ce3032, type: 3}
   m_Name: Jack Malo
   m_EditorClassIdentifier: 
+  type: 10
   creatureName: Jack Malo
+  frontSprite: {fileID: -1506292533, guid: 895a08ef8b73901469cf185322740dcd, type: 3}
+  backSprite: {fileID: -1506292533, guid: 895a08ef8b73901469cf185322740dcd, type: 3}
   maxHP: 100
   attack: 100
   defense: 100
@@ -20,3 +23,4 @@ MonoBehaviour:
   moves:
   - {fileID: 11400000, guid: 4b1333483eee58e4ab46e9de8221d802, type: 2}
   - {fileID: 11400000, guid: efe1de857fd09034a9b51e63faebc885, type: 2}
+  xpYield: 20
