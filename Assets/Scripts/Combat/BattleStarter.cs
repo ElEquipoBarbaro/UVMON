@@ -2,19 +2,43 @@ using UnityEngine;
 
 public class BattleStarter : MonoBehaviour
 {
-    [SerializeField] private DialogueTrigger dialogueTrigger;
-    [SerializeField] private CreatureData playerCreature;
-    [SerializeField] private CreatureData enemyCreature;
+    private EnemyTrainer enemyTrainer;
+    private DialogueTrigger dialogueTrigger;
 
-    private void Start()
+    private void Awake()
     {
-        DialogueManager.Instance.OnDialogueEnded += StartBattle;
+        enemyTrainer = GetComponent<EnemyTrainer>();
+        dialogueTrigger = GetComponent<DialogueTrigger>();
+    }
+
+    public void Interact()
+    {
+        if (dialogueTrigger == null)
+        {
+            StartBattle();
+            return;
+        }
+
+        dialogueTrigger.TriggerDialogue();
+
+        DialogueManager.Instance.OnDialogueEnded += HandleDialogueEnded;
+    }
+
+    private void HandleDialogueEnded()
+    {
+        DialogueManager.Instance.OnDialogueEnded -= HandleDialogueEnded;
+        StartBattle();
     }
 
     private void StartBattle()
     {
-        if (!dialogueTrigger.StartsBattle) return;
+        if (CombatManager.Instance == null) return;
+        if (PlayerParty.Instance == null) return;
+        if (enemyTrainer == null) return;
 
-        CombatManager.Instance.StartBattle(playerCreature, enemyCreature);
+        CombatManager.Instance.StartBattle(
+            PlayerParty.Instance,
+            enemyTrainer
+        );
     }
 }

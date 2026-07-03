@@ -1,27 +1,24 @@
 using UnityEngine;
 using System.Collections;
-using TMPro;
 
 public class CombatManager : MonoBehaviour
 {
-    public static CombatManager Instance;
+    public static CombatManager Instance { get; private set; }
 
     private CreatureRuntime playerRuntime;
     private CreatureRuntime enemyRuntime;
 
-    [SerializeField] private GameObject battleUI;
-    [SerializeField] private GameObject overworldUI;
-    [SerializeField] private GameObject playerObject;
-
-    [SerializeField] private TextMeshProUGUI playerHPText;
-    [SerializeField] private TextMeshProUGUI enemyHPText;
-    [SerializeField] private TextMeshProUGUI moveSelectionText;
+    [Header("Battle Systems")]
+    [SerializeField] private BattleUIManager battleUI;
+    [SerializeField] private BattleAnimationPlayer battleAnimationPlayer;
 
     private bool playerHasChosen = false;
     private bool isPlayerTurn = false;
 
     private MoveData selectedMove;
     private int selectedMoveIndex = 0;
+
+    public BattleUIManager BattleUI => battleUI;
 
     private void Awake()
     {
@@ -30,82 +27,79 @@ public class CombatManager : MonoBehaviour
 
     private void Update()
     {
-        if (!isPlayerTurn || playerRuntime == null) return;
+        if (!isPlayerTurn || playerRuntime == null || battleUI == null)
+            return;
+
+        if (playerRuntime.Moves == null || playerRuntime.Moves.Count == 0)
+            return;
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             selectedMoveIndex--;
             ClampMoveIndex();
-            UpdateMoveSelectionUI();
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             selectedMoveIndex++;
             ClampMoveIndex();
-            UpdateMoveSelectionUI();
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
         }
 
-        // Confirm selection
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            SelectMove(playerRuntime.data.moves[selectedMoveIndex]);
+            if (playerRuntime.Moves.Count > 0)
+                SelectMove(playerRuntime.Moves[selectedMoveIndex]);
         }
     }
 
     private void ClampMoveIndex()
     {
+        if (playerRuntime == null || playerRuntime.Moves == null)
+            return;
+
         selectedMoveIndex = Mathf.Clamp(
             selectedMoveIndex,
             0,
-            playerRuntime.data.moves.Count - 1
+            Mathf.Max(0, playerRuntime.Moves.Count - 1)
         );
     }
 
-    private void UpdateMoveSelectionUI()
+    public void StartBattle(PlayerParty playerParty, EnemyTrainer enemyTrainer)
     {
-        if (moveSelectionText == null) return;
+        if (playerParty == null || enemyTrainer == null)
+            return;
 
-        string text = "";
+        playerRuntime = playerParty.GetLeadCreature();
+        enemyRuntime = enemyTrainer.GetLeadCreature();
 
-        for (int i = 0; i < playerRuntime.data.moves.Count; i++)
+        if (playerRuntime == null || enemyRuntime == null)
         {
-            if (i == selectedMoveIndex)
-                text += "> "; // highlight
-            else
-                text += "  ";
-
-            text += playerRuntime.data.moves[i].moveName + "\n";
+            Debug.LogError("Battle could not start because one side has no usable creature.");
+            return;
         }
 
-        moveSelectionText.text = text;
-    }
-
-    private void UpdateUI()
-    {
-        if (playerRuntime == null || enemyRuntime == null) return;
-
-        playerHPText.text = $"HP: {playerRuntime.CurrentHP}/{playerRuntime.data.maxHP}";
-        enemyHPText.text = $"HP: {enemyRuntime.CurrentHP}/{enemyRuntime.data.maxHP}";
-    }
-
-    public void StartBattle(CreatureData playerData, CreatureData enemyData)
-    {
-        Debug.Log("Battle Started");
-
-        playerObject.SetActive(false);
-        overworldUI.SetActive(false);
-        battleUI.SetActive(true);
-
-        playerRuntime = new CreatureRuntime(playerData);
-        enemyRuntime = new CreatureRuntime(enemyData);
-
         selectedMoveIndex = 0;
+        playerHasChosen = false;
+        isPlayerTurn = false;
+        selectedMove = null;
 
-        UpdateUI();
-        UpdateMoveSelectionUI();
+        if (battleUI != null)
+        {
+            battleUI.ShowBattleUI();
+            battleUI.BindCreatures(playerRuntime, enemyRuntime);
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
+            battleUI.ShowBattleMessage($"A wild {enemyRuntime.data.creatureName} appeared!");
+        }
 
         StartCoroutine(BattleLoop());
+    }
+
+    public void RefreshBattleUI()
+    {
+        if (battleUI != null)
+            battleUI.UpdateHP(playerRuntime, enemyRuntime);
     }
 
     public void SelectMove(MoveData move)
@@ -116,34 +110,64 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator PlayerTurn()
     {
-        Debug.Log("Player Turn - waiting for input");
-
         isPlayerTurn = true;
         playerHasChosen = false;
+
+        if (battleUI != null)
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
 
         yield return new WaitUntil(() => playerHasChosen);
 
         isPlayerTurn = false;
 
-        Debug.Log("Player used: " + selectedMove.moveName);
+        if (selectedMove == null || selectedMove.effect == null)
+        {
+            if (battleUI != null)
+                battleUI.ShowBattleMessage("Nothing happened.");
 
-        selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
-        UpdateUI();
+            yield return new WaitForSeconds(0.8f);
+            yield break;
+        }
 
-        yield return new WaitForSeconds(1f);
+        if (battleAnimationPlayer != null && battleUI != null)
+        {
+            yield return battleAnimationPlayer.PlayMoveAnimation(
+                selectedMove.animationData,
+                battleUI.PlayerView,
+                battleUI.EnemyView
+            );
+        }
+
+        yield return selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
+
+        if (battleUI != null)
+            battleUI.UpdateHP(playerRuntime, enemyRuntime);
+
+        yield return new WaitForSeconds(0.35f);
     }
 
     private IEnumerator EnemyTurn()
     {
-        Debug.Log("Enemy Turn");
+        if (enemyRuntime.Moves == null || enemyRuntime.Moves.Count == 0)
+            yield break;
 
-        MoveData move = enemyRuntime.data.moves[0];
-        Debug.Log("Enemy used: " + move.moveName);
+        MoveData move = enemyRuntime.Moves[0];
 
-        move.effect.Execute(enemyRuntime, playerRuntime, move);
-        UpdateUI();
+        if (battleAnimationPlayer != null && battleUI != null)
+        {
+            yield return battleAnimationPlayer.PlayMoveAnimation(
+                move.animationData,
+                battleUI.EnemyView,
+                battleUI.PlayerView
+            );
+        }
 
-        yield return new WaitForSeconds(1f);
+        yield return move.effect.Execute(enemyRuntime, playerRuntime, move);
+
+        if (battleUI != null)
+            battleUI.UpdateHP(playerRuntime, enemyRuntime);
+
+        yield return new WaitForSeconds(0.35f);
     }
 
     private IEnumerator BattleLoop()
@@ -151,20 +175,44 @@ public class CombatManager : MonoBehaviour
         while (playerRuntime.CurrentHP > 0 && enemyRuntime.CurrentHP > 0)
         {
             yield return PlayerTurn();
-            if (enemyRuntime.CurrentHP <= 0) break;
+            if (enemyRuntime.CurrentHP <= 0 || playerRuntime.CurrentHP <= 0)
+                break;
 
             yield return EnemyTurn();
         }
 
-        EndBattle();
+        yield return EndBattleSequence();
     }
 
-    private void EndBattle()
+    private IEnumerator EndBattleSequence()
     {
-        Debug.Log("Battle Ended");
+        if (battleUI != null)
+        {
+            if (enemyRuntime.CurrentHP <= 0 && playerRuntime.CurrentHP > 0)
+            {
+                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} fainted!");
+                yield return new WaitForSeconds(1f);
 
-        battleUI.SetActive(false);
-        overworldUI.SetActive(true);
-        playerObject.SetActive(true);
+                playerRuntime.GainXP(enemyRuntime.data.xpYield);
+
+                battleUI.ShowBattleMessage("Battle Ended!");
+                yield return new WaitForSeconds(0.8f);
+            }
+            else if (playerRuntime.CurrentHP <= 0)
+            {
+                battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} fainted!");
+                yield return new WaitForSeconds(1f);
+
+                battleUI.ShowBattleMessage("You lost the battle!");
+                yield return new WaitForSeconds(1f);
+            }
+            else
+            {
+                battleUI.ShowBattleMessage("Battle Ended!");
+                yield return new WaitForSeconds(0.8f);
+            }
+
+            battleUI.HideBattleUI();
+        }
     }
 }
