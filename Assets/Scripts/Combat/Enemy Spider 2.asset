@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be411db8fec35004aa383c7e24827ec0, type: 3}
-  m_Name: Tacleada
+  m_Script: {fileID: 11500000, guid: fb20209d6ccd99549bd7f24c9fe0b4c1, type: 3}
+  m_Name: Enemy Spider 2
   m_EditorClassIdentifier: 
-  moveName: Tacleada
-  power: 1
-  accuracy: 100
-  moveType: 6
-  effect: {fileID: 11400000, guid: 2c1434586ddb9c648a4067dc8f3e80df, type: 2}
-  animationData: {fileID: 0}
+  trainerName: Enemy Spider
+  team:
+  - creatureData: {fileID: 11400000, guid: 3e1cced8902b2564491e8c99bef20f16, type: 2}
+    level: 5
+    overrideMoves: 0
+    customMoves: []
