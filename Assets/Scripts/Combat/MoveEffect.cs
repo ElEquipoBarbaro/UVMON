@@ -1,9 +1,7 @@
-using System.Collections;
 using UnityEngine;
-
 public abstract class MoveEffect : ScriptableObject
 {
-    public abstract IEnumerator Execute(
+    public abstract void Execute(
         CreatureRuntime user,
         CreatureRuntime target,
         MoveData move

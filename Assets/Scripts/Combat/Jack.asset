@@ -12,15 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6578330e10fab27419a4a778f6ce3032, type: 3}
   m_Name: Jack
   m_EditorClassIdentifier: 
-  type: 0
   creatureName: Jack
-  frontSprite: {fileID: 21300000, guid: 874e1d4cefc74c245a6d64bb3eb718f0, type: 3}
-  backSprite: {fileID: 21300000, guid: 874e1d4cefc74c245a6d64bb3eb718f0, type: 3}
   maxHP: 150
   attack: 150
-  defense: 150
+  defense: 200
   speed: 150
   moves:
   - {fileID: 11400000, guid: d46691c322005a044b1f9ac03880030b, type: 2}
   - {fileID: 11400000, guid: efe1de857fd09034a9b51e63faebc885, type: 2}
-  xpYield: 20

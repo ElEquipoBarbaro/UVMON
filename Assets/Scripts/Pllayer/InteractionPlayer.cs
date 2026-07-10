@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InteractionPlayer : MonoBehaviour
@@ -5,50 +7,41 @@ public class InteractionPlayer : MonoBehaviour
     [SerializeField] private KeyCode interactionKey = KeyCode.E;
 
     private DialogueTrigger currentNPC;
-    private BattleStarter currentBattleStarter;
 
-    private void Update()
+    void Update()
     {
         if (Input.GetKeyDown(interactionKey))
         {
-            if (currentNPC == null)
-                return;
-
-            if (DialogueManager.Instance.IsDialogueActive)
+            if (currentNPC != null)
             {
-                DialogueManager.Instance.RequestAdvance();
-                return;
-            }
-
-            if (currentBattleStarter != null)
-            {
-                currentBattleStarter.Interact();
-            }
-            else
-            {
-                currentNPC.TriggerDialogue();
+                if (DialogueManager.Instance.IsDialogueActive)
+                {
+                    DialogueManager.Instance.RequestAdvance();
+                }
+                else
+                {
+                    currentNPC.TriggerDialogue();
+                }
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("NPC"))
-            return;
-
-        currentNPC = collision.GetComponentInParent<DialogueTrigger>();
-        currentBattleStarter = collision.GetComponentInParent<BattleStarter>();
+        if (collision.CompareTag("NPC"))
+        {
+            currentNPC = collision.GetComponentInParent<DialogueTrigger>();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!collision.CompareTag("NPC"))
-            return;
-
-        if (!DialogueManager.Instance.IsDialogueActive)
+        if (collision.CompareTag("NPC"))
         {
-            currentNPC = null;
-            currentBattleStarter = null;
+            if (!DialogueManager.Instance.IsDialogueActive)
+            {
+                currentNPC = null;
+            }
         }
     }
 }
