@@ -1,0 +1,714 @@
+fileFormatVersion: 2
+guid: ac7a61077eee85d4e8b55e346c2a4618
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 12
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_1
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 524
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c14b4287fa5e15649a83d5aae654ce76
+      internalID: 688407064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_2
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 524
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccc9636b8f112ca40925a210095cba3c
+      internalID: -575346332
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_3
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 524
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 555b90e147d631e4bb41c4615a087e3e
+      internalID: -1415128265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_5
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 464
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 241048aa5f53a0640aa91ddcc31f837d
+      internalID: 807958619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_6
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 464
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b051017522e29c44e8b845bca719b2ab
+      internalID: 1659289953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_7
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 464
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2319cb3c2fabb944894176013051f11
+      internalID: 780108047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_9
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 404
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5f98b1e6c728e840bfb047821ff4649
+      internalID: -328980189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_10
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 404
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c77ecaed30d4ad6438174049acc48997
+      internalID: 32373194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_11
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 404
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89c212b9852bd794fbba39d440c69422
+      internalID: -221996841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_13
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 344
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b0242bf521644b441b1b31007a43f888
+      internalID: 1141167887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_14
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 344
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbb983713a11bf740a22441e64bdc12d
+      internalID: -984368223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_15
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 344
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 296c0eafb3c11b04da6fdcf1712eaf30
+      internalID: 2030432103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_17
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 284
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c025658bea77b374b99941b302803762
+      internalID: -910765187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_18
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 284
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1633cec56f04334fbda86206ae4485e
+      internalID: 753458788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_19
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 284
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d130fa36a99af8468bd49a1c0a92ff9
+      internalID: 1115576652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_21
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 224
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b2a84fe5123d1644a428b428d460e12
+      internalID: -721204482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_22
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 224
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33a9ddcd082075a47b37a7f41a3bbb53
+      internalID: -1337132979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_23
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 224
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f8c51d04a225236408ab39a5140639cf
+      internalID: -978439152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_25
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 164
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c24aa4a348f0efd4dac6659e9e104b87
+      internalID: -1763684840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_26
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 164
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b262169f336afb049920d0db87a1646a
+      internalID: -1838791671
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_27
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 164
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20495982a6d3be24992c8599bd72e737
+      internalID: 248438606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_29
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 104
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e787a0e2ea7cdf24abc14fc9c8f7ad78
+      internalID: -452266010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_30
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 104
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa0a2b852a9506c458a0b1ce1b6740eb
+      internalID: 859913456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_31
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 104
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9522707dadc40f4880316bcce303bc3
+      internalID: 1684699415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_33
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 44
+        width: 88
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42432db86a58a534097f4ce2d4ade4fd
+      internalID: 1065894623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_34
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 44
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c0bc2bfa8b180349aa2a6a786f1393d
+      internalID: 1678540177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Segundo_Edificio_sin_fondo_35
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 44
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff93222645238d746acacc4af4dcbaec
+      internalID: 138020342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Segundo_Edificio_sin_fondo_0: 774373274
+      Segundo_Edificio_sin_fondo_1: 688407064
+      Segundo_Edificio_sin_fondo_10: 32373194
+      Segundo_Edificio_sin_fondo_11: -221996841
+      Segundo_Edificio_sin_fondo_12: 578738163
+      Segundo_Edificio_sin_fondo_13: 1141167887
+      Segundo_Edificio_sin_fondo_14: -984368223
+      Segundo_Edificio_sin_fondo_15: 2030432103
+      Segundo_Edificio_sin_fondo_16: -1041743943
+      Segundo_Edificio_sin_fondo_17: -910765187
+      Segundo_Edificio_sin_fondo_18: 753458788
+      Segundo_Edificio_sin_fondo_19: 1115576652
+      Segundo_Edificio_sin_fondo_2: -575346332
+      Segundo_Edificio_sin_fondo_20: -24853428
+      Segundo_Edificio_sin_fondo_21: -721204482
+      Segundo_Edificio_sin_fondo_22: -1337132979
+      Segundo_Edificio_sin_fondo_23: -978439152
+      Segundo_Edificio_sin_fondo_24: -513986305
+      Segundo_Edificio_sin_fondo_25: -1763684840
+      Segundo_Edificio_sin_fondo_26: -1838791671
+      Segundo_Edificio_sin_fondo_27: 248438606
+      Segundo_Edificio_sin_fondo_28: -2099670737
+      Segundo_Edificio_sin_fondo_29: -452266010
+      Segundo_Edificio_sin_fondo_3: -1415128265
+      Segundo_Edificio_sin_fondo_30: 859913456
+      Segundo_Edificio_sin_fondo_31: 1684699415
+      Segundo_Edificio_sin_fondo_32: 442542599
+      Segundo_Edificio_sin_fondo_33: 1065894623
+      Segundo_Edificio_sin_fondo_34: 1678540177
+      Segundo_Edificio_sin_fondo_35: 138020342
+      Segundo_Edificio_sin_fondo_4: 1892843921
+      Segundo_Edificio_sin_fondo_5: 807958619
+      Segundo_Edificio_sin_fondo_6: 1659289953
+      Segundo_Edificio_sin_fondo_7: 780108047
+      Segundo_Edificio_sin_fondo_8: -334398885
+      Segundo_Edificio_sin_fondo_9: -328980189
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
