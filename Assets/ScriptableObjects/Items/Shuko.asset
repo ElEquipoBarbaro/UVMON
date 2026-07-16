@@ -18,3 +18,5 @@ MonoBehaviour:
   <Description>k__BackingField: "Plato nacional de dudosa\r procedencia, que recupera\r
     +20 de vida."
   <ItemImage>k__BackingField: {fileID: 21300000, guid: e0523f1423eb0134fbc3049bec929b51, type: 3}
+  <Category>k__BackingField: 0
+  <Effect>k__BackingField: {fileID: 11400000, guid: d162a11dd0dca5143874d86e7577dc25, type: 2}

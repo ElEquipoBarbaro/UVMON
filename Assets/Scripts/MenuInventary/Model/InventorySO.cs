@@ -129,6 +129,23 @@ public class InventorySO : ScriptableObject
         InformAboutChange();
     }
 
+    public void RemoveItem(int itemIndex, int amount)
+    {
+        if (itemIndex < 0 || itemIndex >= inventoryItems.Count)
+            return;
+
+        InventoryItem slot = inventoryItems[itemIndex];
+        if (slot.IsEmpty)
+            return;
+
+        int newQuantity = slot.quantity - amount;
+        inventoryItems[itemIndex] = newQuantity > 0
+            ? slot.ChangeQuantity(newQuantity)
+            : InventoryItem.GetEmptyItem();
+
+        InformAboutChange();
+    }
+
     private void InformAboutChange()
     {
         OnInventoryUpdated?.Invoke(GetCurrentInventoryState());

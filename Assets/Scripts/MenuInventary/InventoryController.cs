@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryController : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class InventoryController : MonoBehaviour
             inventoryUI.OnSwapItems += HandleSwapItems;
             inventoryUI.OnStartDragging += HandleDragging;
             inventoryUI.OnItemActionRequested += HandleItemActionRequest;
+
+            itemsTabButton.onClick.AddListener(ShowItemsTab);
+            pokemonTabButton.onClick.AddListener(ShowPokemonTab);
         }
 
 
@@ -23,6 +27,17 @@ public class InventoryController : MonoBehaviour
 
     [SerializeField]
     private InventorySO inventoryData;
+
+    [SerializeField]
+    private PokemonTabController pokemonTab;
+
+    [SerializeField]
+    private Button itemsTabButton;
+
+    [SerializeField]
+    private Button pokemonTabButton;
+
+    private bool isMenuOpen = false;
 
     public List<InventoryItem> initialItems = new List<InventoryItem>();
 
@@ -42,7 +57,7 @@ public class InventoryController : MonoBehaviour
             if (item.IsEmpty)
             {
                 continue;
-                
+
             }
             inventoryData.AddItem(item.item, item.quantity);
 
@@ -55,7 +70,7 @@ public class InventoryController : MonoBehaviour
             inventoryUI.ResetAllItems();
             foreach (var item in inventoryState)
             {
-                inventoryUI.UpdateData(item.Key, item.Value.item.ItemImage, 
+                inventoryUI.UpdateData(item.Key, item.Value.item.ItemImage,
                     item.Value.quantity);
             }
         }
@@ -68,7 +83,7 @@ public class InventoryController : MonoBehaviour
                 return;
             }
             ItemSO item = inventoryItem.item;
-            
+
             inventoryUI.UpdateDescription(itemIndex, item.ItemImage,
                 item.name, item.Description);
     }
@@ -86,31 +101,78 @@ public class InventoryController : MonoBehaviour
         }
         inventoryUI.CreateDraggedItem(inventoryitem.item.ItemImage, inventoryitem.quantity);
 
-        
+
     }
     private void HandleItemActionRequest(int itemIndex)
     {
-        
+        InventoryItem inventoryItem = inventoryData.GetItemAt(itemIndex);
+        if (inventoryItem.IsEmpty || inventoryItem.item.Category != ItemCategory.Healing)
+            return;
+
+        if (inventoryItem.item.Effect == null)
+            return;
+
+        if (PlayerParty.Instance == null || PlayerParty.Instance.Party.Count == 0)
+            return;
+
+        if (PlayerParty.Instance.Party.Count == 1)
+        {
+            UseHealingItem(itemIndex, PlayerParty.Instance.Party[0]);
+            return;
+        }
+
+        ShowPokemonTab();
+        pokemonTab.BeginTargetSelection(target => UseHealingItem(itemIndex, target));
     }
+
+    private void UseHealingItem(int itemIndex, CreatureRuntime target)
+    {
+        InventoryItem inventoryItem = inventoryData.GetItemAt(itemIndex);
+        if (inventoryItem.IsEmpty)
+            return;
+
+        inventoryItem.item.Effect.Apply(target);
+        inventoryData.RemoveItem(itemIndex, 1);
+        pokemonTab.Refresh();
+    }
+
+    private void ShowItemsTab()
+    {
+        pokemonTab.Hide();
+        inventoryUI.Show();
+        UpdateInventoryUI(inventoryData.GetCurrentInventoryState());
+    }
+
+    private void ShowPokemonTab()
+    {
+        inventoryUI.Hide();
+        pokemonTab.Show();
+    }
+
+    private void OpenMenu()
+    {
+        isMenuOpen = true;
+        ShowItemsTab();
+    }
+
+    private void CloseMenu()
+    {
+        isMenuOpen = false;
+        inventoryUI.Hide();
+        pokemonTab.Hide();
+    }
+
      public void Update()
         {
             if (Input.GetKeyDown(KeyCode.I))
             {
-                if (inventoryUI.isActiveAndEnabled == false)
+                if (!isMenuOpen)
                 {
-                    inventoryUI.Show();
-                    foreach (var item in inventoryData.GetCurrentInventoryState())
-                    {
-                        inventoryUI.UpdateData(
-                            item.Key, 
-                            item.Value.item.ItemImage,
-                        item.Value.quantity);
-                    }
-                   
+                    OpenMenu();
                 }
                 else
                 {
-                    inventoryUI.Hide();
+                    CloseMenu();
                 }
 
             }

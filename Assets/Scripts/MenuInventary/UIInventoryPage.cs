@@ -20,6 +20,7 @@ public class UIInventoryPage : MonoBehaviour
     
 
     private int currentlyDraggedItemIndex = -1;
+    private int contextMenuTargetIndex = -1;
 
     public event Action<int> OnDescriptionRequested,
                 OnItemActionRequested,
@@ -30,11 +31,16 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField]
     private UIInventoryDescription itemDescription;
 
+    [SerializeField]
+    private ItemContextMenu itemContextMenu;
+
     private void Awake()
     {
         Hide();
         mouseFollower.Toggle(false);
         itemDescription.ResetDescription();
+        itemContextMenu.Hide();
+        itemContextMenu.OnUseClicked += HandleUseItem;
     }
     public void InitializeInventoryUI(int inventorysize)
         {
@@ -70,7 +76,23 @@ public class UIInventoryPage : MonoBehaviour
 
       private void HandleShowItemActions(UIInventoryItem inventoryItemUI)
         {
-           
+            int index = listOfUIItems.IndexOf(inventoryItemUI);
+            if (index == -1)
+                return;
+
+            contextMenuTargetIndex = index;
+            itemContextMenu.Show(inventoryItemUI.transform.position);
+        }
+
+        private void HandleUseItem()
+        {
+            itemContextMenu.Hide();
+
+            if (contextMenuTargetIndex == -1)
+                return;
+
+            OnItemActionRequested?.Invoke(contextMenuTargetIndex);
+            contextMenuTargetIndex = -1;
         }
 
         private void HandleEndDrag(UIInventoryItem inventoryItemUI)
@@ -120,6 +142,7 @@ public class UIInventoryPage : MonoBehaviour
 
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
         {
+            itemContextMenu.Hide();
 
             int index = listOfUIItems.IndexOf(inventoryItemUI);
             if (index == -1)
@@ -158,9 +181,10 @@ public class UIInventoryPage : MonoBehaviour
 
     public void Hide()
         {
-          
+
             gameObject.SetActive(false);
             ResetDraggedItem();
-        
+            itemContextMenu.Hide();
+
         }
 }
