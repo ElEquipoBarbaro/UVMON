@@ -9,12 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27d116fe040360a479dcf16fada5674e, type: 3}
-  m_Name: Soda
+  m_Script: {fileID: 11500000, guid: e3d31de87b3e4b2419f0e358732aaa55, type: 3}
+  m_Name: HealPeque
   m_EditorClassIdentifier: 
-  itemName: Soda
-  description: Ligeramente agitada.
-  itemImage: {fileID: 0}
-  isStackable: 1
-  maxStackSize: 99
-  effect: {fileID: 11400000, guid: 12c24e4d29aa95142bb85b6924e2f65a, type: 2}
+  healAmount: 20

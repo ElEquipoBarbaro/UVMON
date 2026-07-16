@@ -1,24 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
+[CreateAssetMenu(menuName = "Inventory/Item")]
 public class ItemSO : ScriptableObject
 {
-    [field: SerializeField]
-    public bool IsStackable { get; set; }
+    [Header("Basic Information")]
+    [SerializeField] private string itemName;
+    [SerializeField]
+    [TextArea]
+    private string description;
+    [SerializeField] private Sprite itemImage;
 
-    public int ID => GetInstanceID();
+    [Header("Inventory")]
+    [SerializeField] private bool isStackable = true;
+    [SerializeField] private int maxStackSize = 99;
 
-    [field: SerializeField]
-    public int MaxStackSize { get; set; } = 1;
+    [Header("Effect")]
+    [SerializeField] private ItemEffect effect;
 
-    [field: SerializeField]
-    public string Name { get; set; }
+    public string Name => itemName;
+    public string Description => description;
+    public Sprite ItemImage => itemImage;
 
-    [field: SerializeField, TextArea]
-    public string Description { get; set; }
+    public bool IsStackable => isStackable;
+    public int MaxStackSize => maxStackSize;
 
-    [field: SerializeField]
-    public Sprite ItemImage { get; set; }
+    public ItemEffect Effect => effect;
+
+    public bool Use(CreatureRuntime target)
+    {
+        if (effect == null)
+        {
+            Debug.LogWarning($"{itemName} has no ItemEffect assigned.");
+            return false;
+        }
+
+        return effect.Use(target);
+    }
 }
