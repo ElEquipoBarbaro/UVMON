@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 43ab0fd58c06d8d40ad29ceef9f51876
+guid: ae4c2c70e9dea1c4bb04dc899d09754d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 5
+  spritePixelsToUnits: 11.7
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -70,7 +70,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -93,1156 +93,1156 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_0
+      name: PrimerEdificio3_0
       rect:
         serializedVersion: 2
-        x: 34
-        y: 290
+        x: 16
+        y: 315
+        width: 77
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 889b02d7ace64eb4a93a3feaaeb21bba
+      internalID: 2040899658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_1
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 315
+        width: 64
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe28cbdc3243db546afccc1c2cdedb5c
+      internalID: -472696276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_2
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 315
+        width: 64
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79ac5acfe8acaf1459c8a310c2c22f2b
+      internalID: -762721080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_3
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 315
+        width: 64
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a53dd929b8e2984187268e55e7cccc9
+      internalID: -1035844345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_4
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 278
+        width: 58
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3bfe371e0a23a84595b67167b883eb3
+      internalID: 1252746162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_5
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5787d30ac7c939140a506b322acd2bf5
+      internalID: 1880368343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_6
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de94d5697acc3c8498e81f95913f4c5a
+      internalID: 1727927754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_7
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 704cbfc0d0bc0074bbd8a9acd40136d4
+      internalID: -1917957652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_8
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72e3022780cec834ea89763bc9e97167
+      internalID: 1549118649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_9
+      rect:
+        serializedVersion: 2
+        x: 599
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 614f191396a7f2e4c9ddb9506b90e4c8
+      internalID: -202366691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_10
+      rect:
+        serializedVersion: 2
+        x: 663
+        y: 278
+        width: 64
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea7cadf089d97784f8b80f35c8dd7da9
+      internalID: 778610729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_11
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 251
+        width: 77
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3b0ffe16c020ba41967149297dbe52d
+      internalID: 1494871197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_12
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 251
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 94e3f52af21f19e4dbc2139f4e940f4d
-      internalID: 1348726087
+      spriteID: 96ab65e04cbbb4e4aaf13c15c5286100
+      internalID: 1885338455
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_1
+      name: PrimerEdificio3_13
       rect:
         serializedVersion: 2
-        x: 98
-        y: 290
+        x: 157
+        y: 251
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a50c89f0b68f85747af61d9a54162ccb
-      internalID: -168974625
+      spriteID: 160147f375cbb944f83ec41ab1aad16e
+      internalID: 858915778
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_2
+      name: PrimerEdificio3_14
       rect:
         serializedVersion: 2
-        x: 162
-        y: 290
+        x: 221
+        y: 251
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a4bc5df6935891744ba52dc6a4ce5208
-      internalID: -1130171707
+      spriteID: 6baf1c5d79f643c4fb4c9c825d558d09
+      internalID: 312584567
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_3
+      name: PrimerEdificio3_15
       rect:
         serializedVersion: 2
-        x: 226
-        y: 290
+        x: 285
+        y: 214
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3238f021f68da064197ffd2934780bf9
+      internalID: 859591174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_16
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f69d56e64c3cf9f4cb13fad7a5edf9c0
-      internalID: -612302847
+      spriteID: c15d8a867d6bd954bac977fb69901e4c
+      internalID: 573373650
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_4
+      name: PrimerEdificio3_17
       rect:
         serializedVersion: 2
-        x: 290
-        y: 290
-        width: 36
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 064dceb44d14621468be458e03dbdd6e
-      internalID: -1988726
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_5
-      rect:
-        serializedVersion: 2
-        x: 326
-        y: 290
+        x: 407
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c92bc7410f9948642903e55f1a6a9676
-      internalID: -1685734329
+      spriteID: 697c4d44bf95d0849a9581ce81f7236b
+      internalID: 963078256
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_6
+      name: PrimerEdificio3_18
       rect:
         serializedVersion: 2
-        x: 390
-        y: 290
+        x: 471
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8f49b6fd8d1ab1541bfcabce5bbc43dc
-      internalID: 581226248
+      spriteID: 5032da38c001c7e41b26986014461ced
+      internalID: -789802695
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_7
+      name: PrimerEdificio3_19
       rect:
         serializedVersion: 2
-        x: 454
-        y: 290
+        x: 535
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 16bc79691e57efc4e8ef520a4c86c865
-      internalID: -2140691026
+      spriteID: 59c05edc9dd766b47adfef3e007d8b3b
+      internalID: 2115247555
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_8
+      name: PrimerEdificio3_20
       rect:
         serializedVersion: 2
-        x: 518
-        y: 290
+        x: 599
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ad6d391409a952d43bc420db8212922e
-      internalID: 1643027389
+      spriteID: a1c59a4c39fa6d947936f300d70b9e60
+      internalID: -2014218385
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_9
+      name: PrimerEdificio3_21
       rect:
         serializedVersion: 2
-        x: 582
-        y: 290
+        x: 663
+        y: 214
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cd2ae31f4091d4e4285c9eee9a40a7d0
-      internalID: 417046443
+      spriteID: fad180a078fd31e44bfd87ab23cd4a0a
+      internalID: 277640338
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_10
+      name: PrimerEdificio3_22
       rect:
         serializedVersion: 2
-        x: 646
-        y: 290
+        x: 16
+        y: 187
+        width: 77
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d1bbf88ca1e9e54ab75a62382c3d65c
+      internalID: 1235141142
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_23
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 187
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bfe2449cef102184fb8db4cbb1702e3e
-      internalID: 1438424913
+      spriteID: a1814b10b7efc2f4ea72132cecdfbbb4
+      internalID: 841525425
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_11
+      name: PrimerEdificio3_24
       rect:
         serializedVersion: 2
-        x: 34
-        y: 226
+        x: 157
+        y: 187
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0cb760df9ab53d94d93b74fc2930bda2
-      internalID: 1684959802
+      spriteID: 24eb9e3306583744eae5d1bb12cb3164
+      internalID: -1938660723
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_12
+      name: PrimerEdificio3_25
       rect:
         serializedVersion: 2
-        x: 98
-        y: 226
+        x: 221
+        y: 187
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 79d9a21b16e32ce4e9db412ff46006ae
-      internalID: 755149539
+      spriteID: f31d39af210c5214694497423b83c216
+      internalID: -1103379764
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_13
+      name: PrimerEdificio3_26
       rect:
         serializedVersion: 2
-        x: 162
-        y: 226
+        x: 285
+        y: 150
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 776e50eff4b98ab45aa32021ae0b0151
+      internalID: 2017277815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_27
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7667b4225836d824d8a4da0d3e9cc630
-      internalID: -1571066676
+      spriteID: e743ebaa9084c544aaf4487f283bf4dc
+      internalID: -54974473
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_14
+      name: PrimerEdificio3_28
       rect:
         serializedVersion: 2
-        x: 226
-        y: 226
+        x: 407
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5019e41de87689c408b880b28e47a8ef
-      internalID: -1451470257
+      spriteID: 393330706b02afe4a9be2b27bccd76c6
+      internalID: 1173889824
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_15
+      name: PrimerEdificio3_29
       rect:
         serializedVersion: 2
-        x: 290
-        y: 226
-        width: 36
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a4a373f632cf1ae448a0d8801cc362ed
-      internalID: 768414740
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_16
-      rect:
-        serializedVersion: 2
-        x: 326
-        y: 226
+        x: 471
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5ebe24f437e1d3e4ea3c4e80004d7a36
-      internalID: -66072396
+      spriteID: dbc1e548ece921143b2052fe405303fd
+      internalID: -1372811780
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_17
+      name: PrimerEdificio3_30
       rect:
         serializedVersion: 2
-        x: 390
-        y: 226
+        x: 535
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4a468073482e0ac4eb30b524113a3240
-      internalID: -1271257273
+      spriteID: 2e66021dd3bcdb049a87dc7674029b1d
+      internalID: 1162801485
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_18
+      name: PrimerEdificio3_31
       rect:
         serializedVersion: 2
-        x: 454
-        y: 226
+        x: 599
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8df2ee7042923ec4f9a8457327eec264
-      internalID: -1258545435
+      spriteID: 2322db0f265027b4eb33172bf21e8d6c
+      internalID: -229039663
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_19
+      name: PrimerEdificio3_32
       rect:
         serializedVersion: 2
-        x: 518
-        y: 226
+        x: 663
+        y: 150
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 53a2d5607267d8c4b8a253bbee0f1624
-      internalID: -943458817
+      spriteID: 8a6b3a7d712f1844e8be28c2634cfd21
+      internalID: -927362609
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_20
+      name: PrimerEdificio3_33
       rect:
         serializedVersion: 2
-        x: 582
-        y: 226
+        x: 16
+        y: 123
+        width: 77
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7885358d0b0bb674d8bcd545744997ed
+      internalID: 215376957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_34
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 123
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14cb6448fde7974478a588c2bd3f71e0
-      internalID: 859458514
+      spriteID: b7afdf799c820f540a1532212a7a39c1
+      internalID: 294724452
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_21
+      name: PrimerEdificio3_35
       rect:
         serializedVersion: 2
-        x: 646
-        y: 226
+        x: 157
+        y: 123
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c2f5047544efaed4dbb4a4f3749ab5e1
-      internalID: 80829094
+      spriteID: ca3ddcdc56e63094fb242f883e42ba01
+      internalID: -717835759
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_22
+      name: PrimerEdificio3_36
       rect:
         serializedVersion: 2
-        x: 34
-        y: 162
+        x: 221
+        y: 123
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e6167bfd7252be74792264f998ece51a
-      internalID: -1757946261
+      spriteID: 2d3f899a9d38d1d43bc1a4604884b08a
+      internalID: -1982845424
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_23
+      name: PrimerEdificio3_37
       rect:
         serializedVersion: 2
-        x: 98
-        y: 162
+        x: 285
+        y: 86
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fed70f9075e69a54da5be7c022e2ccd3
+      internalID: -562437225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_38
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 29226aec7065f4644b2c5dbd0c28512e
-      internalID: -994756391
+      spriteID: 8736e769034361e41a5453e89f324bd0
+      internalID: -72496148
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_24
+      name: PrimerEdificio3_39
       rect:
         serializedVersion: 2
-        x: 162
-        y: 162
+        x: 407
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8b60a0265c5c51140be07a18bfcd49cf
-      internalID: -636678578
+      spriteID: 763bd2ae74abe35419bde3d7d12211ac
+      internalID: -1410328796
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_25
+      name: PrimerEdificio3_40
       rect:
         serializedVersion: 2
-        x: 226
-        y: 162
+        x: 471
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c0bb42bcc7d01ff4c855484250c31238
-      internalID: 1949035513
+      spriteID: 77cf51b48ad620840b88d67d7e9a67b7
+      internalID: 731025388
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_26
+      name: PrimerEdificio3_41
       rect:
         serializedVersion: 2
-        x: 290
-        y: 162
-        width: 36
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4932b1878bfc79647b27f31f78299b6b
-      internalID: -1376473736
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_27
-      rect:
-        serializedVersion: 2
-        x: 326
-        y: 162
+        x: 535
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ac304efbaea3ce14b824e04ff79bbc76
-      internalID: 1997533656
+      spriteID: f8cd068848cd36543b1cc4627e151fc4
+      internalID: 224279407
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_28
+      name: PrimerEdificio3_42
       rect:
         serializedVersion: 2
-        x: 390
-        y: 162
+        x: 599
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 73efa9493c2f2f54dae3f70e9a11d675
-      internalID: -80658008
+      spriteID: 7aa1a2d26c51709478e6347c9f0a8452
+      internalID: -254963841
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_29
+      name: PrimerEdificio3_43
       rect:
         serializedVersion: 2
-        x: 454
-        y: 162
+        x: 663
+        y: 86
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 291a4e5a963c8cd459b9708b5eebfc34
-      internalID: 641512047
+      spriteID: 836b66763eda3ac4e961db54ef8c201f
+      internalID: 813560339
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_30
+      name: PrimerEdificio3_44
       rect:
         serializedVersion: 2
-        x: 518
-        y: 162
+        x: 16
+        y: 59
+        width: 77
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25a5c9f2df96f5243bc1b6d3d81340da
+      internalID: -856571275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_45
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 59
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 195607cb4024a72479a80b3e1d626840
-      internalID: -433679813
+      spriteID: ebbac4bfc2125934581c3c57ae4621bc
+      internalID: 1643508913
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_31
+      name: PrimerEdificio3_46
       rect:
         serializedVersion: 2
-        x: 582
-        y: 162
+        x: 157
+        y: 59
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 221ff2dd3209f5a42ab15dfd72dd32ce
-      internalID: 2051206684
+      spriteID: 65dbf3b720261e249a50eb082c715087
+      internalID: 666389763
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_32
+      name: PrimerEdificio3_47
       rect:
         serializedVersion: 2
-        x: 646
-        y: 162
-        width: 64
-        height: 64
-      alignment: 9
-      pivot: {x: 0.6287985, y: 0.12038112}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3d51b381ef6dbdd48a122a51c5be8d94
-      internalID: 1595892645
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_33
-      rect:
-        serializedVersion: 2
-        x: 34
-        y: 98
+        x: 221
+        y: 59
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d63ad6ff1e5f5e345b566961976c012e
-      internalID: 913206432
+      spriteID: c9c3bcc356448554282b3bf4d5527f26
+      internalID: -202003626
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_34
+      name: PrimerEdificio3_48
       rect:
         serializedVersion: 2
-        x: 98
-        y: 98
+        x: 285
+        y: 22
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9f7965772d48354387388aaa5558e79
+      internalID: -1109066847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PrimerEdificio3_49
+      rect:
+        serializedVersion: 2
+        x: 343
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6ad820b1cad195644a3402ce031760b9
-      internalID: -2086037930
+      spriteID: e9a5735f4b24b0b46aba5c52b5bce035
+      internalID: -774964249
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_35
+      name: PrimerEdificio3_50
       rect:
         serializedVersion: 2
-        x: 162
-        y: 98
+        x: 407
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b86926ac29be21740bdd2cdaeb0adf0f
-      internalID: -102845301
+      spriteID: 8e4641ce17e6e7b48849717f5d4bfbb0
+      internalID: 1253285084
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_36
+      name: PrimerEdificio3_51
       rect:
         serializedVersion: 2
-        x: 226
-        y: 98
+        x: 471
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2bc3d39a8fff65b4ba91d0b5554c549d
-      internalID: 688314296
+      spriteID: ab6ef3264e6f08747af2daba46edd136
+      internalID: 1857103105
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_37
+      name: PrimerEdificio3_52
       rect:
         serializedVersion: 2
-        x: 290
-        y: 98
-        width: 36
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 28685ed657c5f4241a46c649fb5d9523
-      internalID: 53916069
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_38
-      rect:
-        serializedVersion: 2
-        x: 326
-        y: 98
+        x: 535
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2acfefa994874894da26788aad56a804
-      internalID: -770786456
+      spriteID: b6e4a727e19953b4b92c465243a4e69f
+      internalID: 1986259418
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_39
+      name: PrimerEdificio3_53
       rect:
         serializedVersion: 2
-        x: 390
-        y: 98
+        x: 599
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f48882d050bf55a44ae5ac9715b83d16
-      internalID: 626715955
+      spriteID: 5da546d2890cb7b44b4a9fa4a156c34b
+      internalID: 766032279
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_40
+      name: PrimerEdificio3_54
       rect:
         serializedVersion: 2
-        x: 454
-        y: 98
+        x: 663
+        y: 22
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 10e96be2b9090ba489dd64cfe38a52d9
-      internalID: -806438928
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_41
-      rect:
-        serializedVersion: 2
-        x: 518
-        y: 98
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 305cde9209476264fb80e5fd34341387
-      internalID: 1711574823
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_42
-      rect:
-        serializedVersion: 2
-        x: 582
-        y: 98
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7dbedfedcb85c59488f707d03103b60e
-      internalID: -520006124
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_43
-      rect:
-        serializedVersion: 2
-        x: 646
-        y: 98
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: daa7006b0f6b8484e8c619d29ccf466d
-      internalID: 443087654
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_44
-      rect:
-        serializedVersion: 2
-        x: 34
-        y: 69
-        width: 64
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 71c9e87b2e3061648bd203898c0d99a2
-      internalID: 247376481
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_45
-      rect:
-        serializedVersion: 2
-        x: 98
-        y: 69
-        width: 64
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 09946d9833ef83c49a373c2008c14788
-      internalID: 1791538134
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_46
-      rect:
-        serializedVersion: 2
-        x: 162
-        y: 69
-        width: 64
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: db96a643fc1c4bf428c7515302802923
-      internalID: 1021625484
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_47
-      rect:
-        serializedVersion: 2
-        x: 226
-        y: 69
-        width: 64
-        height: 29
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 60a88f8b3eb1e9a428594c8300d27109
-      internalID: 34357967
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_48
-      rect:
-        serializedVersion: 2
-        x: 290
-        y: 34
-        width: 36
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4cd842abd2082de4c97d0793a5345993
-      internalID: 110066335
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_49
-      rect:
-        serializedVersion: 2
-        x: 326
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 878eed1312d912a409702f1d351749d6
-      internalID: -677280094
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_50
-      rect:
-        serializedVersion: 2
-        x: 390
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e02e0bbc2198a5549b5398f0f0d2b07e
-      internalID: -116180602
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_51
-      rect:
-        serializedVersion: 2
-        x: 454
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d0dc2b06a3be5f04a84dd6793520c8ea
-      internalID: 1053632778
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_52
-      rect:
-        serializedVersion: 2
-        x: 518
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e34dbfc412a52ae4db08e6786617bd80
-      internalID: -2082947256
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_53
-      rect:
-        serializedVersion: 2
-        x: 582
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3c95851d8af28784ba7a3600902985de
-      internalID: 2074088577
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Primer_Edificio_sin_fondo_54
-      rect:
-        serializedVersion: 2
-        x: 646
-        y: 34
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3fa2e4515176a7d469a0e8faed9fe7ac
-      internalID: -1197883134
+      spriteID: 11afd7e00d9f2d34f9368a021bc2f3cc
+      internalID: -2047756529
       vertices: []
       indices: 
       edges: []
@@ -1258,61 +1258,61 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Primer_Edificio_sin_fondo_0: 1348726087
-      Primer_Edificio_sin_fondo_1: -168974625
-      Primer_Edificio_sin_fondo_10: 1438424913
-      Primer_Edificio_sin_fondo_11: 1684959802
-      Primer_Edificio_sin_fondo_12: 755149539
-      Primer_Edificio_sin_fondo_13: -1571066676
-      Primer_Edificio_sin_fondo_14: -1451470257
-      Primer_Edificio_sin_fondo_15: 768414740
-      Primer_Edificio_sin_fondo_16: -66072396
-      Primer_Edificio_sin_fondo_17: -1271257273
-      Primer_Edificio_sin_fondo_18: -1258545435
-      Primer_Edificio_sin_fondo_19: -943458817
-      Primer_Edificio_sin_fondo_2: -1130171707
-      Primer_Edificio_sin_fondo_20: 859458514
-      Primer_Edificio_sin_fondo_21: 80829094
-      Primer_Edificio_sin_fondo_22: -1757946261
-      Primer_Edificio_sin_fondo_23: -994756391
-      Primer_Edificio_sin_fondo_24: -636678578
-      Primer_Edificio_sin_fondo_25: 1949035513
-      Primer_Edificio_sin_fondo_26: -1376473736
-      Primer_Edificio_sin_fondo_27: 1997533656
-      Primer_Edificio_sin_fondo_28: -80658008
-      Primer_Edificio_sin_fondo_29: 641512047
-      Primer_Edificio_sin_fondo_3: -612302847
-      Primer_Edificio_sin_fondo_30: -433679813
-      Primer_Edificio_sin_fondo_31: 2051206684
-      Primer_Edificio_sin_fondo_32: 1595892645
-      Primer_Edificio_sin_fondo_33: 913206432
-      Primer_Edificio_sin_fondo_34: -2086037930
-      Primer_Edificio_sin_fondo_35: -102845301
-      Primer_Edificio_sin_fondo_36: 688314296
-      Primer_Edificio_sin_fondo_37: 53916069
-      Primer_Edificio_sin_fondo_38: -770786456
-      Primer_Edificio_sin_fondo_39: 626715955
-      Primer_Edificio_sin_fondo_4: -1988726
-      Primer_Edificio_sin_fondo_40: -806438928
-      Primer_Edificio_sin_fondo_41: 1711574823
-      Primer_Edificio_sin_fondo_42: -520006124
-      Primer_Edificio_sin_fondo_43: 443087654
-      Primer_Edificio_sin_fondo_44: 247376481
-      Primer_Edificio_sin_fondo_45: 1791538134
-      Primer_Edificio_sin_fondo_46: 1021625484
-      Primer_Edificio_sin_fondo_47: 34357967
-      Primer_Edificio_sin_fondo_48: 110066335
-      Primer_Edificio_sin_fondo_49: -677280094
-      Primer_Edificio_sin_fondo_5: -1685734329
-      Primer_Edificio_sin_fondo_50: -116180602
-      Primer_Edificio_sin_fondo_51: 1053632778
-      Primer_Edificio_sin_fondo_52: -2082947256
-      Primer_Edificio_sin_fondo_53: 2074088577
-      Primer_Edificio_sin_fondo_54: -1197883134
-      Primer_Edificio_sin_fondo_6: 581226248
-      Primer_Edificio_sin_fondo_7: -2140691026
-      Primer_Edificio_sin_fondo_8: 1643027389
-      Primer_Edificio_sin_fondo_9: 417046443
+      PrimerEdificio3_0: 2040899658
+      PrimerEdificio3_1: -472696276
+      PrimerEdificio3_10: 778610729
+      PrimerEdificio3_11: 1494871197
+      PrimerEdificio3_12: 1885338455
+      PrimerEdificio3_13: 858915778
+      PrimerEdificio3_14: 312584567
+      PrimerEdificio3_15: 859591174
+      PrimerEdificio3_16: 573373650
+      PrimerEdificio3_17: 963078256
+      PrimerEdificio3_18: -789802695
+      PrimerEdificio3_19: 2115247555
+      PrimerEdificio3_2: -762721080
+      PrimerEdificio3_20: -2014218385
+      PrimerEdificio3_21: 277640338
+      PrimerEdificio3_22: 1235141142
+      PrimerEdificio3_23: 841525425
+      PrimerEdificio3_24: -1938660723
+      PrimerEdificio3_25: -1103379764
+      PrimerEdificio3_26: 2017277815
+      PrimerEdificio3_27: -54974473
+      PrimerEdificio3_28: 1173889824
+      PrimerEdificio3_29: -1372811780
+      PrimerEdificio3_3: -1035844345
+      PrimerEdificio3_30: 1162801485
+      PrimerEdificio3_31: -229039663
+      PrimerEdificio3_32: -927362609
+      PrimerEdificio3_33: 215376957
+      PrimerEdificio3_34: 294724452
+      PrimerEdificio3_35: -717835759
+      PrimerEdificio3_36: -1982845424
+      PrimerEdificio3_37: -562437225
+      PrimerEdificio3_38: -72496148
+      PrimerEdificio3_39: -1410328796
+      PrimerEdificio3_4: 1252746162
+      PrimerEdificio3_40: 731025388
+      PrimerEdificio3_41: 224279407
+      PrimerEdificio3_42: -254963841
+      PrimerEdificio3_43: 813560339
+      PrimerEdificio3_44: -856571275
+      PrimerEdificio3_45: 1643508913
+      PrimerEdificio3_46: 666389763
+      PrimerEdificio3_47: -202003626
+      PrimerEdificio3_48: -1109066847
+      PrimerEdificio3_49: -774964249
+      PrimerEdificio3_5: 1880368343
+      PrimerEdificio3_50: 1253285084
+      PrimerEdificio3_51: 1857103105
+      PrimerEdificio3_52: 1986259418
+      PrimerEdificio3_53: 766032279
+      PrimerEdificio3_54: -2047756529
+      PrimerEdificio3_6: 1727927754
+      PrimerEdificio3_7: -1917957652
+      PrimerEdificio3_8: 1549118649
+      PrimerEdificio3_9: -202366691
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
