@@ -23,6 +23,9 @@ public class InventoryController : MonoBehaviour
 
 
     [SerializeField]
+    private GameObject inGameMenu;
+
+    [SerializeField]
     private UIInventoryPage inventoryUI;
 
     [SerializeField]
@@ -152,6 +155,7 @@ public class InventoryController : MonoBehaviour
     private void OpenMenu()
     {
         isMenuOpen = true;
+        inGameMenu.SetActive(true);
         ShowItemsTab();
     }
 
@@ -160,6 +164,7 @@ public class InventoryController : MonoBehaviour
         isMenuOpen = false;
         inventoryUI.Hide();
         pokemonTab.Hide();
+        inGameMenu.SetActive(false);
     }
 
      public void Update()
