@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "repomix-commands@repomix": true,
+    "repomix-mcp@repomix": true,
+    "repomix-explorer@repomix": true
+  }
+}

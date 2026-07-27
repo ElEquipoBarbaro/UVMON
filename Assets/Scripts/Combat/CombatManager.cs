@@ -12,6 +12,10 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private BattleUIManager battleUI;
     [SerializeField] private BattleAnimationPlayer battleAnimationPlayer;
 
+    [Header("QTE")]
+    [SerializeField] private QTEController qteController;
+    [SerializeField] private QTEData qteData;
+
     private bool playerHasChosen = false;
     private bool isPlayerTurn = false;
 
@@ -124,6 +128,24 @@ public class CombatManager : MonoBehaviour
         {
             if (battleUI != null)
                 battleUI.ShowBattleMessage("Nothing happened.");
+
+            yield return new WaitForSeconds(0.8f);
+            yield break;
+        }
+
+        bool attackSucceeds = true;
+
+        if (qteController != null && qteData != null)
+        {
+            bool qteResult = false;
+            yield return qteController.RunQTE(qteData, result => qteResult = result);
+            attackSucceeds = qteResult;
+        }
+
+        if (!attackSucceeds)
+        {
+            if (battleUI != null)
+                battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName}'s attack missed!");
 
             yield return new WaitForSeconds(0.8f);
             yield break;
