@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CombatManager : MonoBehaviour
 {
@@ -135,10 +136,24 @@ public class CombatManager : MonoBehaviour
 
         bool attackSucceeds = true;
 
-        if (qteController != null && qteData != null)
+        if (qteController != null)
         {
-            bool qteResult = false;
-            yield return qteController.RunQTE(qteData, result => qteResult = result);
+            bool qteResult = true;
+
+            if (selectedMove.qteParallel != null && selectedMove.qteParallel.Length > 0)
+            {
+                yield return qteController.RunQTEParallel(selectedMove.qteParallel, result => qteResult = result);
+            }
+            else
+            {
+                IReadOnlyList<QTEData> qteChain = (selectedMove.qteSequence != null && selectedMove.qteSequence.Length > 0)
+                    ? selectedMove.qteSequence
+                    : (qteData != null ? new QTEData[] { qteData } : null);
+
+                if (qteChain != null)
+                    yield return qteController.RunQTEChain(qteChain, result => qteResult = result);
+            }
+
             attackSucceeds = qteResult;
         }
 

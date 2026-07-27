@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15860da738642be4c95bc4770df9f2e9, type: 3}
-  m_Name: AttackQTE_Default
+  m_Name: AttackQTE_ParallelB
   m_EditorClassIdentifier: 
-  innerRadius: 90
-  outerRadius: 220
-  shrinkSpeed: 55
-  position: {x: 0, y: 40}
-  randomizePosition: 0
+  innerRadius: 70
+  outerRadius: 180
+  shrinkSpeed: 65
+  position: {x: 0, y: 0}
+  randomizePosition: 1

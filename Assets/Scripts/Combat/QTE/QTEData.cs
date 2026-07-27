@@ -12,9 +12,12 @@ public class QTEData : ScriptableObject
 
     [Header("Dificultad")]
     [Tooltip("Velocidad (en pixeles por segundo) a la que se reduce el radio del circulo exterior.")]
-    public float shrinkSpeed = 140f;
+    public float shrinkSpeed = 60f;
 
     [Header("Posicion en pantalla")]
-    [Tooltip("Posicion (x, y) del QTE respecto al centro del panel de batalla.")]
+    [Tooltip("Posicion (x, y) del QTE respecto al centro del panel de batalla. Se ignora si 'randomizePosition' esta activo.")]
     public Vector2 position = Vector2.zero;
+
+    [Tooltip("Si esta activo, la posicion se sortea al azar dentro de la pantalla de batalla en vez de usar 'position'.")]
+    public bool randomizePosition = false;
 }

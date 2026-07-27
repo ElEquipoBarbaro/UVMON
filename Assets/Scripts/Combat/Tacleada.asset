@@ -18,3 +18,7 @@ MonoBehaviour:
   moveType: 6
   effect: {fileID: 11400000, guid: 2c1434586ddb9c648a4067dc8f3e80df, type: 2}
   animationData: {fileID: 0}
+  qteParallel:
+  - {fileID: 11400000, guid: 5079b5ebafe1e3343bfeeca161846dd0, type: 2}
+  - {fileID: 11400000, guid: d59d55205123db24b98820c6bb158c26, type: 2}
+  qteSequence: []
