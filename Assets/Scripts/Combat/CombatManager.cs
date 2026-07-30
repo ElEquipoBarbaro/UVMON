@@ -34,47 +34,46 @@ public class CombatManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
 
-    private void Update()
-    {
-        if (!isPlayerTurn || playerRuntime == null || battleUI == null)
-            return;
-
-        if (playerRuntime.Moves == null || playerRuntime.Moves.Count == 0)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (battleUI != null)
         {
-            selectedMoveIndex--;
-            ClampMoveIndex();
-            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
-        }
-
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            selectedMoveIndex++;
-            ClampMoveIndex();
-            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            if (playerRuntime.Moves.Count > 0)
-                SelectMove(playerRuntime.Moves[selectedMoveIndex]);
+            battleUI.OnMoveHovered += HandleMoveHovered;
+            battleUI.OnMoveClicked += HandleMoveClicked;
         }
     }
 
-    private void ClampMoveIndex()
+    private void OnDestroy()
     {
-        if (playerRuntime == null || playerRuntime.Moves == null)
+        if (battleUI != null)
+        {
+            battleUI.OnMoveHovered -= HandleMoveHovered;
+            battleUI.OnMoveClicked -= HandleMoveClicked;
+        }
+    }
+
+    private void HandleMoveHovered(int index)
+    {
+        if (!IsValidMoveIndex(index))
             return;
 
-        selectedMoveIndex = Mathf.Clamp(
-            selectedMoveIndex,
-            0,
-            Mathf.Max(0, playerRuntime.Moves.Count - 1)
-        );
+        selectedMoveIndex = index;
+        battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
+    }
+
+    private void HandleMoveClicked(int index)
+    {
+        if (!IsValidMoveIndex(index))
+            return;
+
+        SelectMove(playerRuntime.Moves[index]);
+    }
+
+    private bool IsValidMoveIndex(int index)
+    {
+        if (!isPlayerTurn || playerRuntime == null || playerRuntime.Moves == null)
+            return false;
+
+        return index >= 0 && index < playerRuntime.Moves.Count;
     }
 
     public void StartBattle(PlayerParty playerParty, EnemyTrainer enemyTrainer)

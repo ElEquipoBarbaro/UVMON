@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -12,8 +13,19 @@ public class BattleUIManager : MonoBehaviour
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private TextMeshProUGUI enemyHPText;
-    [SerializeField] private TextMeshProUGUI moveSelectionText;
     [SerializeField] private TextMeshProUGUI battleMessageText;
+
+    [Header("Move Selection")]
+    [SerializeField] private Transform moveOptionsContainer;
+    [SerializeField] private MoveOptionUI moveOptionPrefab;
+
+    private readonly List<MoveOptionUI> moveOptionSlots = new List<MoveOptionUI>();
+
+    /// <summary>El jugador paso el cursor sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
+    public event Action<int> OnMoveHovered;
+
+    /// <summary>El jugador hizo clic sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
+    public event Action<int> OnMoveClicked;
 
     [Header("Creature Views")]
     [SerializeField] private CreatureBattleView playerCreatureView;
@@ -34,6 +46,10 @@ public class BattleUIManager : MonoBehaviour
         if (battleUI != null) battleUI.SetActive(false);
         if (overworldUI != null) overworldUI.SetActive(true);
         if (playerObject != null) playerObject.SetActive(true);
+
+        // Por si el jugador dejaba el mouse sobre una opcion de ataque justo cuando
+        // termino la batalla (el slot se destruye/desactiva sin disparar OnPointerExit).
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
 
     public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
@@ -64,24 +80,53 @@ public class BattleUIManager : MonoBehaviour
 
     public void RenderMoveSelection(IReadOnlyList<MoveData> moves, int selectedMoveIndex)
     {
-        if (moveSelectionText == null)
+        if (moveOptionsContainer == null || moveOptionPrefab == null)
             return;
 
-        if (moves == null || moves.Count == 0)
+        int moveCount = moves != null ? moves.Count : 0;
+
+        if (moveOptionSlots.Count != moveCount)
+            RebuildMoveOptions(moves);
+
+        for (int i = 0; i < moveOptionSlots.Count; i++)
+            moveOptionSlots[i].SetHighlighted(i == selectedMoveIndex);
+    }
+
+    private void RebuildMoveOptions(IReadOnlyList<MoveData> moves)
+    {
+        foreach (MoveOptionUI slot in moveOptionSlots)
         {
-            moveSelectionText.text = string.Empty;
-            return;
+            slot.OnHoverEnter -= HandleMoveOptionHoverEnter;
+            slot.OnClicked -= HandleMoveOptionClicked;
+            Destroy(slot.gameObject);
         }
 
-        string text = "";
+        moveOptionSlots.Clear();
+
+        if (moves == null)
+            return;
 
         for (int i = 0; i < moves.Count; i++)
         {
-            text += i == selectedMoveIndex ? "> " : "  ";
-            text += moves[i].moveName + "\n";
+            MoveOptionUI slot = Instantiate(moveOptionPrefab, moveOptionsContainer);
+            slot.gameObject.SetActive(true);
+            slot.SetIndex(i);
+            slot.SetText(moves[i].moveName);
+            slot.SetHighlighted(false);
+            slot.OnHoverEnter += HandleMoveOptionHoverEnter;
+            slot.OnClicked += HandleMoveOptionClicked;
+            moveOptionSlots.Add(slot);
         }
+    }
 
-        moveSelectionText.text = text;
+    private void HandleMoveOptionHoverEnter(MoveOptionUI slot)
+    {
+        OnMoveHovered?.Invoke(slot.Index);
+    }
+
+    private void HandleMoveOptionClicked(MoveOptionUI slot)
+    {
+        OnMoveClicked?.Invoke(slot.Index);
     }
 
     public void ShowBattleMessage(string message)
