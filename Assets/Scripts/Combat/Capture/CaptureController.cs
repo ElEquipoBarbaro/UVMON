@@ -47,8 +47,10 @@ public class CaptureController : MonoBehaviour
 
     /// <summary>
     /// Corre el desafio de captura completo: valida el inventario, mueve/reduce el
-    /// circulo indicador, deja caer el frasco al hacer clic y valida el impacto por
-    /// geometria. No debe llamarse mientras ya hay un intento en curso.
+    /// circulo indicador dentro del area circular delimitada, deja caer el frasco
+    /// (que se mueve como un riel sobre esa misma circunferencia) al hacer clic, y
+    /// valida el impacto por geometria. No debe llamarse mientras ya hay un intento
+    /// en curso.
     /// </summary>
     public IEnumerator RunCapture(CreatureData targetCreature, InventorySO inventory, CaptureData data, Action<CaptureResult> onComplete)
     {
@@ -97,15 +99,16 @@ public class CaptureController : MonoBehaviour
         velocidadReduccion = Mathf.Lerp(data.velocidadReduccionMaxima, data.velocidadReduccionMinima, pCaptura);
         radioActual = radioInicial;
 
-        Rect bounds = captureAreaRect.rect;
+        Rect rect = captureAreaRect.rect;
+        float areaRadius = Mathf.Min(rect.width, rect.height) * 0.5f;
 
-        if (!TryGetValidDestinoBounds(bounds, radioActual, data.margenArea, out Rect destinoBounds))
+        if (!TryGetMaxDestinoRadius(areaRadius, radioActual, data.margenArea, out float maxDestinoRadius))
         {
             // Area demasiado chica para el radio inicial: recortamos el radio al maximo que entra.
-            float radioMaximoPorArea = Mathf.Min(bounds.width, bounds.height) / 2f - data.margenArea;
+            float radioMaximoPorArea = areaRadius - data.margenArea;
 
             if (radioMaximoPorArea < data.radioMinimoPermitido ||
-                !TryGetValidDestinoBounds(bounds, radioMaximoPorArea, data.margenArea, out destinoBounds))
+                !TryGetMaxDestinoRadius(areaRadius, radioMaximoPorArea, data.margenArea, out maxDestinoRadius))
             {
                 state = CaptureState.Failure;
                 onComplete?.Invoke(CaptureResult.Fail(CaptureFailReason.InvalidConfiguration));
@@ -116,7 +119,7 @@ public class CaptureController : MonoBehaviour
         }
 
         posicionIndicador = Vector2.zero;
-        posicionDestino = GenerateDestino(bounds, radioActual, data, posicionIndicador);
+        posicionDestino = GenerateDestino(areaRadius, radioActual, data, posicionIndicador);
 
         if (overlayRoot != null)
             overlayRoot.SetActive(true);
@@ -126,11 +129,7 @@ public class CaptureController : MonoBehaviour
 
         ApplyIndicatorVisual(idleColor);
 
-        float jarHalfWidth = jarRect.rect.width * 0.5f;
-        float jarHeight = jarRect.rect.height;
-        float jarStartY = bounds.yMax - data.margenArea - jarHeight;
-
-        jarRect.anchoredPosition = new Vector2(0f, jarStartY);
+        jarRect.anchoredPosition = new Vector2(areaRadius, 0f);
 
         state = CaptureState.Active;
 
@@ -144,8 +143,8 @@ public class CaptureController : MonoBehaviour
             float deltaTime = Time.deltaTime;
             tiempoTranscurrido += deltaTime;
 
-            UpdateIndicator(bounds, data, deltaTime);
-            UpdateJarFollow(bounds, jarHalfWidth, jarStartY);
+            UpdateIndicator(areaRadius, data, deltaTime);
+            UpdateJarRail(areaRadius);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -187,9 +186,10 @@ public class CaptureController : MonoBehaviour
         jarConsumed = true;
         state = CaptureState.Dropping;
 
-        float lockedX = Mathf.Clamp(jarRect.anchoredPosition.x, bounds.xMin + jarHalfWidth, bounds.xMax - jarHalfWidth);
-        Vector2 posicionInicioCaida = new Vector2(lockedX, jarStartY);
-        Vector2 posicionFinCaida = new Vector2(lockedX, bounds.yMin);
+        // El frasco viaja desde su punto fijo en el riel (borde de la circunferencia)
+        // hacia el centro del area; no puede corregirse durante el trayecto.
+        Vector2 posicionInicioCaida = jarRect.anchoredPosition;
+        Vector2 posicionFinCaida = Vector2.zero;
 
         float caidaTranscurrida = 0f;
         Vector2 posicionImpactoFrasco = posicionFinCaida;
@@ -201,14 +201,14 @@ public class CaptureController : MonoBehaviour
             float deltaTime = Time.deltaTime;
             caidaTranscurrida += deltaTime;
 
-            UpdateIndicator(bounds, data, deltaTime);
+            UpdateIndicator(areaRadius, data, deltaTime);
 
             float u = Mathf.Clamp01(caidaTranscurrida / data.duracionCaidaFrasco);
             Vector2 posicionFrasco = Vector2.Lerp(posicionInicioCaida, posicionFinCaida, u);
             jarRect.anchoredPosition = posicionFrasco;
 
             // El impacto se resuelve apenas el frasco, en su trayecto de caida,
-            // entra en contacto con el circulo (no solo si llega hasta el piso).
+            // entra en contacto con el circulo (no solo si llega al centro).
             float distanciaActual = Vector2.Distance(posicionFrasco, posicionIndicador);
 
             if (distanciaActual <= radioActual + data.toleranciaImpacto)
@@ -248,14 +248,14 @@ public class CaptureController : MonoBehaviour
         onComplete?.Invoke(finalResult);
     }
 
-    private void UpdateIndicator(Rect bounds, CaptureData data, float deltaTime)
+    private void UpdateIndicator(float areaRadius, CaptureData data, float deltaTime)
     {
         radioActual = Mathf.Max(data.radioMinimoPermitido, radioActual - velocidadReduccion * deltaTime);
 
         posicionIndicador = Vector2.MoveTowards(posicionIndicador, posicionDestino, data.velocidadMovimientoIndicador * deltaTime);
 
         if (Vector2.Distance(posicionIndicador, posicionDestino) <= data.epsilonDestino)
-            posicionDestino = GenerateDestino(bounds, radioActual, data, posicionIndicador);
+            posicionDestino = GenerateDestino(areaRadius, radioActual, data, posicionIndicador);
 
         ApplyIndicatorVisual(idleColor);
     }
@@ -272,7 +272,8 @@ public class CaptureController : MonoBehaviour
             indicatorImage.color = color;
     }
 
-    private void UpdateJarFollow(Rect bounds, float jarHalfWidth, float jarStartY)
+    /// <summary>Mueve el frasco como si estuviera sobre un riel: fijo a la circunferencia del area, siguiendo el angulo del cursor.</summary>
+    private void UpdateJarRail(float areaRadius)
     {
         if (jarRect == null || jarRect.parent == null)
             return;
@@ -283,8 +284,8 @@ public class CaptureController : MonoBehaviour
             !RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, Input.mousePosition, null, out Vector2 localPoint))
             return;
 
-        float clampedX = Mathf.Clamp(localPoint.x, bounds.xMin + jarHalfWidth, bounds.xMax - jarHalfWidth);
-        jarRect.anchoredPosition = new Vector2(clampedX, jarStartY);
+        float angle = Mathf.Atan2(localPoint.y, localPoint.x);
+        jarRect.anchoredPosition = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * areaRadius;
     }
 
     private IEnumerator ShowResult(bool success)
@@ -305,38 +306,26 @@ public class CaptureController : MonoBehaviour
         state = CaptureState.Inactive;
     }
 
-    /// <summary>Rango valido para el centro del indicador dado el radio y el margen del area.</summary>
-    private static bool TryGetValidDestinoBounds(Rect bounds, float radio, float margenArea, out Rect destinoBounds)
+    /// <summary>Radio maximo (desde el centro) en el que puede caer el destino del indicador, dado el radio actual y el margen del area.</summary>
+    private static bool TryGetMaxDestinoRadius(float areaRadius, float radio, float margenArea, out float maxDestinoRadius)
     {
-        float xMin = bounds.xMin + radio + margenArea;
-        float xMax = bounds.xMax - radio - margenArea;
-        float yMin = bounds.yMin + radio + margenArea;
-        float yMax = bounds.yMax - radio - margenArea;
-
-        destinoBounds = Rect.MinMaxRect(xMin, yMin, xMax, yMax);
-
-        return xMin <= xMax && yMin <= yMax;
+        maxDestinoRadius = areaRadius - radio - margenArea;
+        return maxDestinoRadius >= 0f;
     }
 
-    private static Vector2 GenerateDestino(Rect bounds, float radio, CaptureData data, Vector2 desdePosicion)
+    private static Vector2 GenerateDestino(float areaRadius, float radio, CaptureData data, Vector2 desdePosicion)
     {
-        if (!TryGetValidDestinoBounds(bounds, radio, data.margenArea, out Rect destinoBounds))
+        if (!TryGetMaxDestinoRadius(areaRadius, radio, data.margenArea, out float maxDestinoRadius))
             return Vector2.zero;
 
         for (int attempt = 0; attempt < data.maxIntentosDestino; attempt++)
         {
-            Vector2 candidate = new Vector2(
-                UnityEngine.Random.Range(destinoBounds.xMin, destinoBounds.xMax),
-                UnityEngine.Random.Range(destinoBounds.yMin, destinoBounds.yMax)
-            );
+            Vector2 candidate = UnityEngine.Random.insideUnitCircle * maxDestinoRadius;
 
             if (Vector2.Distance(candidate, desdePosicion) >= data.distanciaMinimaEntreDestinos)
                 return candidate;
         }
 
-        return new Vector2(
-            UnityEngine.Random.Range(destinoBounds.xMin, destinoBounds.xMax),
-            UnityEngine.Random.Range(destinoBounds.yMin, destinoBounds.yMax)
-        );
+        return UnityEngine.Random.insideUnitCircle * maxDestinoRadius;
     }
 }

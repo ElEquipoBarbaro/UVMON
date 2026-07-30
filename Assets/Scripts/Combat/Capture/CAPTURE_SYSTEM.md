@@ -53,32 +53,53 @@ Preparing          -> calcula radioInicial/velocidadReduccion a partir de pCaptu
                        si el área es demasiado chica para el radio, lo recorta;
                        si ni así entra -> Failure(InvalidConfiguration)
 Active             -> el indicador se mueve hacia destinos aleatorios (MoveTowards)
-                       dentro del área y se encoge cada frame; el frasco sigue la
-                       posición X del cursor (clamp al área), Y fija arriba.
+                       dentro del área circular (en las dos dimensiones, no solo
+                       izquierda/derecha) y se encoge cada frame; el frasco se mueve
+                       como si estuviera sobre un riel fijo a la circunferencia del
+                       área, siguiendo el ángulo del cursor respecto al centro.
                        - clic izquierdo -> intenta consumir el frasco -> Dropping
                        - radio <= radioMinimoPermitido sin clic -> Failure(IndicatorTooSmall)
                        - tiempoTranscurrido >= tiempoMaximoCaptura -> Failure(Timeout)
-Dropping           -> se bloquea la X del frasco; cae en línea recta hacia el borde
-                       inferior del área en 'duracionCaidaFrasco' segundos. El círculo
-                       indicador sigue moviéndose y encogiéndose durante la caída
-                       (regla elegida y aplicada de forma consistente). Cada frame de
-                       la caída se compara Distance(posicionFrasco, posicionIndicador)
-                       contra radioActual + toleranciaImpacto: el impacto se resuelve
-                       apenas el frasco toca el círculo en cualquier punto del
-                       trayecto, no recién al llegar al piso (ver §7).
-Resolving          -> si no hubo contacto durante la caída, se hace la misma
-                       comprobación una última vez contra la posición final (el piso).
-                       Sin aleatoriedad adicional ni segunda comprobación más allá de
-                       esta.
+Dropping           -> se bloquea el ángulo del frasco (su punto en el riel al momento
+                       del clic); viaja en línea recta desde ese punto hacia el centro
+                       del área en 'duracionCaidaFrasco' segundos. El círculo indicador
+                       sigue moviéndose y encogiéndose durante el trayecto (regla
+                       elegida y aplicada de forma consistente). Cada frame se compara
+                       Distance(posicionFrasco, posicionIndicador) contra radioActual +
+                       toleranciaImpacto: el impacto se resuelve apenas el frasco toca
+                       el círculo en cualquier punto del trayecto, no recién al llegar
+                       al centro (ver §7).
+Resolving          -> si no hubo contacto durante el trayecto, se hace la misma
+                       comprobación una última vez contra la posición final (el
+                       centro del área). Sin aleatoriedad adicional ni segunda
+                       comprobación más allá de esta.
 Success / Failure  -> muestra "¡CAPTURADO!" / "¡ESCAPO!" ~0.9s y cierra el overlay.
 ```
 
 El punto de impacto del frasco es el `anchoredPosition` de su `RectTransform`, cuyo
-`pivot` está fijado en `(0.5, 0)` (centro inferior) — así coincide con la
-"centro inferior del frasco" que pide la especificación sin necesitar un hijo
-`ImpactPoint` aparte. Indicador y frasco son ambos hijos directos de `CaptureArea`,
-así que sus `anchoredPosition` están en el mismo espacio de coordenadas y son
-comparables directamente.
+`pivot` está en `(0.5, 0.5)` (centro) — al moverse radialmente sobre el área en vez de
+caer verticalmente, no hay un "borde inferior del objeto" que tenga sentido físico;
+se usa el centro del frasco. Indicador, frasco y el anillo delimitador (`AreaBoundary`)
+son todos hijos directos de `CaptureArea`, así que sus `anchoredPosition` están en el
+mismo espacio de coordenadas (con origen en el centro del área) y son comparables
+directamente.
+
+### Geometría del área circular
+
+`CaptureArea` es un `RectTransform` cuadrado (300x300); `areaRadius` se calcula como
+`Mathf.Min(rect.width, rect.height) / 2f`. Tanto los destinos aleatorios del indicador
+como el riel del frasco usan ese mismo radio:
+
+- **Destinos del indicador** (`GenerateDestino`): se sortean con
+  `Random.insideUnitCircle * maxDestinoRadius`, donde
+  `maxDestinoRadius = areaRadius - radioActual - margenArea` — así el círculo nunca se
+  sale del área delimitada, en cualquier dirección (arriba, abajo, diagonal, etc), no
+  solo izquierda/derecha.
+- **Riel del frasco** (`UpdateJarRail`): se calcula el ángulo del cursor respecto al
+  centro de `CaptureArea` (`Atan2(localPoint.y, localPoint.x)`) y se posiciona el
+  frasco a `areaRadius` de distancia en esa dirección — igual que una cuenta
+  deslizándose sobre un riel circular. Al hacer clic se congela ese ángulo/posición y
+  el frasco viaja en línea recta hacia el centro (`Vector2.zero`).
 
 ## 5. Integración con `CombatManager`
 
@@ -103,9 +124,12 @@ método que ya usaba `PlayerParty` para agregar criaturas.
 BattleUI (Canvas)
 └─ Capture                 (RectTransform stretch full screen, CaptureController)
    └─ Overlay               (Image negro semitransparente, alpha 0.75; oculto hasta RunCapture)
-      ├─ CaptureArea         (RectTransform 700x260, define los límites del área de captura)
-      │  ├─ Indicator        (Image, sprite reutilizado de Assets/Sprites/QTE/ring.png)
-      │  └─ Jar              (Image, sprite Assets/Items/frasco.png, pivot (0.5, 0))
+      ├─ CaptureArea         (RectTransform 300x300, define el área circular de captura)
+      │  ├─ AreaBoundary     (Image blanca, sprite ring.png, 300x300 — la circunferencia
+      │  │                    visible del área; sibling index 0 para quedar detrás)
+      │  ├─ Indicator        (Image, mismo sprite ring.png, se mueve/encoge dentro del área)
+      │  └─ Jar              (Image, sprite Assets/Items/frasco.png, pivot (0.5, 0.5),
+      │                        se desplaza sobre la circunferencia como un riel)
       └─ CaptureResultText   (TMP, "¡CAPTURADO!"/"¡ESCAPO!")
 ```
 
@@ -131,10 +155,12 @@ mientras el frasco está en movimiento en vez de una sola vez al final.
 
 ## 8. Nota sobre la posición inicial del frasco
 
-`jarStartY` se calcula siempre desde los límites del área (`bounds.yMax - margenArea -
-jarHeight`), nunca leyendo la posición actual del `RectTransform` del frasco. Si se
-leyera la posición actual, una segunda captura en la misma sesión heredaría la
-posición final de la caída anterior (abajo del área) en vez de reaparecer arriba.
+La posición del frasco en el riel se recalcula desde cero cada vez que arranca un
+intento (`jarRect.anchoredPosition = new Vector2(areaRadius, 0f)` en `Preparing`, y
+`UpdateJarRail` la sobrescribe todos los frames en `Active` según el ángulo del
+cursor). Nunca se lee la posición dejada por un intento anterior — si se hiciera, una
+segunda captura en la misma sesión heredaría la posición final del centro del área
+(donde terminó la caída anterior) en vez de reaparecer sobre el riel.
 
 ## 9. Bug encontrado y corregido: escala 0 en objetos creados por MCP
 
