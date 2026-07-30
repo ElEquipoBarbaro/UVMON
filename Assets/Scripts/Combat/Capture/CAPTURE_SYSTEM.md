@@ -86,7 +86,7 @@ directamente.
 
 ### Geometría del área circular
 
-`CaptureArea` es un `RectTransform` cuadrado (300x300); `areaRadius` se calcula como
+`CaptureArea` es un `RectTransform` cuadrado (640x640); `areaRadius` se calcula como
 `Mathf.Min(rect.width, rect.height) / 2f`. Tanto los destinos aleatorios del indicador
 como el riel del frasco usan ese mismo radio:
 
@@ -118,14 +118,24 @@ registra al UVGmon en el equipo del jugador con
 `PlayerParty.Instance.AddCreature(enemyRuntime.data, enemyRuntime.Level)` — el mismo
 método que ya usaba `PlayerParty` para agregar criaturas.
 
+### El NPC desaparece del mapa al ganar la batalla
+
+`CombatManager` guarda el `EnemyTrainer` recibido en `StartBattle` como
+`currentEnemyTrainer`. Si el jugador gana (sin importar si además capturó al
+UVGmon o no), al final de `EndBattleSequence()` se hace
+`Destroy(currentEnemyTrainer.gameObject)` — el `NPC` completo (con su
+`BattleStarter`, `DialogueTrigger`, sprite, collider, etc) se elimina de la escena
+del mundo, así no se lo puede volver a enfrentar. Esto es independiente del sistema
+de captura: pasa en cualquier batalla ganada, sea el enemigo capturable o no.
+
 ## 6. Jerarquía en la escena
 
 ```
 BattleUI (Canvas)
 └─ Capture                 (RectTransform stretch full screen, CaptureController)
    └─ Overlay               (Image negro semitransparente, alpha 0.75; oculto hasta RunCapture)
-      ├─ CaptureArea         (RectTransform 300x300, define el área circular de captura)
-      │  ├─ AreaBoundary     (Image blanca, sprite ring.png, 300x300 — la circunferencia
+      ├─ CaptureArea         (RectTransform 640x640, define el área circular de captura)
+      │  ├─ AreaBoundary     (Image blanca, sprite ring.png, 640x640 — la circunferencia
       │  │                    visible del área; sibling index 0 para quedar detrás)
       │  ├─ Indicator        (Image, mismo sprite ring.png, se mueve/encoge dentro del área)
       │  └─ Jar              (Image, sprite Assets/Items/frasco.png, pivot (0.5, 0.5),

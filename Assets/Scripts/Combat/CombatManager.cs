@@ -8,6 +8,7 @@ public class CombatManager : MonoBehaviour
 
     private CreatureRuntime playerRuntime;
     private CreatureRuntime enemyRuntime;
+    private EnemyTrainer currentEnemyTrainer;
 
     [Header("Battle Systems")]
     [SerializeField] private BattleUIManager battleUI;
@@ -83,6 +84,7 @@ public class CombatManager : MonoBehaviour
 
         playerRuntime = playerParty.GetLeadCreature();
         enemyRuntime = enemyTrainer.GetLeadCreature();
+        currentEnemyTrainer = enemyTrainer;
 
         if (playerRuntime == null || enemyRuntime == null)
         {
@@ -242,6 +244,12 @@ public class CombatManager : MonoBehaviour
 
                 battleUI.ShowBattleMessage("Battle Ended!");
                 yield return new WaitForSeconds(0.8f);
+
+                if (currentEnemyTrainer != null)
+                {
+                    Destroy(currentEnemyTrainer.gameObject);
+                    currentEnemyTrainer = null;
+                }
             }
             else if (playerRuntime.CurrentHP <= 0)
             {
