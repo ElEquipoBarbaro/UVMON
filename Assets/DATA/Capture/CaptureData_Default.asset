@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba43af3ae6fde8743bb453ace6e523fb, type: 3}
+  m_Name: CaptureData_Default
+  m_EditorClassIdentifier: 
+  radioInicialMinimo: 40
+  radioInicialMaximo: 100
+  velocidadReduccionMinima: 10
+  velocidadReduccionMaxima: 50
+  radioMinimoPermitido: 15
+  velocidadMovimientoIndicador: 140
+  epsilonDestino: 4
+  distanciaMinimaEntreDestinos: 20
+  maxIntentosDestino: 10
+  margenArea: 10
+  duracionCaidaFrasco: 0.5
+  tiempoMaximoCaptura: 8
+  toleranciaImpacto: 4

@@ -17,6 +17,11 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private QTEController qteController;
     [SerializeField] private QTEData qteData;
 
+    [Header("Capture")]
+    [SerializeField] private CaptureController captureController;
+    [SerializeField] private CaptureData captureData;
+    [SerializeField] private InventorySO inventoryData;
+
     private bool playerHasChosen = false;
     private bool isPlayerTurn = false;
 
@@ -232,6 +237,9 @@ public class CombatManager : MonoBehaviour
 
                 playerRuntime.GainXP(enemyRuntime.data.xpYield);
 
+                if (enemyRuntime.data.isCapturable)
+                    yield return RunCaptureSequence();
+
                 battleUI.ShowBattleMessage("Battle Ended!");
                 yield return new WaitForSeconds(0.8f);
             }
@@ -251,5 +259,29 @@ public class CombatManager : MonoBehaviour
 
             battleUI.HideBattleUI();
         }
+    }
+
+    private IEnumerator RunCaptureSequence()
+    {
+        if (captureController == null)
+            yield break;
+
+        CaptureResult result = default;
+        yield return captureController.RunCapture(enemyRuntime.data, inventoryData, captureData, r => result = r);
+
+        if (battleUI != null)
+        {
+            if (result.success)
+                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} was captured!");
+            else if (result.failureReason == CaptureFailReason.NoJar)
+                battleUI.ShowBattleMessage("You don't have any capture jars!");
+            else
+                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} broke free!");
+
+            yield return new WaitForSeconds(1f);
+        }
+
+        if (result.success && PlayerParty.Instance != null)
+            PlayerParty.Instance.AddCreature(enemyRuntime.data, enemyRuntime.Level);
     }
 }
