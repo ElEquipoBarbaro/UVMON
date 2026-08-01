@@ -16,6 +16,10 @@ public class PauseManager : MonoBehaviour
     [SerializeField] private bool pauseAudio = false;
     [SerializeField] private bool logActions = true;
 
+    [Header("Cursor")]
+    [SerializeField] private Texture2D defaultCursor;
+    [SerializeField] private Vector2 defaultCursorHotspot = Vector2.zero;
+
     private bool isPaused;
 
     // Escenas donde NO debe aparecer el menú de pausa
@@ -32,6 +36,9 @@ public class PauseManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject); // Sobrevive al cambiar de escena
+
+        if (defaultCursor != null)
+            Cursor.SetCursor(defaultCursor, defaultCursorHotspot, CursorMode.Auto);
 
         if (pauseOverlay != null)
             pauseOverlay.SetActive(false);

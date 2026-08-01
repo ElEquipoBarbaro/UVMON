@@ -22776,8 +22776,8 @@ MonoBehaviour:
   background: {fileID: 915950858}
   idleColor: {r: 1, g: 1, b: 1, a: 0.08}
   highlightColor: {r: 1, g: 0.8, b: 0.2, a: 0.55}
-  pointerCursor: {fileID: 2800000, guid: ba5c4db6d3c327a4f827629a0d779e66, type: 3}
-  pointerCursorHotspot: {x: 13, y: 3}
+  pointerCursor: {fileID: 2800000, guid: 16464853b96fe474b9b536a901b4adf2, type: 3}
+  pointerCursorHotspot: {x: 9, y: 4}
 --- !u!1 &986506519
 GameObject:
   m_ObjectHideFlags: 0
