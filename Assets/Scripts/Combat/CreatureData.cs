@@ -23,4 +23,12 @@ public class CreatureData : ScriptableObject
     public List<MoveData> moves;
 
     public int xpYield = 20;
+
+    [Header("Captura")]
+    [Tooltip("Si esta activo, este UVGmon puede intentarse capturar al derrotarlo en batalla.")]
+    public bool isCapturable = false;
+
+    [Tooltip("Dificultad manual del desafio de captura (0-100). No es probabilidad: alto = circulo inicial mas grande y reduccion mas lenta (mas facil); bajo = circulo mas chico y reduccion mas rapida (mas dificil).")]
+    [Range(0f, 100f)]
+    public float porcentajeCaptura = 50f;
 }

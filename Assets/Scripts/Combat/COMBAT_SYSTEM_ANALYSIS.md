@@ -36,9 +36,10 @@ Data is modeled with `ScriptableObject`s (`CreatureData`, `MoveData`, `MoveAnima
 | File | Role |
 |---|---|
 | `BattleStarter.cs` | Entry point on an NPC/trainer GameObject. Optionally plays a dialogue first, then calls `CombatManager.Instance.StartBattle(...)`. |
-| `CombatManager.cs` | The orchestrator/singleton. Owns the turn loop coroutine, reads player input (arrow keys + Enter) to pick a move, drives `BattleUIManager` and `BattleAnimationPlayer`, and calls into the selected `MoveEffect`. |
+| `CombatManager.cs` | The orchestrator/singleton. Owns the turn loop coroutine, picks a move from mouse hover/click on `BattleUIManager`'s move options (see below), drives `BattleUIManager` and `BattleAnimationPlayer`, and calls into the selected `MoveEffect`. |
 | `PlayerTurn.cs` | **Dead code** — a `MonoBehaviour` with a single empty coroutine (`yield return null`). Not attached/referenced anywhere; `CombatManager` has its own private `PlayerTurn()` coroutine method that does the real work under the same name. |
-| `BattleUIManager.cs` | Pure UI façade: shows/hides the battle panel vs overworld, renders HP text, renders the move list with a `>` cursor, shows battle messages. No logic of its own. |
+| `BattleUIManager.cs` | UI façade: shows/hides the battle panel vs overworld, renders HP text, shows battle messages, and manages the move-selection slots (instantiates one `MoveOptionUI` per move under `moveOptionsContainer` from `moveOptionPrefab`, re-firing their hover/click as `OnMoveHovered`/`OnMoveClicked` events). |
+| `MoveOptionUI.cs` | Per-slot component (`Image` background + `TextMeshProUGUI` label). Implements `IPointerEnterHandler`/`IPointerClickHandler` — hover swaps the background to `highlightColor`, click raises `OnClicked`. The background stays enabled at all times (only its color changes) so it never stops being a valid raycast/click target. |
 | `BattleAnimationPlayer.cs` | Plays `MoveAnimationData`: startup motion (shake/lunge/charge/hop) on the attacker, optional projectile/beam travel, optional impact VFX, optional camera shake, then a hit-reaction shake on the target. |
 | `CreatureBattleView.cs` | Per-side visual (sprite + `RectTransform`). Caches a "resting" anchored position so animations can offset from it and return. |
 | `CreatureData.cs` | ScriptableObject: type, name, sprites, base stats (HP/atk/def/speed), move list, XP yield. |
@@ -60,7 +61,7 @@ Data is modeled with `ScriptableObject`s (`CreatureData`, `MoveData`, `MoveAnima
 
 1. `StartBattle` grabs both leads, resets selection state, shows the UI, prints the "A wild X appeared!" message, and starts `BattleLoop()`.
 2. `BattleLoop` is a `while (playerRuntime.CurrentHP > 0 && enemyRuntime.CurrentHP > 0)` loop that always runs **`PlayerTurn()` then `EnemyTurn()`**, unconditionally, every round.
-3. `PlayerTurn()` sets `isPlayerTurn = true` and awaits `playerHasChosen` (set by `SelectMove`, itself only called from `Update()`'s Enter-key handler). Once chosen: plays the move's startup/attack animation, then `move.effect.Execute(...)`, then refreshes HP UI.
+3. `PlayerTurn()` sets `isPlayerTurn = true` and awaits `playerHasChosen` (set by `SelectMove`). Hovering a `MoveOptionUI` slot fires `BattleUIManager.OnMoveHovered` → `CombatManager.HandleMoveHovered` (updates `selectedMoveIndex` and re-highlights); clicking one fires `OnMoveClicked` → `HandleMoveClicked` → `SelectMove(playerRuntime.Moves[index])`. Once chosen: plays the move's startup/attack animation, then `move.effect.Execute(...)`, then refreshes HP UI.
 4. `EnemyTurn()` always plays `enemyRuntime.Moves[0]` — no AI decision-making at all.
 5. `EndBattleSequence()` prints fainted/win/lose messages and hides the battle UI, awarding XP to the player's lead creature only on a win.
 

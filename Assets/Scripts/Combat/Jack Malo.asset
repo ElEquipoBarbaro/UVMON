@@ -24,3 +24,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4b1333483eee58e4ab46e9de8221d802, type: 2}
   - {fileID: 11400000, guid: efe1de857fd09034a9b51e63faebc885, type: 2}
   xpYield: 20
+  isCapturable: 1
+  porcentajeCaptura: 55

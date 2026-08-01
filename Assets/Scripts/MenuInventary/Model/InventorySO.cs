@@ -150,7 +150,35 @@ public class InventorySO : ScriptableObject
     {
         OnInventoryUpdated?.Invoke(GetCurrentInventoryState());
     }
-    
+
+    public int GetCaptureJarCount()
+    {
+        int total = 0;
+
+        foreach (InventoryItem slot in inventoryItems)
+        {
+            if (!slot.IsEmpty && slot.item.Category == ItemCategory.Capture)
+                total += slot.quantity;
+        }
+
+        return total;
+    }
+
+    public bool TryConsumeCaptureJar()
+    {
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            InventoryItem slot = inventoryItems[i];
+
+            if (slot.IsEmpty || slot.item.Category != ItemCategory.Capture)
+                continue;
+
+            RemoveItem(i, 1);
+            return true;
+        }
+
+        return false;
+    }
 
 }
 
