@@ -185,6 +185,8 @@ MonoBehaviour:
   pauseKey: 27
   pauseAudio: 0
   logActions: 1
+  defaultCursor: {fileID: 2800000, guid: 2d52804ad4a4d3741a2abcaad1dd84c4, type: 3}
+  defaultCursorHotspot: {x: 9, y: 2}
 --- !u!1 &3221817819881161520
 GameObject:
   m_ObjectHideFlags: 0
