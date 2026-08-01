@@ -110,3 +110,100 @@ this file is the source of truth. If the port/PID ever changes, update this sect
   *before* touching the scene (a scene wired against a component that failed to compile
   fails silently/confusingly later). End every batch of scene edits with
   `manage_scene action=save`.
+
+- **`read_console` showing zero errors for your own files does NOT mean
+  `Assembly-CSharp` actually compiled.** Unity's default assembly implicitly
+  references *every* other precompiled/package assembly in the project. If **any**
+  package has a hard compile error — even one totally unrelated to your code, e.g. a
+  Burst-dependent package that failed to resolve — `Assembly-CSharp` silently never
+  finishes building, and no `Assembly-CSharp.dll` shows up in
+  `Library/ScriptAssemblies` at all. Symptoms that reveal this (all observed together
+  once, 2026-08-01, root cause: `com.unity.burst` failed to install with `ENOSPC` —
+  the machine's `C:` drive had ~190-450 MB free, see `Get-PSDrive C`): `read_console`
+  shows only the *package's* CS0246 errors, never anything under `Assets/Scripts`;
+  `AssetDatabase.LoadAssetAtPath` (via `execute_code`) returns `null` for **any**
+  asset whose type lives in `Assembly-CSharp` (e.g. every `CreatureData` instance,
+  even ones untouched this session); `manage_scriptable_object action=modify`
+  reports `target_not_found` for those same assets even though `manage_asset
+  action=get_info` resolves the guid/path fine; `mcpforunity://tests` returns a
+  root node with **zero** children for both EditMode and PlayMode no matter how many
+  times you `refresh_unity` or open the Test Runner window; components that
+  definitely exist in the saved `.unity` YAML (e.g. `MoveOptionUI` on
+  `MoveOptionTemplate`) are silently missing from
+  `mcpforunity://scene/gameobject/{id}/components`. None of this is fixable from
+  scripts/scene edits — check `Get-PSDrive C` and `read_console` for package
+  resolution errors (`"An error occurred while resolving packages"`) *first* whenever
+  MCP tools that touch `Assembly-CSharp` types start failing in these specific ways.
+  Fix: free disk space (safe to delete:
+  `%LOCALAPPDATA%\Unity\cache\packages`, the package download cache — Unity
+  re-downloads on demand) and reopen the project / retry package resolution; you
+  cannot work around it by editing more scripts.
+  - **When this is blocking you**: you can still make real progress without a
+    working `Assembly-CSharp` — plain-Unity-type scene edits (`RectTransform`,
+    `Image`, `CanvasRenderer`, `TextMeshProUGUI`, `Shadow`, ...) via
+    `manage_gameobject`/`manage_components` work fine (those types live in engine/UGUI
+    assemblies, not `Assembly-CSharp`), and hand-editing a ScriptableObject `.asset`'s
+    YAML directly (`Read`/`Edit`, not the MCP asset tools) is a safe fallback for
+    setting fields Unity itself can't currently deserialize through — it'll be picked
+    up correctly once compilation is unblocked, since YAML doesn't care about the
+    live AppDomain. What you *cannot* do: attach a custom `MonoBehaviour`/assign a
+    field that's typed as one of your own classes (the type doesn't exist as a
+    loaded `Type` yet), or trust `execute_code` snippets that reference your own
+    project types (only engine/editor namespaces resolve).
+
+- **A `List<T>`/array field on a `ScriptableObject`, edited by hand in YAML, uses
+  Unity's `Array.size` + `Array.data[i].field` shape** — e.g.
+  `bodyParts:\n  - idParte: body\n    vidaMaxima: 70\n    ...` (a plain YAML sequence
+  of mappings works directly, no `Array.size`/`data[]` needed in the raw `.asset`
+  file — that indexed-path form is only for `SerializedProperty` paths used by tools
+  like `manage_scriptable_object`'s `patches`, not for hand-written YAML).
+
+- **Single-sprite-mode texture importers (`spriteMode: 1`) always expose their Sprite
+  sub-asset as `{fileID: 21300000, guid: <texture guid>, type: 3}`** — confirmed by
+  reading multiple existing `CreatureData` assets' `frontSprite`/`backSprite`
+  references. Useful when hand-writing a sprite reference in YAML instead of going
+  through `manage_scriptable_object`.
+
+- **`manage_texture action=set_import_settings`'s `import_settings` dict key for
+  Read/Write Enabled is `"readable": true`** (it maps internally to the importer's
+  `isReadable`, per the tool's own `_debug_params` echo). Needed before
+  `Image.alphaHitTestMinimumThreshold` will actually do anything (that feature reads
+  pixels via `Texture2D.GetPixelBilinear`, which throws/no-ops on a non-readable
+  texture).
+
+- **Fixed 2026-08-01**: freeing disk space alone did *not* get `com.unity.burst` to
+  install — the earlier failed resolution attempt stays stuck until you explicitly
+  force a retry with `manage_packages action=resolve_packages`. After that,
+  `refresh_unity(compile=request, mode=force)` picked it up and `Assembly-CSharp`
+  compiled cleanly on the next pass (confirmed via `Library/ScriptAssemblies` and
+  `AssetDatabase.LoadAssetAtPath` no longer returning `null`). If you hit the
+  broken-compile symptoms described above, check disk space *and* remember to call
+  `resolve_packages` once space is free — don't just wait/retry refresh.
+
+- **`manage_components action=add` fails the same way `modify`/`delete` do for
+  anything inside the (inactive) `BattleUI` tree** (`"not found using method
+  'default'"`) — the earlier-documented workaround (`execute_code` +
+  `Resources.FindObjectsOfTypeAll<Transform>()` + `go.AddComponent(typeof(X))`,
+  then `EditorSceneManager.MarkSceneDirty`) covers `add` too, not just
+  `modify`/`delete`. `set_property` on components already present is still the one
+  action that works normally even inside that inactive tree.
+
+- **Scene-object instance IDs are not stable across a domain reload/scene
+  reload** (e.g. after `resolve_packages` or any compile that actually completes a
+  reload) — an ID captured before the reload (from `find_gameobjects` or a `create`
+  call) can 404 afterward even though the GameObject itself is untouched. Re-run
+  `find_gameobjects` by name to get fresh IDs before wiring references post-reload;
+  don't assume an ID from earlier in the session is still valid after any
+  `recovered_from_disconnect`/domain-reload event.
+
+- **Verifying a UI click handler actually works, without a human clicking**: build
+  with `execute_code` and `UnityEngine.EventSystems.ExecuteEvents.Execute(gameObject,
+  new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler)` —
+  this runs the exact same `IPointerClickHandler.OnPointerClick` callback a real
+  mouse click would, through the real event pipeline, so it's a faithful way to
+  confirm click-to-select logic (e.g. body-part targeting) end-to-end in Play mode
+  via MCP instead of just trusting the code compiles. Find the live GameObject by
+  name via `Resources.FindObjectsOfTypeAll(typeof(GameObject))` — runtime-instantiated
+  clones share the prefab/template's name (`"X(Clone)"`), so also check a
+  distinguishing component property (e.g. an `Index` field) to pick the right one
+  when several clones exist.

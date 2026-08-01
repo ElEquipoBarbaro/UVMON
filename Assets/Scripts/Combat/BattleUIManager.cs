@@ -34,6 +34,60 @@ public class BattleUIManager : MonoBehaviour
     public CreatureBattleView PlayerView => playerCreatureView;
     public CreatureBattleView EnemyView => enemyCreatureView;
 
+    [Header("Enemy Body Parts (Prompt 18)")]
+    [SerializeField] private EnemyBodyPartsView enemyBodyPartsView;
+    [SerializeField] private TextMeshProUGUI targetIndicatorText;
+
+    /// <summary>El jugador hizo clic sobre una extremidad del enemigo (indice en la lista de BodyPart activa).</summary>
+    public event Action<int> OnBodyPartClicked;
+
+    public bool HasEnemyBodyParts => enemyBodyPartsView != null && enemyBodyPartsView.PartCount > 0;
+
+    private void Awake()
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.OnPartClicked += HandleBodyPartClicked;
+    }
+
+    private void OnDestroy()
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.OnPartClicked -= HandleBodyPartClicked;
+    }
+
+    private void HandleBodyPartClicked(int index)
+    {
+        OnBodyPartClicked?.Invoke(index);
+    }
+
+    public void SetupEnemyBodyParts(IReadOnlyList<BodyPart> parts)
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.Setup(parts);
+
+        if ((parts == null || parts.Count == 0) && targetIndicatorText != null)
+            targetIndicatorText.text = string.Empty;
+    }
+
+    public void SelectEnemyBodyPart(BodyPart part, int index)
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.SelectIndex(index);
+
+        if (targetIndicatorText != null && part != null)
+        {
+            targetIndicatorText.text = part.EsParteCritica
+                ? $"Objetivo: {part.NombreParte} (¡critico!)"
+                : $"Objetivo: {part.NombreParte}";
+        }
+    }
+
+    public void MarkEnemyBodyPartDamaged(int index, Sprite damagedSprite)
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.MarkDamaged(index, damagedSprite);
+    }
+
     public void ShowBattleUI()
     {
         if (battleUI != null) battleUI.SetActive(true);
@@ -50,6 +104,8 @@ public class BattleUIManager : MonoBehaviour
         // Por si el jugador dejaba el mouse sobre una opcion de ataque justo cuando
         // termino la batalla (el slot se destruye/desactiva sin disparar OnPointerExit).
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+
+        SetupEnemyBodyParts(null);
     }
 
     public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)

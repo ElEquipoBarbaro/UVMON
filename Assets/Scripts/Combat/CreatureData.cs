@@ -31,4 +31,8 @@ public class CreatureData : ScriptableObject
     [Tooltip("Dificultad manual del desafio de captura (0-100). No es probabilidad: alto = circulo inicial mas grande y reduccion mas lenta (mas facil); bajo = circulo mas chico y reduccion mas rapida (mas dificil).")]
     [Range(0f, 100f)]
     public float porcentajeCaptura = 50f;
+
+    [Header("Extremidades (opcional)")]
+    [Tooltip("Si tiene elementos, esta criatura puede recibir ataques dirigidos a una extremidad especifica (seleccionable con el mouse en batalla) en vez de solo al cuerpo entero. Vacio = comportamiento normal (DamageEffect de siempre).")]
+    public System.Collections.Generic.List<BodyPartDefinition> bodyParts = new System.Collections.Generic.List<BodyPartDefinition>();
 }

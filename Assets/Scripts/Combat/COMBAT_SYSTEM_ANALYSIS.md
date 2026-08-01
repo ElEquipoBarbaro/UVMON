@@ -2,6 +2,12 @@
 
 Analysis of how the turn-based battle system works, based on reading all 19 scripts in the folder.
 
+> **Extremidades / acertividad / daño crítico (Prompts 12-18, `COMBAT_SYSTEM_SPEC.md`
+> en la raíz del repo)**: ver `BODY_PARTS_SYSTEM.md` en esta misma carpeta.
+> `MoveData.accuracy` sigue sin usarse (ver hallazgo más abajo) — la acertividad del
+> sistema nuevo vive en `BodyPartDefinition.porcentajeAcertividad`, no en el
+> movimiento.
+
 ## 1. High-level architecture
 
 ```

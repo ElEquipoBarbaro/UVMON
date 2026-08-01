@@ -23,11 +23,18 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private CaptureData captureData;
     [SerializeField] private InventorySO inventoryData;
 
+    [Header("Body Parts")]
+    [Tooltip("Multiplicador aplicado al dano de una extremidad antes de restarlo a la vida global del enemigo (spec sec 31). 1.0 = sin cambio.")]
+    [SerializeField] private float multiplicadorVidaGlobal = 1f;
+
     private bool playerHasChosen = false;
     private bool isPlayerTurn = false;
 
     private MoveData selectedMove;
     private int selectedMoveIndex = 0;
+
+    private List<BodyPart> enemyBodyPartsRuntime;
+    private int selectedBodyPartIndex = 0;
 
     public BattleUIManager BattleUI => battleUI;
 
@@ -39,6 +46,7 @@ public class CombatManager : MonoBehaviour
         {
             battleUI.OnMoveHovered += HandleMoveHovered;
             battleUI.OnMoveClicked += HandleMoveClicked;
+            battleUI.OnBodyPartClicked += HandleBodyPartClicked;
         }
     }
 
@@ -48,7 +56,24 @@ public class CombatManager : MonoBehaviour
         {
             battleUI.OnMoveHovered -= HandleMoveHovered;
             battleUI.OnMoveClicked -= HandleMoveClicked;
+            battleUI.OnBodyPartClicked -= HandleBodyPartClicked;
         }
+    }
+
+    private void HandleBodyPartClicked(int index)
+    {
+        if (enemyBodyPartsRuntime == null || index < 0 || index >= enemyBodyPartsRuntime.Count)
+            return;
+
+        SelectBodyPartTarget(index);
+    }
+
+    private void SelectBodyPartTarget(int index)
+    {
+        selectedBodyPartIndex = index;
+
+        if (battleUI != null)
+            battleUI.SelectEnemyBodyPart(enemyBodyPartsRuntime[index], index);
     }
 
     private void HandleMoveHovered(int index)
@@ -96,15 +121,39 @@ public class CombatManager : MonoBehaviour
         isPlayerTurn = false;
         selectedMove = null;
 
+        enemyBodyPartsRuntime = BuildBodyPartsRuntime(enemyRuntime.data);
+        selectedBodyPartIndex = 0;
+
         if (battleUI != null)
         {
             battleUI.ShowBattleUI();
             battleUI.BindCreatures(playerRuntime, enemyRuntime);
             battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
             battleUI.ShowBattleMessage($"A wild {enemyRuntime.data.creatureName} appeared!");
+
+            battleUI.SetupEnemyBodyParts(enemyBodyPartsRuntime);
+
+            if (enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0)
+                SelectBodyPartTarget(0);
         }
 
         StartCoroutine(BattleLoop());
+    }
+
+    private static List<BodyPart> BuildBodyPartsRuntime(CreatureData data)
+    {
+        if (data == null || data.bodyParts == null || data.bodyParts.Count == 0)
+            return null;
+
+        List<BodyPart> parts = new List<BodyPart>(data.bodyParts.Count);
+
+        foreach (BodyPartDefinition definition in data.bodyParts)
+        {
+            if (definition != null)
+                parts.Add(new BodyPart(definition));
+        }
+
+        return parts.Count > 0 ? parts : null;
     }
 
     public void RefreshBattleUI()
@@ -181,12 +230,84 @@ public class CombatManager : MonoBehaviour
             );
         }
 
-        yield return selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
+        if (enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0)
+            yield return ExecuteBodyPartAttack(selectedMove);
+        else
+            yield return selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
 
         if (battleUI != null)
             battleUI.UpdateHP(playerRuntime, enemyRuntime);
 
         yield return new WaitForSeconds(0.35f);
+    }
+
+    /// <summary>
+    /// Ataque dirigido a una extremidad del enemigo (Docs/CombatSystem/COMBAT_SYSTEM_SPEC.md
+    /// sec 24-31). El QTE ya se resolvio con exito antes de llegar aqui (ver PlayerTurn),
+    /// asi que el orden restante es: acertividad -> critico -> variacion -> dano -> aplicar
+    /// a la extremidad -> aplicar a la vida global -> UI -> sprite danado si corresponde.
+    /// </summary>
+    private IEnumerator ExecuteBodyPartAttack(MoveData move)
+    {
+        if (enemyBodyPartsRuntime == null ||
+            selectedBodyPartIndex < 0 ||
+            selectedBodyPartIndex >= enemyBodyPartsRuntime.Count)
+            yield break;
+
+        BodyPart target = enemyBodyPartsRuntime[selectedBodyPartIndex];
+
+        if (battleUI != null)
+        {
+            battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} used {move.moveName}!");
+            yield return new WaitForSeconds(0.6f);
+        }
+
+        int danoBase = Mathf.Max(1, playerRuntime.Attack + move.power);
+
+        DamageCalculator.Result result = DamageCalculator.Calculate(
+            true, // qteExitoso: ya se comprobo antes de llamar a este metodo
+            danoBase,
+            target.PorcentajeAtaque,
+            target.PorcentajeAcertividad,
+            enemyRuntime.CurrentHP,
+            UnityRandomProvider.Instance
+        );
+
+        if (!result.ataqueImpacta)
+        {
+            if (battleUI != null)
+            {
+                battleUI.ShowBattleMessage($"Attack missed {target.NombreParte}!");
+                yield return new WaitForSeconds(0.8f);
+            }
+
+            yield break;
+        }
+
+        if (result.esCritico && battleUI != null)
+        {
+            battleUI.ShowBattleMessage("Critical hit!");
+            yield return new WaitForSeconds(0.8f);
+        }
+
+        bool justCrossedToZero = target.ApplyDamage(result.danoFinalEntero);
+
+        int danoVidaGlobal = Mathf.RoundToInt(result.danoFinalEntero * Mathf.Max(0f, multiplicadorVidaGlobal));
+        enemyRuntime.TakeDamage(danoVidaGlobal);
+
+        RefreshBattleUI();
+
+        if (battleUI != null)
+        {
+            battleUI.ShowBattleMessage($"{target.NombreParte} took {result.danoFinalEntero} damage! ({target.VidaActual}/{target.VidaMaxima} HP)");
+            yield return new WaitForSeconds(0.8f);
+        }
+
+        if (justCrossedToZero && battleUI != null)
+            battleUI.MarkEnemyBodyPartDamaged(selectedBodyPartIndex, target.ReferenciaVisualDanada);
+
+        // El mensaje/derrota del enemigo (vidaGlobal <= 0) lo emite EndBattleSequence
+        // una unica vez, cuando BattleLoop detecta que termino la ronda — no se repite aqui.
     }
 
     private IEnumerator EnemyTurn()

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Jack Malo
   m_EditorClassIdentifier: 
   type: 10
-  creatureName: Jack Malo
-  frontSprite: {fileID: -1506292533, guid: 895a08ef8b73901469cf185322740dcd, type: 3}
-  backSprite: {fileID: -1506292533, guid: 895a08ef8b73901469cf185322740dcd, type: 3}
+  creatureName: Arana
+  frontSprite: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}
+  backSprite: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}
   maxHP: 100
   attack: 100
   defense: 100
@@ -26,3 +26,20 @@ MonoBehaviour:
   xpYield: 20
   isCapturable: 1
   porcentajeCaptura: 55
+  bodyParts:
+  - idParte: body
+    nombreParte: Cuerpo
+    vidaMaxima: 70
+    porcentajeAtaque: 55
+    porcentajeAcertividad: 85
+    referenciaVisualNormal: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}
+    referenciaVisualDanada: {fileID: 21300000, guid: 749127dabd5c62d45b107708d808c279, type: 3}
+    anchoredPosition: {x: 0, y: 0}
+  - idParte: head
+    nombreParte: Cabeza
+    vidaMaxima: 30
+    porcentajeAtaque: 100
+    porcentajeAcertividad: 30
+    referenciaVisualNormal: {fileID: 21300000, guid: 9651267dcda8e4f488692eb64a4366ce, type: 3}
+    referenciaVisualDanada: {fileID: 0}
+    anchoredPosition: {x: 0, y: 0}
