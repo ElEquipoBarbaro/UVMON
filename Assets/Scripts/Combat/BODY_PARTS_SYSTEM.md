@@ -433,6 +433,55 @@ overlay volvió a `RGBA(1,1,1,0)` en los dos. Compilación limpia
 (`refresh_unity` sin errores), cambios guardados con `manage_scene action=save`
 antes de la prueba.
 
+## 12. Fundido del enemigo antes de la captura (2026-08-02)
+
+Pedido del usuario: al terminar el combate (enemigo derrotado) y antes de iniciar el
+sistema de captura, que los assets visuales del enemigo se desvanezcan con un efecto
+en vez de desaparecer de golpe.
+
+- `CreatureBattleView.FadeOut(float duration)` / `EnemyBodyPartsView.FadeOut(float
+  duration)`: mismo patron (`Mathf.Lerp(1f, 0f, elapsed/duration)` cuadro a cuadro,
+  `Time.deltaTime` escalado — a diferencia de los parpadeos de `BodyPartOptionUI` que
+  usan `Time.unscaledTime`, este es un evento de flujo de batalla, no de UI, asi que
+  usa tiempo escalado igual que el resto de `CombatManager`). `EnemyBodyPartsView`
+  anima **todas las partes con un unico temporizador compartido** (no una corrutina
+  por parte) para que no se noten desfasadas entre si.
+- `BattleUIManager.FadeOutEnemyVisual(float duration)` decide cual desvanecer segun
+  `HasEnemyBodyParts`: las partes (`EnemyBodyPartsView.FadeOut`) si el enemigo tiene
+  extremidades, o el sprite unico (`CreatureBattleView.FadeOut`) si no.
+- `CombatManager.EndBattleSequence`: `battleUI.FadeOutEnemyVisual(0.8f)` justo antes
+  de `RunCaptureSequence()`, dentro del mismo `if (enemyRuntime.data.isCapturable)`
+  (si la criatura no es capturable, no hay secuencia de captura, asi que tampoco
+  hace falta el fundido).
+- `CreatureBattleView.SetSprite()` ahora tambien resetea el alfa a 1 — necesario
+  porque, a diferencia de `EnemyBodyPartsView` (que destruye e instancia partes
+  nuevas en cada batalla), `CreatureBattleView` es el mismo GameObject reusado en
+  todas las batallas; sin este reset, la criatura de la **siguiente** batalla
+  aparecia invisible (heredaba el alfa 0 del fundido anterior).
+
+**Verificacion (Play mode, 2026-08-02)**: batalla real contra "Enemy Spider 1" por
+reflexion. Nota de metodo: `yield return algunIEnumerator` (como
+`FadeOutEnemyVisual`/`RunCaptureSequence` dentro de `EndBattleSequence`) **no se
+puede pumpear con un simple `while (enumerator.MoveNext())` manual** — eso solo
+avanza el enumerador *externo*, sin drenar el interno (esa recursion es magia
+propia del scheduler de `StartCoroutine` de Unity, no de C# puro). Hubo que simular
+ese drenado con una pila manual (`Stack<IEnumerator>`, push cuando `Current` es a su
+vez `IEnumerator`, pop cuando `MoveNext()` devuelve `false`) para poder probar
+`EndBattleSequence`/`FadeOutEnemyVisual` fuera de Play mode real. Con eso: `Time.
+deltaTime` dentro de una batalla real corriendo (a diferencia de los cuadros
+"congelados" que afectan a `Time.unscaledTime` cuando el Editor pierde el foco,
+documentado en §9/§11) se mantuvo en valores normales (~0.02s), y el fundido se vio
+progresar cuadro a cuadro de forma correcta (0.975 -> 0.95 -> ... -> 0 en ~40 pasos
+para una duracion de 0.8s). Se observaron un par de `TargetException` ("Non-static
+method requires a target") intermitentes al invocar metodos por reflexion en medio
+de esta sesion de pruebas — no relacionados con el codigo del fundido (reintentar la
+misma llamada, sin cambiar nada, funciono correctamente) sino con inestabilidad del
+puente MCP ya vista en esta sesion (reconexiones de WebSocket, "TCS ... already
+completed"). Al salir de Play mode se verifico explicitamente `scene.isDirty ==
+false` y ausencia de clones sueltos antes de dar la tarea por terminada (protocolo
+adoptado tras el incidente de §11 en que un Play mode que termino solo sin que se
+detectara a tiempo dejo `BattleUI` activo guardado en la escena de edicion).
+
 Efecto colateral no relacionado, encontrado durante esta prueba: `PlayerParty` usa
 un singleton estático (`Instance`) que puede quedar apuntando a un objeto viejo si
 se entra/sale de Play mode varias veces sin recarga de dominio (Editor con "Reload

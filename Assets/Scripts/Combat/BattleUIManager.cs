@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -114,6 +115,18 @@ public class BattleUIManager : MonoBehaviour
     {
         if (enemyBodyPartsView != null)
             enemyBodyPartsView.PlayHitFlash(index);
+    }
+
+    /// <summary>
+    /// Desvanece el/los asset(s) visuales del enemigo actual (sus partes si las tiene, o su
+    /// sprite unico) — usado al terminar el combate, antes de iniciar el sistema de captura.
+    /// </summary>
+    public IEnumerator FadeOutEnemyVisual(float duration)
+    {
+        if (HasEnemyBodyParts)
+            yield return enemyBodyPartsView.FadeOut(duration);
+        else if (enemyCreatureView != null)
+            yield return enemyCreatureView.FadeOut(duration);
     }
 
     public void ShowBattleUI()

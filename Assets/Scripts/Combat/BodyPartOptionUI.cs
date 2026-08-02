@@ -93,6 +93,17 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         Index = index;
     }
 
+    /// <summary>Usado por EnemyBodyPartsView.FadeOut para desvanecer todas las partes juntas
+    /// con un unico temporizador (ver PROMPT.md: fundido antes de iniciar la captura).</summary>
+    public void SetAlpha(float alpha)
+    {
+        if (image == null)
+            return;
+
+        Color c = image.color;
+        image.color = new Color(c.r, c.g, c.b, alpha);
+    }
+
     public void SetSprite(Sprite sprite)
     {
         if (image == null)

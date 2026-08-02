@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -97,5 +98,37 @@ public class EnemyBodyPartsView : MonoBehaviour
     private void HandleSlotClicked(BodyPartOptionUI slot)
     {
         OnPartClicked?.Invoke(slot.Index);
+    }
+
+    /// <summary>Desvanece todas las partes juntas, con un unico temporizador compartido (para
+    /// que no se noten desfasadas entre si) — usado antes de iniciar la captura.</summary>
+    public IEnumerator FadeOut(float duration)
+    {
+        if (partSlots.Count == 0)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            for (int i = 0; i < partSlots.Count; i++)
+                partSlots[i].SetAlpha(0f);
+
+            yield break;
+        }
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, Mathf.Clamp01(elapsed / duration));
+
+            for (int i = 0; i < partSlots.Count; i++)
+                partSlots[i].SetAlpha(alpha);
+
+            yield return null;
+        }
+
+        for (int i = 0; i < partSlots.Count; i++)
+            partSlots[i].SetAlpha(0f);
     }
 }

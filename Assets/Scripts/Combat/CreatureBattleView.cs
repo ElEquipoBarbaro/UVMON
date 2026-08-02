@@ -34,6 +34,44 @@ public class CreatureBattleView : MonoBehaviour
 
         creatureImage.sprite = sprite;
         creatureImage.enabled = sprite != null;
+
+        // Una nueva batalla reutiliza el mismo GameObject: si la anterior termino con un
+        // fundido (ver FadeOut), hay que restaurar la opacidad para la proxima criatura.
+        SetAlpha(1f);
+    }
+
+    public void SetAlpha(float alpha)
+    {
+        if (creatureImage == null)
+            return;
+
+        Color c = creatureImage.color;
+        creatureImage.color = new Color(c.r, c.g, c.b, alpha);
+    }
+
+    /// <summary>Desvanece el sprite de la criatura (p.ej. antes de iniciar la captura).</summary>
+    public IEnumerator FadeOut(float duration)
+    {
+        if (creatureImage == null)
+            yield break;
+
+        if (duration <= 0f)
+        {
+            SetAlpha(0f);
+            yield break;
+        }
+
+        float startAlpha = creatureImage.color.a;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            SetAlpha(Mathf.Lerp(startAlpha, 0f, Mathf.Clamp01(elapsed / duration)));
+            yield return null;
+        }
+
+        SetAlpha(0f);
     }
 
     public void CacheRestingPosition()

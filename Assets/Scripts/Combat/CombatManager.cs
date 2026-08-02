@@ -422,7 +422,10 @@ public class CombatManager : MonoBehaviour
                 playerRuntime.GainXP(enemyRuntime.data.xpYield);
 
                 if (enemyRuntime.data.isCapturable)
+                {
+                    yield return battleUI.FadeOutEnemyVisual(0.8f);
                     yield return RunCaptureSequence();
+                }
 
                 battleUI.ShowBattleMessage("Battle Ended!");
                 yield return new WaitForSeconds(0.8f);
