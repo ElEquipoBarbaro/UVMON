@@ -313,3 +313,78 @@ cuerpo (vivo) sí lo cambió (control positivo). `PlayHitFlash()` se invocó sin
 excepciones. Cero errores/warnings nuevos en consola. Cambios de escena (sibling
 index, `anchoredPosition`) hechos en Edit mode (no en Play mode, que no persiste) y
 guardados con `manage_scene action=save`.
+
+## 10. Correcciones de UX (2026-08-02, tras probar el sistema completo en juego)
+
+Tres pedidos del usuario (ver `PROMPT.md` — el texto libre al inicio, no un prompt
+numerado — y confirmados con pruebas empíricas en Play mode, no solo lectura de
+código):
+
+1. **"No puedo seleccionar la cabeza, solo el cuerpo, en el primer ataque"**: **no
+   era un problema de los sprites superpuestos** — se verificó con
+   `execute_code` que `head.png`/`body.png` comparten el mismo lienzo 280×172 y que
+   los "ojos rojos" caen en el **mismo bounding box exacto** en ambas imágenes
+   (`x[87-133] y[63-84]`), es decir que `head.png` sí está perfectamente
+   pre-alineado sobre la cabeza real de `body.png` (la sospecha inicial del usuario
+   de que los assets se solapaban mal era una impresión visual, no el bug real). El
+   verdadero problema era de **flujo**: `CombatManager.StartBattle` auto-seleccionaba
+   `selectedBodyPartIndex = 0` (cuerpo) y **nada bloqueaba los botones de
+   movimiento**, así que un jugador que atacaba sin pensar en elegir objetivo
+   primero (el flujo natural en cualquier RPG) siempre terminaba golpeando el
+   cuerpo por default, sin haber elegido conscientemente. Esto coincide
+   exactamente con el pedido #2 del usuario (orden explícito: parte → movimiento →
+   QTE), así que ambos pedidos se resolvieron con el mismo cambio.
+2. **Orden obligatorio parte→movimiento→QTE**: `CombatManager` ahora trackea
+   `bodyPartConfirmedThisTurn` (reseteado a `false` al inicio de cada `PlayerTurn`,
+   junto con `battleUI.ClearEnemyBodyPartSelection()` que apaga el brillo y pone el
+   texto "Selecciona una parte del enemigo para atacar", y
+   `battleUI.SetMoveSelectionLocked(true)`). `HandleBodyPartClicked` (guardado con
+   `isPlayerTurn && !playerHasChosen`, antes no tenía ningún guard) marca
+   `bodyPartConfirmedThisTurn = true` y llama `SetMoveSelectionLocked(false)` recién
+   ahí. `IsValidMoveIndex` también lo comprueba como red de seguridad por si el
+   guard visual se saltea. `MoveOptionUI` ganó `SetInteractable(bool)` (mismo
+   patrón que `BodyPartOptionUI`: ignora hover/click y atenúa el color de fondo
+   —`disabledColor`— cuando está bloqueado) y `BattleUIManager.SetMoveSelectionLocked`
+   lo aplica a todos los slots (incluyendo los que se creen después vía
+   `RebuildMoveOptions`, que ahora respeta el flag `moveSelectionLocked`). Esto se
+   re-exige **cada turno**, no solo el primero (una criatura enemiga puede perder
+   una extremidad a mitad de combate; forzar una elección consciente cada vez evita
+   apuntar por inercia a una parte que ya no es la que el jugador quiere).
+3. **Cursor incorrecto en la selección de extremidad**: `BodyPartOptionTemplate`
+   apuntaba a `Assets/Sprites/UI/cursor_pointer.png` (guion bajo — un mero contorno
+   sin rellenar, un placeholder), mientras que `MoveOptionUI` ya usaba
+   `Assets/Sprites/UI/cursor-pointer.png` (guion medio — la mano apuntando rellena
+   que pidió el usuario) con hotspot `(9, 4)`. Se igualó `BodyPartOptionUI.pointerCursor`
+   / `pointerCursorHotspot` al mismo asset y hotspot que `MoveOptionUI`.
+4. **Flash de golpe: filtro blanco en vez de fundido de alfa**: `PlayHitFlash()`
+   antes bajaba el alfa del *propio* sprite (parpadeo de transparencia, no un
+   "filtro blanco" real). Se agregó un `Image` hijo nuevo, `FlashOverlay`
+   (`anchorMin (0,0)`/`anchorMax (1,1)` estirado, `raycastTarget=false`, creado bajo
+   `BodyPartOptionTemplate` vía `execute_code` por el mismo motivo de siempre —
+   `BattleUI` inactivo, ver gotcha en `CLAUDE.md`), wireado a
+   `BodyPartOptionUI.flashOverlayImage`. `SetSprite()` ahora también genera (y
+   cachea en un `Dictionary<Sprite,Sprite>` estático) una variante **blanca** del
+   sprite actual: mismo canal alfa, RGB en blanco puro
+   (`GetOrCreateWhiteSprite`, usa `Texture2D.GetPixels` sobre el rect del sprite —
+   requiere Read/Write Enabled, ya activado, ver §8) y se la asigna al overlay.
+   `PlayHitFlash()`/`HitFlashRoutine` ahora oscilan el **alfa del overlay** entre 0
+   y `hitFlashMaxAlpha` (0.85 por defecto, antes `hitFlashMinAlpha` controlaba el
+   piso del sprite original) con el mismo patrón sinusoidal de siempre — el sprite
+   base ya no se toca, así que sus colores no se alteran entre parpadeos, solo se
+   superpone (y desaparece) una silueta blanca semitransparente.
+
+**Verificación (Play mode, 2026-08-02)**: batalla iniciada por reflexión contra
+"Enemy Spider 1" (mismo patrón que el resto del documento). Confirmado con
+`execute_code`: (a) ambos `MoveOptionUI` arrancan con `isInteractable=false` y
+`targetIndicatorText` en el prompt de selección al iniciar la batalla; (b) clic
+simulado sobre el clon de la cabeza cambia `selectedBodyPartIndex` a 1,
+`bodyPartConfirmedThisTurn` a `true`, el texto a `"Objetivo: Cabeza (¡critico!)"` y
+desbloquea `move[0].isInteractable`; (c) tras varios intentos de
+`ExecuteBodyPartAttack` (la cabeza tiene 30% de acertividad, así que hubo fallos
+antes del impacto — comportamiento esperado, no un bug) el golpe que impactó dejó
+`flashOverlayImage.color` en `RGBA(1, 1, 1, 0.52)` con la corrutina todavía activa,
+confirmando el filtro blanco real (antes habría sido el color original del sprite
+con canal alfa reducido, nunca blanco puro). Cero errores nuevos en consola durante
+todo el flujo. Cambios de escena (`pointerCursor`, `FlashOverlay` +
+`flashOverlayImage`) hechos en Edit mode y guardados con `manage_scene
+action=save` antes de entrar a Play mode para probar.

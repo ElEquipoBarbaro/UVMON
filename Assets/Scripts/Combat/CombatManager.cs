@@ -35,6 +35,9 @@ public class CombatManager : MonoBehaviour
 
     private List<BodyPart> enemyBodyPartsRuntime;
     private int selectedBodyPartIndex = 0;
+    private bool bodyPartConfirmedThisTurn;
+
+    private bool HasEnemyBodyParts => enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0;
 
     public BattleUIManager BattleUI => battleUI;
 
@@ -62,10 +65,20 @@ public class CombatManager : MonoBehaviour
 
     private void HandleBodyPartClicked(int index)
     {
+        // Solo se puede (re)elegir objetivo antes de confirmar un movimiento (PROMPT.md
+        // Prompt 18: primero se elige la parte, recien despues se habilita el ataque).
+        if (!isPlayerTurn || playerHasChosen)
+            return;
+
         if (enemyBodyPartsRuntime == null || index < 0 || index >= enemyBodyPartsRuntime.Count)
             return;
 
         SelectBodyPartTarget(index);
+
+        bodyPartConfirmedThisTurn = true;
+
+        if (battleUI != null)
+            battleUI.SetMoveSelectionLocked(false);
     }
 
     private void SelectBodyPartTarget(int index)
@@ -98,6 +111,11 @@ public class CombatManager : MonoBehaviour
         if (!isPlayerTurn || playerRuntime == null || playerRuntime.Moves == null)
             return false;
 
+        // El enemigo tiene extremidades atacables: hay que confirmar un objetivo
+        // (clic sobre una parte) antes de poder elegir el movimiento (Prompt 18).
+        if (HasEnemyBodyParts && !bodyPartConfirmedThisTurn)
+            return false;
+
         return index >= 0 && index < playerRuntime.Moves.Count;
     }
 
@@ -123,6 +141,7 @@ public class CombatManager : MonoBehaviour
 
         enemyBodyPartsRuntime = BuildBodyPartsRuntime(enemyRuntime.data);
         selectedBodyPartIndex = 0;
+        bodyPartConfirmedThisTurn = false;
 
         if (battleUI != null)
         {
@@ -133,8 +152,11 @@ public class CombatManager : MonoBehaviour
 
             battleUI.SetupEnemyBodyParts(enemyBodyPartsRuntime);
 
-            if (enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0)
-                SelectBodyPartTarget(0);
+            if (HasEnemyBodyParts)
+            {
+                battleUI.ClearEnemyBodyPartSelection();
+                battleUI.SetMoveSelectionLocked(true);
+            }
         }
 
         StartCoroutine(BattleLoop());
@@ -172,9 +194,22 @@ public class CombatManager : MonoBehaviour
     {
         isPlayerTurn = true;
         playerHasChosen = false;
+        bodyPartConfirmedThisTurn = false;
 
         if (battleUI != null)
+        {
             battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
+
+            if (HasEnemyBodyParts)
+            {
+                battleUI.ClearEnemyBodyPartSelection();
+                battleUI.SetMoveSelectionLocked(true);
+            }
+            else
+            {
+                battleUI.SetMoveSelectionLocked(false);
+            }
+        }
 
         yield return new WaitUntil(() => playerHasChosen);
 

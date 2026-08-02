@@ -20,6 +20,7 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private MoveOptionUI moveOptionPrefab;
 
     private readonly List<MoveOptionUI> moveOptionSlots = new List<MoveOptionUI>();
+    private bool moveSelectionLocked;
 
     /// <summary>El jugador paso el cursor sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
     public event Action<int> OnMoveHovered;
@@ -80,6 +81,27 @@ public class BattleUIManager : MonoBehaviour
                 ? $"Objetivo: {part.NombreParte} (¡critico!)"
                 : $"Objetivo: {part.NombreParte}";
         }
+    }
+
+    /// <summary>Ningun objetivo confirmado todavia este turno: limpia el brillo y pide al
+    /// jugador que elija una parte antes de poder atacar (ver PROMPT.md Prompt 18).</summary>
+    public void ClearEnemyBodyPartSelection()
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.SelectIndex(-1);
+
+        if (targetIndicatorText != null)
+            targetIndicatorText.text = "Selecciona una parte del enemigo para atacar";
+    }
+
+    /// <summary>Bloquea/desbloquea las opciones de movimiento (se exige elegir una extremidad
+    /// objetivo primero cuando el enemigo actual tiene bodyParts).</summary>
+    public void SetMoveSelectionLocked(bool locked)
+    {
+        moveSelectionLocked = locked;
+
+        foreach (MoveOptionUI slot in moveOptionSlots)
+            slot.SetInteractable(!locked);
     }
 
     public void MarkEnemyBodyPartDamaged(int index, Sprite damagedSprite)
@@ -175,6 +197,7 @@ public class BattleUIManager : MonoBehaviour
             slot.SetIndex(i);
             slot.SetText(moves[i].moveName);
             slot.SetHighlighted(false);
+            slot.SetInteractable(!moveSelectionLocked);
             slot.OnHoverEnter += HandleMoveOptionHoverEnter;
             slot.OnClicked += HandleMoveOptionClicked;
             moveOptionSlots.Add(slot);

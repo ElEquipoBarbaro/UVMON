@@ -11,6 +11,7 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     [SerializeField] private Color idleColor = new Color(1f, 1f, 1f, 0.08f);
     [SerializeField] private Color highlightColor = new Color(1f, 0.8f, 0.2f, 0.55f);
+    [SerializeField] private Color disabledColor = new Color(1f, 1f, 1f, 0.03f);
 
     [Header("Cursor")]
     [SerializeField] private Texture2D pointerCursor;
@@ -20,6 +21,8 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public event Action<MoveOptionUI> OnClicked;
 
     public int Index { get; private set; }
+    private bool isInteractable = true;
+    private bool isHighlighted;
 
     public void SetIndex(int index)
     {
@@ -37,12 +40,36 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     // area clickeable al des-resaltar.
     public void SetHighlighted(bool highlighted)
     {
-        if (background != null)
-            background.color = highlighted ? highlightColor : idleColor;
+        isHighlighted = highlighted;
+        RefreshColor();
+    }
+
+    /// <summary>
+    /// Bloquea/desbloquea este movimiento como opcion elegible. Se usa para exigir que
+    /// el jugador confirme un objetivo (extremidad enemiga) antes de poder atacar.
+    /// </summary>
+    public void SetInteractable(bool interactable)
+    {
+        isInteractable = interactable;
+        RefreshColor();
+
+        if (!interactable)
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    }
+
+    private void RefreshColor()
+    {
+        if (background == null)
+            return;
+
+        background.color = !isInteractable ? disabledColor : (isHighlighted ? highlightColor : idleColor);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         OnHoverEnter?.Invoke(this);
 
         if (pointerCursor != null)
@@ -57,6 +84,9 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         OnClicked?.Invoke(this);
     }
 }
