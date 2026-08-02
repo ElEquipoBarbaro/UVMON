@@ -88,6 +88,12 @@ public class BattleUIManager : MonoBehaviour
             enemyBodyPartsView.MarkDamaged(index, damagedSprite);
     }
 
+    public void PlayEnemyBodyPartHitFlash(int index)
+    {
+        if (enemyBodyPartsView != null)
+            enemyBodyPartsView.PlayHitFlash(index);
+    }
+
     public void ShowBattleUI()
     {
         if (battleUI != null) battleUI.SetActive(true);

@@ -298,16 +298,43 @@ public class CombatManager : MonoBehaviour
         RefreshBattleUI();
 
         if (battleUI != null)
+            battleUI.PlayEnemyBodyPartHitFlash(selectedBodyPartIndex);
+
+        if (battleUI != null)
         {
             battleUI.ShowBattleMessage($"{target.NombreParte} took {result.danoFinalEntero} damage! ({target.VidaActual}/{target.VidaMaxima} HP)");
             yield return new WaitForSeconds(0.8f);
         }
 
-        if (justCrossedToZero && battleUI != null)
-            battleUI.MarkEnemyBodyPartDamaged(selectedBodyPartIndex, target.ReferenciaVisualDanada);
+        if (justCrossedToZero)
+        {
+            if (battleUI != null)
+                battleUI.MarkEnemyBodyPartDamaged(selectedBodyPartIndex, target.ReferenciaVisualDanada);
+
+            // La parte que se acaba de destruir ya no es un objetivo valido (no puede
+            // volver a seleccionarse) — si era la seleccionada, se pasa el objetivo a
+            // otra parte viva automaticamente.
+            int nextAliveIndex = FindNextAliveBodyPartIndex(selectedBodyPartIndex);
+            if (nextAliveIndex >= 0)
+                SelectBodyPartTarget(nextAliveIndex);
+        }
 
         // El mensaje/derrota del enemigo (vidaGlobal <= 0) lo emite EndBattleSequence
         // una unica vez, cuando BattleLoop detecta que termino la ronda — no se repite aqui.
+    }
+
+    private int FindNextAliveBodyPartIndex(int excludeIndex)
+    {
+        if (enemyBodyPartsRuntime == null)
+            return -1;
+
+        for (int i = 0; i < enemyBodyPartsRuntime.Count; i++)
+        {
+            if (i != excludeIndex && enemyBodyPartsRuntime[i].IsAlive)
+                return i;
+        }
+
+        return -1;
     }
 
     private IEnumerator EnemyTurn()

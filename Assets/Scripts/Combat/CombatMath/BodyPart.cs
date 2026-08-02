@@ -18,6 +18,9 @@ public class BodyPart
     /// <summary>Se vuelve true una unica vez, al cruzar de vida positiva a 0.</summary>
     public bool EstadoDanado { get; private set; }
 
+    /// <summary>false una vez que la extremidad llega a 0 de vida (ya no es un objetivo valido).</summary>
+    public bool IsAlive => VidaActual > 0;
+
     public Sprite ReferenciaVisualNormal => definition.referenciaVisualNormal;
     public Sprite ReferenciaVisualDanada => definition.referenciaVisualDanada;
 

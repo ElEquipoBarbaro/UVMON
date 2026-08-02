@@ -259,3 +259,57 @@ se reintentaba solo con `refresh_unity`, hubo que forzarlo explícitamente.
 Después de eso, `Assembly-CSharp.dll` apareció en `Library/ScriptAssemblies` en el
 siguiente compile, `AssetDatabase.LoadAssetAtPath` volvió a funcionar para
 `CreatureData`, y las 24 pruebas EditMode corrieron y pasaron.
+
+## 9. Correcciones de UX (2026-08-01, sesión posterior)
+
+Cuatro pedidos del usuario tras probar el sistema en juego:
+
+1. **Feedback de golpe (parpadeo de alfa)**: `BodyPartOptionUI.PlayHitFlash()` —
+   corrutina que oscila `image.color.a` con `Mathf.Sin` (mismo patrón que el brillo
+   de selección del `Shadow`, pero sobre el `Image` en vez del `Shadow`) durante
+   `hitFlashDuration` (0.5s por defecto). `EnemyBodyPartsView.PlayHitFlash(index)` →
+   `BattleUIManager.PlayEnemyBodyPartHitFlash(index)` → llamado desde
+   `CombatManager.ExecuteBodyPartAttack` justo después de `RefreshBattleUI()`, en
+   **todo** golpe que impacta (no solo el que destruye la parte).
+2. **Orden de dibujo**: `EnemyBodyPartsContainer` estaba en el sibling index 8 de
+   `BattleUI`, **por encima** de `QTE` (5) y `Capture` (6) — los sprites de
+   extremidades tapaban la pantalla negra del QTE. Se movió a sibling index 3
+   (justo después de `jackmalo`, antes de `BattleMessageText`/
+   `MoveOptionsContainer`/`QTE`/`Capture`). Sibling order = draw order (ver gotcha
+   en `CLAUDE.md`): ahora `EnemyBodyPartsContainer` queda debajo de todo lo demás.
+3. **`TargetIndicatorText` tapaba el primer botón de movimiento**: pese a que en
+   coordenadas locales el texto (`anchoredPosition.y=-205`) y el contenedor de
+   movimientos (`anchoredPosition.y=-265`, `sizeDelta.y=90`) parecían solo tocarse
+   en el borde, midiendo con `RectTransform.GetWorldCorners` en Play mode (tras
+   `LayoutRebuilder.ForceRebuildLayoutImmediate` sobre `MoveOptionsContainer`, que
+   tiene un `VerticalLayoutGroup`) el texto quedaba **encima del botón 0**
+   (rango Y mundial del texto `[110, 163]` vs. botón 0 `[108, 171]` — solapamiento
+   casi total), bloqueando el click. Se subió `TargetIndicatorText.anchoredPosition.y`
+   a `-70` (medido empíricamente con `GetWorldCorners`, no por cálculo analítico —
+   la pendiente local→mundo no coincidía entre hermanos por razones no
+   diagnosticadas, así que se iteró midiendo directamente hasta confirmar
+   `worldMinY` del texto por encima de `worldMaxY` del contenedor de botones con
+   margen). Verificado sin overlap contra `MoveOptionsContainer` ni
+   `EnemyBodyPartsContainer`.
+4. **Extremidad a 0 HP ya no se puede reseleccionar**: `BodyPart.IsAlive` (nueva
+   propiedad, `VidaActual > 0`) + `BodyPartOptionUI.SetInteractable(bool)` (ignora
+   `OnPointerClick`/cursor cuando `false`, y fuerza `SetSelected(false)`).
+   `EnemyBodyPartsView.MarkDamaged` ahora llama `SetInteractable(false)` sobre la
+   parte destruida (antes solo cambiaba el sprite). Si la parte que acaba de morir
+   era el objetivo seleccionado, `CombatManager.ExecuteBodyPartAttack` reasigna
+   automáticamente el objetivo a la siguiente parte viva
+   (`FindNextAliveBodyPartIndex`) para no dejar el ataque apuntando a una
+   extremidad muerta.
+
+**Verificación (Play mode, sin click real de usuario)**: mismo patrón que el resto
+del documento — `ExecuteBodyPartAttack` invocado por reflexión y bombeado con
+`MoveNext()` manualmente (evita depender de tiempo real/frames, que no avanzan
+cuando el Editor no tiene foco — `Time.frameCount` se quedó en 4 esperando
+`WaitForSeconds` real vía `StartCoroutine` normal). Con eso: la cabeza (30 HP) murió
+en el primer intento, `selectedBodyPartIndex` pasó de 1 a 0 automáticamente. Clic
+simulado (`ExecuteEvents.Execute(..., pointerClickHandler)`) sobre el clon de la
+cabeza muerta no cambió `selectedBodyPartIndex` (bloqueado); el mismo clic sobre el
+cuerpo (vivo) sí lo cambió (control positivo). `PlayHitFlash()` se invocó sin
+excepciones. Cero errores/warnings nuevos en consola. Cambios de escena (sibling
+index, `anchoredPosition`) hechos en Edit mode (no en Play mode, que no persiste) y
+guardados con `manage_scene action=save`.

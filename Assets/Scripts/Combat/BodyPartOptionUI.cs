@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,10 +27,17 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private Texture2D pointerCursor;
     [SerializeField] private Vector2 pointerCursorHotspot = Vector2.zero;
 
+    [Header("Flash de golpe (feedback de dano, intermitente como el hover)")]
+    [SerializeField] private float hitFlashDuration = 0.5f;
+    [SerializeField] private float hitFlashSpeed = 18f;
+    [SerializeField] private float hitFlashMinAlpha = 0.25f;
+
     public event Action<BodyPartOptionUI> OnClicked;
 
     public int Index { get; private set; }
     private bool isSelected;
+    private bool isInteractable = true;
+    private Coroutine hitFlashRoutine;
 
     private void Awake()
     {
@@ -93,8 +101,59 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
             selectionGlow.effectColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
     }
 
+    /// <summary>
+    /// Habilita/deshabilita esta parte como objetivo seleccionable. Se usa cuando la
+    /// extremidad llega a 0 de vida: deja de recibir clicks y de poder mostrarse como
+    /// seleccionada (Prompt: "si ya se ataco una parte y su vida bajo a 0, no puedo
+    /// volver a seleccionarla").
+    /// </summary>
+    public void SetInteractable(bool interactable)
+    {
+        isInteractable = interactable;
+
+        if (!interactable)
+            SetSelected(false);
+    }
+
+    /// <summary>
+    /// Feedback visual de golpe: baja el alfa del sprite de forma intermitente (mismo
+    /// patron sinusoidal que el brillo de seleccion) por un instante cuando el ataque
+    /// impacta esta extremidad.
+    /// </summary>
+    public void PlayHitFlash()
+    {
+        if (image == null || !gameObject.activeInHierarchy)
+            return;
+
+        if (hitFlashRoutine != null)
+            StopCoroutine(hitFlashRoutine);
+
+        hitFlashRoutine = StartCoroutine(HitFlashRoutine());
+    }
+
+    private IEnumerator HitFlashRoutine()
+    {
+        Color baseColor = image.color;
+        float elapsed = 0f;
+
+        while (elapsed < hitFlashDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = (Mathf.Sin(elapsed * hitFlashSpeed) + 1f) * 0.5f;
+            float alpha = Mathf.Lerp(hitFlashMinAlpha, 1f, t);
+            image.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+            yield return null;
+        }
+
+        image.color = new Color(baseColor.r, baseColor.g, baseColor.b, 1f);
+        hitFlashRoutine = null;
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         if (pointerCursor != null)
             Cursor.SetCursor(pointerCursor, pointerCursorHotspot, CursorMode.Auto);
     }
@@ -107,6 +166,9 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         OnClicked?.Invoke(this);
     }
 }

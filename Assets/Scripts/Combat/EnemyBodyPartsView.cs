@@ -54,6 +54,7 @@ public class EnemyBodyPartsView : MonoBehaviour
                 : part.ReferenciaVisualNormal);
             slot.SetAnchoredPosition(part.definition.anchoredPosition);
             slot.SetSelected(false);
+            slot.SetInteractable(part.IsAlive);
             slot.OnClicked += HandleSlotClicked;
 
             // El primero en la lista queda mas al fondo, el ultimo mas encima
@@ -70,13 +71,27 @@ public class EnemyBodyPartsView : MonoBehaviour
             partSlots[i].SetSelected(i == index);
     }
 
-    /// <summary>Cambia el sprite de la parte a su variante danada (Prompt 17). No-op si ya no hay referencia.</summary>
+    /// <summary>Cambia el sprite de la parte a su variante danada (Prompt 17) y la deshabilita
+    /// como objetivo seleccionable (ya llego a 0 de vida). No cambia el sprite si no hay
+    /// referencia, pero igual se deshabilita.</summary>
     public void MarkDamaged(int index, Sprite damagedSprite)
     {
-        if (index < 0 || index >= partSlots.Count || damagedSprite == null)
+        if (index < 0 || index >= partSlots.Count)
             return;
 
-        partSlots[index].SetSprite(damagedSprite);
+        if (damagedSprite != null)
+            partSlots[index].SetSprite(damagedSprite);
+
+        partSlots[index].SetInteractable(false);
+    }
+
+    /// <summary>Feedback de golpe: parpadeo intermitente del alfa de la parte impactada.</summary>
+    public void PlayHitFlash(int index)
+    {
+        if (index < 0 || index >= partSlots.Count)
+            return;
+
+        partSlots[index].PlayHitFlash();
     }
 
     private void HandleSlotClicked(BodyPartOptionUI slot)
