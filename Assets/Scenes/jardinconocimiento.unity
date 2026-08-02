@@ -22442,13 +22442,10 @@ MonoBehaviour:
   image: {fileID: 771072312}
   selectionGlow: {fileID: 771072314}
   flashOverlayImage: {fileID: 649278184}
-  glowColor: {r: 1, g: 1, b: 1, a: 1}
-  blinkSpeed: 4
-  minGlowAlpha: 0.15
-  maxGlowAlpha: 1
-  glowDistance: {x: 3, y: -3}
   pointerCursor: {fileID: 2800000, guid: 16464853b96fe474b9b536a901b4adf2, type: 3}
   pointerCursorHotspot: {x: 9, y: 4}
+  ambientBlinkSpeed: 4
+  ambientMaxAlpha: 0.6
   hitFlashDuration: 0.5
   hitFlashSpeed: 18
   hitFlashMaxAlpha: 0.85

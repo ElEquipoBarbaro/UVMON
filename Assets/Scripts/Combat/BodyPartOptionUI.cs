@@ -8,8 +8,9 @@ using UnityEngine.UI;
 /// <summary>
 /// Un sprite de extremidad clickeable sobre la vista del enemigo (Prompt 18). Analogo a
 /// MoveOptionUI pero para seleccionar el objetivo de un ataque en vez de un movimiento.
-/// Requiere un Shadow (blanco) en el mismo GameObject para el brillo intermitente de
-/// seleccion; si no hay ninguno se agrega uno en tiempo de ejecucion.
+/// Un unico filtro blanco (flashOverlayImage) da feedback de hover, seleccion y golpe:
+/// mismo efecto (parpadeo sinusoidal de alfa), solo cambia la velocidad y si es un bucle
+/// continuo (hover/seleccion) o un pulso unico (golpe).
 /// </summary>
 [RequireComponent(typeof(Image))]
 public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -18,18 +19,15 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private Shadow selectionGlow;
     [SerializeField] private Image flashOverlayImage;
 
-    [Header("Brillo de seleccion (shadow blanco intermitente)")]
-    [SerializeField] private Color glowColor = Color.white;
-    [SerializeField] private float blinkSpeed = 4f;
-    [SerializeField] private float minGlowAlpha = 0.15f;
-    [SerializeField] private float maxGlowAlpha = 1f;
-    [SerializeField] private Vector2 glowDistance = new Vector2(3f, -3f);
-
     [Header("Cursor")]
     [SerializeField] private Texture2D pointerCursor;
     [SerializeField] private Vector2 pointerCursorHotspot = Vector2.zero;
 
-    [Header("Flash de golpe (filtro blanco intermitente sobre el sprite al recibir dano)")]
+    [Header("Filtro blanco: hover/seleccion (bucle continuo, lento)")]
+    [SerializeField] private float ambientBlinkSpeed = 4f;
+    [SerializeField] private float ambientMaxAlpha = 0.6f;
+
+    [Header("Filtro blanco: golpe recibido (pulso unico, rapido)")]
     [SerializeField] private float hitFlashDuration = 0.5f;
     [SerializeField] private float hitFlashSpeed = 18f;
     [SerializeField] private float hitFlashMaxAlpha = 0.85f;
@@ -40,6 +38,7 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public int Index { get; private set; }
     private bool isSelected;
+    private bool isHovered;
     private bool isInteractable = true;
     private Coroutine hitFlashRoutine;
 
@@ -54,15 +53,14 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         if (image != null)
             image.alphaHitTestMinimumThreshold = 0.1f;
 
+        // El brillo de seleccion ahora lo da el filtro blanco (flashOverlayImage), no el
+        // Shadow: si quedo uno de una version anterior de la escena, se neutraliza para
+        // que no deje un borde fijo sin querer.
         if (selectionGlow == null)
             selectionGlow = GetComponent<Shadow>();
 
-        if (selectionGlow == null)
-            selectionGlow = gameObject.AddComponent<Shadow>();
-
-        selectionGlow.effectColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
-        selectionGlow.effectDistance = glowDistance;
-        selectionGlow.useGraphicAlpha = true;
+        if (selectionGlow != null)
+            selectionGlow.effectColor = new Color(0f, 0f, 0f, 0f);
 
         if (flashOverlayImage != null)
         {
@@ -73,12 +71,21 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void Update()
     {
-        if (!isSelected || selectionGlow == null)
+        // El pulso de golpe (rapido, un unico disparo) tiene prioridad exclusiva sobre el
+        // filtro mientras esta corriendo: HitFlashRoutine ya escribe flashOverlayImage.color
+        // cuadro a cuadro, asi que el bucle de hover/seleccion no debe pisarlo.
+        if (flashOverlayImage == null || hitFlashRoutine != null)
             return;
 
-        float t = (Mathf.Sin(Time.unscaledTime * blinkSpeed) + 1f) * 0.5f;
-        float alpha = Mathf.Lerp(minGlowAlpha, maxGlowAlpha, t);
-        selectionGlow.effectColor = new Color(glowColor.r, glowColor.g, glowColor.b, alpha);
+        if (!isInteractable || !(isSelected || isHovered))
+        {
+            flashOverlayImage.color = new Color(1f, 1f, 1f, 0f);
+            return;
+        }
+
+        float t = (Mathf.Sin(Time.unscaledTime * ambientBlinkSpeed) + 1f) * 0.5f;
+        float alpha = Mathf.Lerp(0f, ambientMaxAlpha, t);
+        flashOverlayImage.color = new Color(1f, 1f, 1f, alpha);
     }
 
     public void SetIndex(int index)
@@ -137,13 +144,10 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
             rt.anchoredPosition = position;
     }
 
-    /// <summary>Marca esta parte como el objetivo actual: activa el brillo intermitente.</summary>
+    /// <summary>Marca esta parte como el objetivo actual: activa el filtro blanco en bucle.</summary>
     public void SetSelected(bool selected)
     {
         isSelected = selected;
-
-        if (selectionGlow != null && !selected)
-            selectionGlow.effectColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
     }
 
     /// <summary>
@@ -157,7 +161,10 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         isInteractable = interactable;
 
         if (!interactable)
+        {
             SetSelected(false);
+            isHovered = false;
+        }
     }
 
     /// <summary>
@@ -199,12 +206,16 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         if (!isInteractable)
             return;
 
+        isHovered = true;
+
         if (pointerCursor != null)
             Cursor.SetCursor(pointerCursor, pointerCursorHotspot, CursorMode.Auto);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        isHovered = false;
+
         if (pointerCursor != null)
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }

@@ -388,3 +388,59 @@ con canal alfa reducido, nunca blanco puro). Cero errores nuevos en consola dura
 todo el flujo. Cambios de escena (`pointerCursor`, `FlashOverlay` +
 `flashOverlayImage`) hechos en Edit mode y guardados con `manage_scene
 action=save` antes de entrar a Play mode para probar.
+
+## 11. Hover y seleccion usan el mismo filtro blanco que el golpe, mas lento (2026-08-02)
+
+Pedido del usuario tras probar el punto 10: quería que pasar el cursor sobre una
+parte (antes de hacer click) y tener una parte seleccionada usaran **el mismo**
+filtro blanco que el flash de golpe (`flashOverlayImage`, ver §10.4) — no el
+`Shadow` blanco intermitente que existía desde el Prompt 18 original —, solo que
+más lento y en bucle mientras dura el estado (a diferencia del golpe, que es un
+pulso único y rápido).
+
+- `BodyPartOptionUI.Update()` ahora es el único lugar que escribe
+  `flashOverlayImage.color` para hover/selección: si `hitFlashRoutine` está corriendo
+  no toca nada (el pulso de golpe tiene prioridad exclusiva, evita que ambos bucles
+  se pisen); si no, y `isInteractable && (isSelected || isHovered)`, oscila el alfa
+  entre 0 y `ambientMaxAlpha` (0.6 por defecto) con `Mathf.Sin(Time.unscaledTime *
+  ambientBlinkSpeed)` (`ambientBlinkSpeed = 4`, notablemente más lento que
+  `hitFlashSpeed = 18` del golpe); si no, fuerza el overlay a alfa 0.
+- `isHovered` es un campo nuevo, seteado en `OnPointerEnter`/`OnPointerExit` (y
+  forzado a `false` en `SetInteractable(false)`, igual que `isSelected`).
+- El `Shadow` (`selectionGlow`) que antes hacía el brillo de selección quedó
+  **neutralizado** (alfa forzada a 0 una sola vez en `Awake`, sin lógica en
+  `Update`) en vez de eliminado del GameObject — así una escena vieja que todavía
+  tenga el componente `Shadow` de una sesión anterior no deja un borde fijo sin
+  querer, sin tener que editar la escena para borrar el componente. Los campos
+  `glowColor`/`blinkSpeed`/`minGlowAlpha`/`maxGlowAlpha`/`glowDistance` se
+  eliminaron del script (reemplazados por `ambientBlinkSpeed`/`ambientMaxAlpha`);
+  al guardar la escena Unity descarta solo esos valores serializados viejos, sin
+  romper nada.
+
+**Verificación (Play mode, 2026-08-02)**: mismo patrón de batalla por reflexión que
+el resto del documento. Nota de entorno: en esta sesión de pruebas
+`Time.unscaledTime` quedó congelado entre llamadas separadas de `execute_code`
+(Editor sin foco → el Player Loop de Play mode no avanza fotogramas reales entre
+comandos MCP, mismo fenómeno que ya documentaba §9 con `WaitForSeconds`), así que
+no se pudo observar la animación cambiando cuadro a cuadro sondeando en vivo; en
+su lugar se invocó `BodyPartOptionUI.Update()` directamente por reflexión (mismo
+`Time.unscaledTime` congelado, pero validando la fórmula) con la parte "cuerpo" en
+estado hovered-no-seleccionado y la parte "cabeza" en estado seleccionada-no-hovered
+al mismo instante: **ambas devolvieron exactamente el mismo alfa**
+(`RGBA(1,1,1,0.594)`), confirmando que hover y selección producen el efecto
+idéntico. Con ambos estados apagados (`isHovered=false`, `SetSelected(false)`) el
+overlay volvió a `RGBA(1,1,1,0)` en los dos. Compilación limpia
+(`refresh_unity` sin errores), cambios guardados con `manage_scene action=save`
+antes de la prueba.
+
+Efecto colateral no relacionado, encontrado durante esta prueba: `PlayerParty` usa
+un singleton estático (`Instance`) que puede quedar apuntando a un objeto viejo si
+se entra/sale de Play mode varias veces sin recarga de dominio (Editor con "Reload
+Domain" desactivado en Enter Play Mode Settings, o sin foco) — el `Player` activo
+más reciente se auto-destruye pensando que es un duplicado, dejando `party` vacío
+(`GetLeadCreature()` devuelve `null`, `CombatManager.StartBattle` aborta con
+`"Battle could not start because one side has no usable creature."`). Esto **no es
+un bug de este trabajo** ni del flujo normal de juego (un jugador real solo entra a
+Play mode una vez por sesión); solo aparece automatizando pruebas repetidas por MCP
+en la misma sesión de Editor. No se tocó `PlayerParty.cs` — quedó anotado acá por si
+vuelve a aparecer en una futura sesión de pruebas.
