@@ -116,3 +116,6 @@ Icon?
 *.pem
 
 node_modules/
+
+
+Assets/Screenshots/

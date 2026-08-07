@@ -16,7 +16,7 @@ MonoBehaviour:
   creatureName: Arana
   frontSprite: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}
   backSprite: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}
-  maxHP: 100
+  maxHP: 300
   attack: 100
   defense: 100
   speed: 100
@@ -29,7 +29,7 @@ MonoBehaviour:
   bodyParts:
   - idParte: body
     nombreParte: Cuerpo
-    vidaMaxima: 70
+    vidaMaxima: 200
     porcentajeAtaque: 55
     porcentajeAcertividad: 85
     referenciaVisualNormal: {fileID: 21300000, guid: 9611f90b62f48544b99aef3fae35afd9, type: 3}

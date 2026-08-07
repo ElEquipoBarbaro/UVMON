@@ -31,11 +31,14 @@ parámetros fuera de los 4 pedidos.
 3. El anillo se pinta verde como aviso de "ya casi llega" cuando está cerca del
    objetivo (`innerRadius <= currentRadius <= innerRadius + tolerancia`) — es
    solo una ayuda visual, no cambia la regla de acierto.
-4. **Regla de acierto:** clic izquierdo (`Input.GetMouseButtonDown(0)`, en
-   cualquier parte de la pantalla) mientras `currentRadius >= innerRadius`
-   (o sea, **antes** de que la circunferencia llegue al radio interno) → éxito,
-   sin importar qué tan grande sea todavía el círculo. No hay que esperar a que
-   se achique hasta el objetivo ni acertar una ventana angosta.
+4. **Regla de acierto:** clic izquierdo (`Input.GetMouseButtonDown(0)`) → éxito
+   solo si se cumplen **dos** condiciones a la vez: (a) el cursor cae dentro del
+   área visible del círculo en ese instante (distancia al centro ≤ `currentRadius`,
+   circunferencia incluida — ver sección 9) y (b) todavía no pasó el radio interno
+   (`currentRadius >= innerRadius`). No hay que esperar a que se achique hasta el
+   objetivo ni acertar una ventana angosta, pero un clic fuera del círculo (aunque
+   el timing sea correcto) es fallo inmediato — antes cualquier clic en pantalla
+   contaba, ya no.
 5. Si el radio queda por debajo de `innerRadius` sin que le hayan hecho clic
    (ya lo "pasó", se te fue el tiempo) → fallo automático inmediato.
 6. Se muestra "¡EXITO!"/"¡FALLO!" ~0.5s y se oculta el overlay.
@@ -198,7 +201,46 @@ BattleUI (Canvas)
 su propia corrutina (Unity detiene las corrutinas de un GameObject apenas se
 desactiva ese mismo GameObject).
 
-## 9. Bug encontrado y corregido: escala 0 en objetos creados por MCP
+## 9. Bug encontrado y corregido (2026-08-07): el acierto no comprobaba la posicion del clic
+
+**Sintoma:** un clic en cualquier parte de la pantalla (incluso lejos del anillo) se
+registraba como acierto, siempre que ocurriera mientras `currentRadius >= innerRadius`.
+La regla de acierto era 100% temporal (`Input.GetMouseButtonDown(0)` en cualquier lugar)
+y 0% espacial — ni `TargetRing` ni `ShrinkingRing` tienen `raycastTarget` activo, asi que
+no habia ningun mecanismo (ni siquiera un raycast) mirando donde cayo el cursor.
+
+**Fix:** `IsPointerInsideCircle(ringCenter, radius, screenPoint)` convierte el punto de
+pantalla al espacio local de `RingsContainer` (o su clon, en modo paralelo) con
+`RectTransformUtility.ScreenPointToLocalPointInRectangle` y compara la distancia al
+centro contra `currentRadius` (el radio *visible* en ese instante). Funciona porque
+`TargetRing`/`ShrinkingRing` estan anclados/pivoteados al centro de su contenedor con
+`anchoredPosition (0,0)` — el origen local (0,0) del contenedor coincide exactamente con
+el centro visual del circulo. La circunferencia cuenta como valida (`<=`, con un margen
+de `BoundaryEpsilon = 0.5f` unidades locales para absorber el redondeo de punto flotante
+de la conversion pantalla→local, que sin esto podia rechazar un clic justo sobre el
+borde matematico). Se aplico tanto en `RunCircle` (un circulo/cadena) como en
+`RunQTEParallel` (el circulo "mas cercano" ahora tambien debe pasar el chequeo espacial,
+no solo ser el mas cercano por posicion).
+
+**Verificacion:** en vez de simular hardware de mouse (no hay forma de sobrescribir
+`Input.mousePosition`), se invoco `IsPointerInsideCircle` por reflection en Play Mode
+contra el `RingsContainer` real de la escena, con puntos de pantalla calculados para
+corresponder a offsets exactos en unidades locales (centro, radio-5, radio exacto,
+radio+2, lejos, y dos casos diagonales) — los 7 casos dieron el resultado esperado.
+
+**Nota aparte (no es un bug, se investigo y se descarto):** el `BattleUI` raiz tiene
+`m_LocalScale: {x: 0, y: 0, z: 0}` serializado en la escena. Parecia el mismo bug de
+"escala 0 en objetos creados con el padre inactivo" documentado en la seccion 9
+original (mas abajo), pero **no lo es**: `BattleUI` tiene un `CanvasScaler` en modo
+"Scale With Screen Size", y ese componente sobreescribe `RectTransform.localScale` con
+el factor de escala calculado (`screenWidth / referenceResolution.width`) apenas el
+Canvas se activa (`SetActive(true)` + `Canvas.ForceUpdateCanvases()` en Play Mode lo
+confirmo: paso de `(0,0,0)` a `(0.63,0.63,0.63)` automaticamente, sin que ningun script
+del proyecto lo toque). El valor serializado en disco es simplemente el ultimo estado
+guardado desde el Editor con el Canvas inactivo (donde `CanvasScaler` nunca corrio) —
+no afecta el juego real.
+
+## 10. Bug encontrado y corregido: escala 0 en objetos creados por MCP
 
 Al crear `QTE` y `Overlay` con la herramienta de GameObjects del MCP de Unity
 mientras `BattleUI` (su padre) estaba inactivo, ambos quedaron con

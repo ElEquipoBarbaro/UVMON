@@ -32,8 +32,6 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
     [SerializeField] private float hitFlashSpeed = 18f;
     [SerializeField] private float hitFlashMaxAlpha = 0.85f;
 
-    private static readonly Dictionary<Sprite, Sprite> whiteSpriteCache = new Dictionary<Sprite, Sprite>();
-
     public event Action<BodyPartOptionUI> OnClicked;
 
     public int Index { get; private set; }
@@ -113,39 +111,7 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         image.enabled = sprite != null;
 
         if (flashOverlayImage != null)
-            flashOverlayImage.sprite = GetOrCreateWhiteSprite(sprite);
-    }
-
-    /// <summary>
-    /// Genera (y cachea) una variante blanca de un sprite: mismo canal alfa, RGB en blanco
-    /// puro. Se usa como overlay para el flash de golpe (Prompt 18: "filtro blanco...
-    /// parpadea de manera intermitente y rapida"), en vez de solo desvanecer el alfa del
-    /// sprite original. Requiere que la textura tenga Read/Write Enabled (ver CLAUDE.md).
-    /// </summary>
-    private static Sprite GetOrCreateWhiteSprite(Sprite source)
-    {
-        if (source == null || source.texture == null)
-            return null;
-
-        Sprite cached;
-        if (whiteSpriteCache.TryGetValue(source, out cached) && cached != null)
-            return cached;
-
-        Rect r = source.rect;
-        Color[] pixels = source.texture.GetPixels((int)r.x, (int)r.y, (int)r.width, (int)r.height);
-
-        for (int i = 0; i < pixels.Length; i++)
-            pixels[i] = new Color(1f, 1f, 1f, pixels[i].a);
-
-        Texture2D whiteTex = new Texture2D((int)r.width, (int)r.height, TextureFormat.RGBA32, false);
-        whiteTex.SetPixels(pixels);
-        whiteTex.Apply();
-
-        Vector2 normalizedPivot = new Vector2(source.pivot.x / r.width, source.pivot.y / r.height);
-        Sprite whiteSprite = Sprite.Create(whiteTex, new Rect(0f, 0f, r.width, r.height), normalizedPivot, source.pixelsPerUnit);
-
-        whiteSpriteCache[source] = whiteSprite;
-        return whiteSprite;
+            flashOverlayImage.sprite = HitFlashEffect.GetOrCreateWhiteSprite(sprite);
     }
 
     public void SetAnchoredPosition(Vector2 position)
@@ -197,18 +163,7 @@ public class BodyPartOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private IEnumerator HitFlashRoutine()
     {
-        float elapsed = 0f;
-
-        while (elapsed < hitFlashDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = (Mathf.Sin(elapsed * hitFlashSpeed) + 1f) * 0.5f;
-            float alpha = Mathf.Lerp(0f, hitFlashMaxAlpha, t);
-            flashOverlayImage.color = new Color(1f, 1f, 1f, alpha);
-            yield return null;
-        }
-
-        flashOverlayImage.color = new Color(1f, 1f, 1f, 0f);
+        yield return HitFlashEffect.PlayOverlay(flashOverlayImage, hitFlashDuration, hitFlashSpeed, hitFlashMaxAlpha);
         hitFlashRoutine = null;
     }
 

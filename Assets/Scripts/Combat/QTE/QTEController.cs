@@ -27,6 +27,13 @@ public class QTEController : MonoBehaviour
     private const float OverlapPadding = 24f;
     private const int OverlapMaxAttempts = 30;
 
+    // Margen minimo (menos de un pixel visual) para que un clic exactamente sobre la
+    // circunferencia cuente como valido pese al redondeo de punto flotante al convertir
+    // la posicion de pantalla al espacio local del RectTransform. Sin esto, un clic
+    // matematicamente "justo en el borde" a veces caia 0.0001 unidades afuera y se
+    // perdia como fallo, violando la regla de que el borde es parte del circulo.
+    private const float BoundaryEpsilon = 0.5f;
+
     private class ParallelCircle
     {
         public QTEData data;
@@ -120,6 +127,40 @@ public class QTEController : MonoBehaviour
         return currentRadius >= innerRadius && currentRadius <= innerRadius + tolerance;
     }
 
+    /// <summary>
+    /// Valida si un punto de pantalla cae dentro (circunferencia incluida) del circulo
+    /// visible de radio 'radius' centrado en 'ringCenter'. 'ringCenter' es el
+    /// RectTransform de RingsContainer (o su clon en modo paralelo): TargetRing y
+    /// ShrinkingRing estan anclados/pivoteados a su centro con anchoredPosition (0,0),
+    /// asi que el origen local (0,0) de 'ringCenter' coincide con el centro visual real
+    /// del circulo, sin importar en que parte de la pantalla este posicionado el QTE.
+    /// Reemplaza la regla anterior, que aceptaba cualquier clic en pantalla sin mirar
+    /// donde cayo el cursor.
+    /// </summary>
+    private bool IsPointerInsideCircle(RectTransform ringCenter, float radius, Vector2 screenPoint)
+    {
+        if (ringCenter == null || radius <= 0f)
+            return false;
+
+        // includeInactive:true porque este chequeo puede correr mientras BattleUI
+        // (el Canvas padre) todavia esta activandose o en un frame donde la
+        // jerarquia esta inactiva; sin esto GetComponentInParent devuelve null.
+        Canvas canvas = ringCenter.GetComponentInParent<Canvas>(true);
+        Camera eventCamera = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            ? canvas.worldCamera
+            : null;
+
+        Vector2 localPoint;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(ringCenter, screenPoint, eventCamera, out localPoint))
+            return false;
+
+        // La circunferencia cuenta como parte valida del circulo (<=, no <), con un
+        // margen submilimétrico que absorbe el ruido de punto flotante de la conversion
+        // pantalla -> local sin agrandar perceptiblemente el area de acierto.
+        float allowedRadius = radius + BoundaryEpsilon;
+        return localPoint.sqrMagnitude <= allowedRadius * allowedRadius;
+    }
+
     /// <summary>Corre un unico circulo. Requiere que el overlay ya este activo.</summary>
     private IEnumerator RunCircle(QTEData data, Action<bool> onResult)
     {
@@ -153,8 +194,13 @@ public class QTEController : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                // Exito: toco el circulo antes de que llegue al radio interno.
-                result = currentRadius >= data.innerRadius;
+                // Exito solo si el clic cayo realmente dentro del area visible del
+                // circulo (no en cualquier parte de la pantalla) Y ademas llego a
+                // tiempo (antes de que el radio pase por debajo del objetivo). Un
+                // clic fuera del circulo es fallo inmediato, sin importar el timing.
+                bool clickedInsideCircle = IsPointerInsideCircle(ringsContainer, Mathf.Max(0f, currentRadius), Input.mousePosition);
+                bool reachedTarget = currentRadius >= data.innerRadius;
+                result = clickedInsideCircle && reachedTarget;
             }
             else if (currentRadius < data.innerRadius)
             {
@@ -351,10 +397,13 @@ public class QTEController : MonoBehaviour
 
                 if (nearest != null)
                 {
-                    // Exito: toco ese circulo antes de que llegue a su radio interno.
+                    // Exito solo si el clic cayo dentro del area visible de ESE
+                    // circulo (el mas cercano solo decide a cual se le "apunto"; no
+                    // basta con estar cerca en pantalla) y ademas llego a tiempo.
+                    bool clickedInsideCircle = IsPointerInsideCircle(nearest.container, Mathf.Max(0f, nearest.currentRadius), Input.mousePosition);
                     bool reachedTarget = nearest.currentRadius >= nearest.data.innerRadius;
 
-                    if (reachedTarget)
+                    if (clickedInsideCircle && reachedTarget)
                         nearest.resolved = true;
                     else
                         overallResult = false;

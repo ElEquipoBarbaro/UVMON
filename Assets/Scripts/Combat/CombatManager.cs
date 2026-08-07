@@ -41,8 +41,25 @@ public class CombatManager : MonoBehaviour
 
     public BattleUIManager BattleUI => battleUI;
 
+    /// <summary>No nulo mientras BattleLoop() esta corriendo. Usado para impedir que una
+    /// segunda llamada a StartBattle (p.ej. un doble trigger de interaccion) arranque un
+    /// segundo BattleLoop superpuesto compartiendo los mismos campos de turno/seleccion —
+    /// eso rompia la alternancia de turnos y dejaba el sistema "sin sentido" (ver hallazgo
+    /// en COMBAT_SYSTEM_ANALYSIS.md).</summary>
+    private Coroutine battleLoopCoroutine;
+    public bool IsBattleActive => battleLoopCoroutine != null;
+
     private void Awake()
     {
+        // Igual que PlayerParty.Awake: si por algun motivo ya hay un CombatManager vivo
+        // (duplicado en la escena), este se autodestruye en vez de pisar la referencia
+        // singleton existente.
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
 
         if (battleUI != null)
@@ -61,6 +78,11 @@ public class CombatManager : MonoBehaviour
             battleUI.OnMoveClicked -= HandleMoveClicked;
             battleUI.OnBodyPartClicked -= HandleBodyPartClicked;
         }
+
+        // Evita que Instance quede apuntando a un objeto destruido si este era el
+        // singleton activo (mismo patron que el guard de duplicados en Awake).
+        if (Instance == this)
+            Instance = null;
     }
 
     private void HandleBodyPartClicked(int index)
@@ -124,6 +146,14 @@ public class CombatManager : MonoBehaviour
         if (playerParty == null || enemyTrainer == null)
             return;
 
+        // Ya hay un BattleLoop corriendo (p.ej. un doble trigger de interaccion antes de
+        // que la primera batalla arrancara del todo): ignorar la llamada en vez de
+        // arrancar un segundo BattleLoop superpuesto que comparta isPlayerTurn/
+        // playerHasChosen/selectedBodyPartIndex con el primero (eso es lo que rompia la
+        // alternancia de turnos — ver COMBAT_SYSTEM_ANALYSIS.md).
+        if (battleLoopCoroutine != null)
+            return;
+
         playerRuntime = playerParty.GetLeadCreature();
         enemyRuntime = enemyTrainer.GetLeadCreature();
         currentEnemyTrainer = enemyTrainer;
@@ -159,7 +189,7 @@ public class CombatManager : MonoBehaviour
             }
         }
 
-        StartCoroutine(BattleLoop());
+        battleLoopCoroutine = StartCoroutine(BattleLoop());
     }
 
     private static List<BodyPart> BuildBodyPartsRuntime(CreatureData data)
@@ -182,6 +212,25 @@ public class CombatManager : MonoBehaviour
     {
         if (battleUI != null)
             battleUI.UpdateHP(playerRuntime, enemyRuntime);
+    }
+
+    /// <summary>
+    /// Dispara el flash de golpe (CreatureBattleView.PlayHitFlash) sobre la vista que
+    /// corresponda segun quien recibio el dano — llamado desde DamageEffect justo
+    /// despues de confirmar CreatureRuntime.TakeDamage, para que nunca se dispare en un
+    /// ataque fallido. Solo afecta al sprite de la criatura golpeada; la otra vista no se
+    /// toca. El ataque dirigido a extremidades (ExecuteBodyPartAttack) ya tiene su propio
+    /// flash por parte (PlayEnemyBodyPartHitFlash) y no pasa por aca.
+    /// </summary>
+    public void PlayHitFlashFor(CreatureRuntime creature)
+    {
+        if (battleUI == null || creature == null)
+            return;
+
+        if (creature == playerRuntime)
+            battleUI.PlayerView?.PlayHitFlash();
+        else if (creature == enemyRuntime)
+            battleUI.EnemyView?.PlayHitFlash();
     }
 
     public void SelectMove(MoveData move)
@@ -249,6 +298,9 @@ public class CombatManager : MonoBehaviour
 
         if (!attackSucceeds)
         {
+            if (battleAnimationPlayer != null && battleUI != null)
+                battleAnimationPlayer.PlayMissIndicator(battleUI.EnemyView);
+
             if (battleUI != null)
                 battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName}'s attack missed!");
 
@@ -310,6 +362,9 @@ public class CombatManager : MonoBehaviour
 
         if (!result.ataqueImpacta)
         {
+            if (battleAnimationPlayer != null && battleUI != null)
+                battleAnimationPlayer.PlayMissIndicator(battleUI.EnemyView);
+
             if (battleUI != null)
             {
                 battleUI.ShowBattleMessage($"Attack missed {target.NombreParte}!");
@@ -408,6 +463,8 @@ public class CombatManager : MonoBehaviour
         }
 
         yield return EndBattleSequence();
+
+        battleLoopCoroutine = null;
     }
 
     private IEnumerator EndBattleSequence()

@@ -10,7 +10,13 @@ public class BattleAnimationPlayer : MonoBehaviour
     [Header("Fallbacks")]
     [SerializeField] private float fallbackTravelDuration = 0.35f;
 
+    [Header("Indicador de fallo (\"FALLO\")")]
+    [SerializeField] private GameObject missIndicatorPrefab;
+    [SerializeField] private float missIndicatorVerticalOffset = 90f;
+    [SerializeField] private float missIndicatorLifetime = 1.5f;
+
     private Vector3 cameraRestingLocalPosition;
+    private GameObject currentMissIndicator;
 
     private void Awake()
     {
@@ -121,6 +127,45 @@ public class BattleAnimationPlayer : MonoBehaviour
         }
 
         Destroy(attackObject);
+    }
+
+    /// <summary>
+    /// Muestra el indicador "FALLO" sobre la cabeza/parte superior de <paramref name="targetView"/>.
+    /// Debe llamarse SOLO cuando el resultado oficial del ataque es un fallo — nunca junto con
+    /// dano o el flash de golpe. Si ya hay un indicador en pantalla (fallos consecutivos rapidos)
+    /// lo reemplaza en vez de acumular instancias.
+    /// </summary>
+    public void PlayMissIndicator(CreatureBattleView targetView)
+    {
+        if (missIndicatorPrefab == null || targetView == null)
+            return;
+
+        if (currentMissIndicator != null)
+            Destroy(currentMissIndicator);
+
+        // targetView vive bajo el Canvas de BattleUI (su propia convencion de unidades,
+        // distinta de la de projectileLayer), asi que no se puede reutilizar su
+        // anchoredPosition tal cual. Se pasa por la posicion real en pantalla (world/screen
+        // space, igual para cualquier canvas Screen Space Overlay) para calcular la posicion
+        // equivalente dentro de projectileLayer.
+        Vector2 position = ProjectileLayerPosition(targetView.transform.position)
+            + new Vector2(0f, missIndicatorVerticalOffset);
+
+        currentMissIndicator = InstantiateImpact(missIndicatorPrefab, position);
+
+        if (currentMissIndicator != null)
+            Destroy(currentMissIndicator, Mathf.Max(0.01f, missIndicatorLifetime));
+    }
+
+    private Vector2 ProjectileLayerPosition(Vector3 worldPosition)
+    {
+        if (projectileLayer == null)
+            return worldPosition;
+
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, worldPosition);
+        Vector2 localPoint;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(projectileLayer, screenPoint, null, out localPoint);
+        return localPoint;
     }
 
     private GameObject InstantiateImpact(GameObject prefab, Vector2 anchoredPosition)

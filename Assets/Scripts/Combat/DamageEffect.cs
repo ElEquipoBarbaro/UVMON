@@ -61,7 +61,10 @@ public class DamageEffect : MoveEffect
         target.TakeDamage(damage);
 
         if (CombatManager.Instance != null)
+        {
             CombatManager.Instance.RefreshBattleUI();
+            CombatManager.Instance.PlayHitFlashFor(target);
+        }
 
         if (ui != null)
         {
