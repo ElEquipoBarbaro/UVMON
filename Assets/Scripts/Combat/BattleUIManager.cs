@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BattleUIManager : MonoBehaviour
 {
@@ -11,10 +12,40 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private GameObject overworldUI;
     [SerializeField] private GameObject playerObject;
 
+    [Header("Tabs: Ataques / Inventario / Equipo (Prompt 3-5)")]
+    [SerializeField] private Button attacksTabButton;
+    [SerializeField] private Button inventoryTabButton;
+    [SerializeField] private Button teamTabButton;
+    [SerializeField] private GameObject attacksPanel;
+    [SerializeField] private GameObject inventoryPanel;
+    [SerializeField] private CombatInventoryUI combatInventoryUI;
+    [SerializeField] private GameObject teamPanel;
+    [SerializeField] private CombatTeamUI combatTeamUI;
+    [SerializeField] private Color tabActiveColor = new Color(1f, 1f, 1f, 1f);
+    [SerializeField] private Color tabInactiveColor = new Color(0.6f, 0.6f, 0.6f, 1f);
+
+    public enum CombatTab { Attacks, Inventory, Team }
+    public CombatTab CurrentTab { get; private set; } = CombatTab.Attacks;
+
+    /// <summary>Se dispara cada vez que la pestana visible cambia (p.ej. para refrescar
+    /// Inventario/Equipo con datos actuales al abrirse).</summary>
+    public event Action<CombatTab> OnTabChanged;
+
+    /// <summary>El jugador hizo clic sobre un integrante del equipo en la pestana Equipo
+    /// (Prompt 6). Indice real en PlayerParty.Instance.Party.</summary>
+    public event Action<int> OnTeamMemberClicked;
+
+    /// <summary>El jugador hizo clic sobre un objeto en la pestana Inventario (Prompt 7).
+    /// Indice real en InventorySO.</summary>
+    public event Action<int> OnInventoryItemClicked;
+
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private TextMeshProUGUI enemyHPText;
     [SerializeField] private TextMeshProUGUI battleMessageText;
+
+    [Tooltip("Nombre + nivel del UVGmon activo (Prompt 8: panel 'UVGmon activo' del mockup objetivo). Se actualiza junto con el sprite/HP en BindCreatures.")]
+    [SerializeField] private TextMeshProUGUI playerNameLevelText;
 
     [Header("Move Selection")]
     [SerializeField] private Transform moveOptionsContainer;
@@ -22,6 +53,7 @@ public class BattleUIManager : MonoBehaviour
 
     private readonly List<MoveOptionUI> moveOptionSlots = new List<MoveOptionUI>();
     private bool moveSelectionLocked;
+    private IReadOnlyList<MoveData> lastRenderedMoves;
 
     /// <summary>El jugador paso el cursor sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
     public event Action<int> OnMoveHovered;
@@ -49,17 +81,86 @@ public class BattleUIManager : MonoBehaviour
     {
         if (enemyBodyPartsView != null)
             enemyBodyPartsView.OnPartClicked += HandleBodyPartClicked;
+
+        if (combatTeamUI != null)
+            combatTeamUI.OnCreatureSelected += HandleTeamMemberClicked;
+
+        if (combatInventoryUI != null)
+            combatInventoryUI.OnItemSelected += HandleInventoryItemClicked;
+
+        if (attacksTabButton != null)
+            attacksTabButton.onClick.AddListener(ShowAttacksTab);
+
+        if (inventoryTabButton != null)
+            inventoryTabButton.onClick.AddListener(ShowInventoryTab);
+
+        if (teamTabButton != null)
+            teamTabButton.onClick.AddListener(ShowTeamTab);
     }
 
     private void OnDestroy()
     {
         if (enemyBodyPartsView != null)
             enemyBodyPartsView.OnPartClicked -= HandleBodyPartClicked;
+
+        if (combatTeamUI != null)
+            combatTeamUI.OnCreatureSelected -= HandleTeamMemberClicked;
+
+        if (combatInventoryUI != null)
+            combatInventoryUI.OnItemSelected -= HandleInventoryItemClicked;
+
+        if (attacksTabButton != null)
+            attacksTabButton.onClick.RemoveListener(ShowAttacksTab);
+
+        if (inventoryTabButton != null)
+            inventoryTabButton.onClick.RemoveListener(ShowInventoryTab);
+
+        if (teamTabButton != null)
+            teamTabButton.onClick.RemoveListener(ShowTeamTab);
+    }
+
+    public void ShowAttacksTab() => SetTab(CombatTab.Attacks);
+    public void ShowInventoryTab() => SetTab(CombatTab.Inventory);
+    public void ShowTeamTab() => SetTab(CombatTab.Team);
+
+    private void SetTab(CombatTab tab)
+    {
+        CurrentTab = tab;
+
+        if (attacksPanel != null) attacksPanel.SetActive(tab == CombatTab.Attacks);
+        if (inventoryPanel != null) inventoryPanel.SetActive(tab == CombatTab.Inventory);
+        if (teamPanel != null) teamPanel.SetActive(tab == CombatTab.Team);
+
+        SetTabButtonColor(attacksTabButton, tab == CombatTab.Attacks);
+        SetTabButtonColor(inventoryTabButton, tab == CombatTab.Inventory);
+        SetTabButtonColor(teamTabButton, tab == CombatTab.Team);
+
+        OnTabChanged?.Invoke(tab);
+    }
+
+    private void SetTabButtonColor(Button button, bool active)
+    {
+        if (button == null)
+            return;
+
+        Image img = button.targetGraphic as Image;
+        if (img != null)
+            img.color = active ? tabActiveColor : tabInactiveColor;
     }
 
     private void HandleBodyPartClicked(int index)
     {
         OnBodyPartClicked?.Invoke(index);
+    }
+
+    private void HandleTeamMemberClicked(int partyIndex)
+    {
+        OnTeamMemberClicked?.Invoke(partyIndex);
+    }
+
+    private void HandleInventoryItemClicked(int inventoryIndex)
+    {
+        OnInventoryItemClicked?.Invoke(inventoryIndex);
     }
 
     public void SetupEnemyBodyParts(IReadOnlyList<BodyPart> parts)
@@ -134,6 +235,9 @@ public class BattleUIManager : MonoBehaviour
         if (battleUI != null) battleUI.SetActive(true);
         if (overworldUI != null) overworldUI.SetActive(false);
         if (playerObject != null) playerObject.SetActive(false);
+
+        SetTab(CombatTab.Attacks);
+        RefreshTeamTab();
     }
 
     public void HideBattleUI()
@@ -163,6 +267,9 @@ public class BattleUIManager : MonoBehaviour
         if (enemyCreatureView != null)
             enemyCreatureView.CacheRestingPosition();
 
+        if (playerNameLevelText != null && playerRuntime != null)
+            playerNameLevelText.text = $"{playerRuntime.data.creatureName}  Lv.{playerRuntime.Level}";
+
         UpdateHP(playerRuntime, enemyRuntime);
     }
 
@@ -173,6 +280,19 @@ public class BattleUIManager : MonoBehaviour
 
         if (enemyRuntime != null && enemyHPText != null)
             enemyHPText.text = $"HP: {enemyRuntime.CurrentHP}/{enemyRuntime.MaxHP}";
+
+        // La pestana Equipo lee PlayerParty en vivo (sin copia propia); cualquier cambio de
+        // vida del jugador debe reflejarse ahi tambien, este visible o no en este momento
+        // (si esta oculta, OnEnable() la refresca igual al volver a mostrarla).
+        RefreshTeamTab();
+    }
+
+    /// <summary>Fuerza una relectura del equipo real en la pestana Equipo (Prompt 5/6):
+    /// cambio de vida, cambio de UVGmon activo, inicio de combate, etc.</summary>
+    public void RefreshTeamTab()
+    {
+        if (combatTeamUI != null)
+            combatTeamUI.Refresh();
     }
 
     public void RenderMoveSelection(IReadOnlyList<MoveData> moves, int selectedMoveIndex)
@@ -180,13 +300,38 @@ public class BattleUIManager : MonoBehaviour
         if (moveOptionsContainer == null || moveOptionPrefab == null)
             return;
 
-        int moveCount = moves != null ? moves.Count : 0;
-
-        if (moveOptionSlots.Count != moveCount)
+        // Antes solo comparaba la CANTIDAD de movimientos (moveOptionSlots.Count !=
+        // moveCount) para decidir si reconstruir los slots. Eso evitaba el rebuild -- y
+        // dejaba nombres obsoletos en pantalla -- cuando el UVGmon activo cambiaba a otro
+        // con la misma cantidad de ataques pero distintos (Prompt 4/6: la lista debe
+        // reflejar siempre los ataques REALES del activo). Comparar por referencia cada
+        // MoveData detecta ese caso sin perder la optimizacion de no reconstruir en cada
+        // hover del mismo turno (HandleMoveHovered llama a este metodo constantemente).
+        if (!MovesMatch(lastRenderedMoves, moves))
+        {
             RebuildMoveOptions(moves);
+            lastRenderedMoves = moves;
+        }
 
         for (int i = 0; i < moveOptionSlots.Count; i++)
             moveOptionSlots[i].SetHighlighted(i == selectedMoveIndex);
+    }
+
+    private static bool MovesMatch(IReadOnlyList<MoveData> a, IReadOnlyList<MoveData> b)
+    {
+        int countA = a != null ? a.Count : 0;
+        int countB = b != null ? b.Count : 0;
+
+        if (countA != countB)
+            return false;
+
+        for (int i = 0; i < countA; i++)
+        {
+            if (!ReferenceEquals(a[i], b[i]))
+                return false;
+        }
+
+        return true;
     }
 
     private void RebuildMoveOptions(IReadOnlyList<MoveData> moves)
