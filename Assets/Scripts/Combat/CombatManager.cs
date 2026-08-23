@@ -37,7 +37,26 @@ public class CombatManager : MonoBehaviour
     private int selectedBodyPartIndex = 0;
     private bool bodyPartConfirmedThisTurn;
 
+    /// <summary>Se pone en true cuando una accion que NO es un ataque (cambio de UVGmon,
+    /// Prompt 6; usar un objeto de inventario, Prompt 7) resuelve el turno del jugador --
+    /// PlayerTurn() lo usa para saltarse por completo el camino de ataque (QTE/dano) y
+    /// terminar el turno directamente, sin imprimir "Nothing happened."</summary>
+    private bool nonAttackActionResolved;
+
     private bool HasEnemyBodyParts => enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0;
+
+    /// <summary>
+    /// Prompt 7: guardia unica ("playerActionInProgress") que bloquea el inicio de
+    /// cualquier accion del jugador (ataque, objeto, cambio de UVGmon) fuera de la
+    /// ventana valida. Es true tanto cuando NO es el turno del jugador (QTE en curso,
+    /// turno enemigo, batalla resolviendo) como cuando ya eligio una accion este turno
+    /// pero todavia no termino de resolverse -- exactamente la misma condicion que ya
+    /// usaban por separado HandleBodyPartClicked/IsValidMoveIndex/HandleTeamMemberClicked,
+    /// ahora centralizada en un solo lugar en vez de repetir "!isPlayerTurn || playerHasChosen"
+    /// en cada handler (y con eso, sin crear una maquina de turnos paralela: sigue leyendo
+    /// los mismos dos campos que ya gobiernan PlayerTurn()).
+    /// </summary>
+    private bool IsPlayerActionLocked => !isPlayerTurn || playerHasChosen;
 
     public BattleUIManager BattleUI => battleUI;
 
@@ -67,6 +86,8 @@ public class CombatManager : MonoBehaviour
             battleUI.OnMoveHovered += HandleMoveHovered;
             battleUI.OnMoveClicked += HandleMoveClicked;
             battleUI.OnBodyPartClicked += HandleBodyPartClicked;
+            battleUI.OnTeamMemberClicked += HandleTeamMemberClicked;
+            battleUI.OnInventoryItemClicked += HandleInventoryItemClicked;
         }
     }
 
@@ -77,6 +98,8 @@ public class CombatManager : MonoBehaviour
             battleUI.OnMoveHovered -= HandleMoveHovered;
             battleUI.OnMoveClicked -= HandleMoveClicked;
             battleUI.OnBodyPartClicked -= HandleBodyPartClicked;
+            battleUI.OnTeamMemberClicked -= HandleTeamMemberClicked;
+            battleUI.OnInventoryItemClicked -= HandleInventoryItemClicked;
         }
 
         // Evita que Instance quede apuntando a un objeto destruido si este era el
@@ -89,7 +112,7 @@ public class CombatManager : MonoBehaviour
     {
         // Solo se puede (re)elegir objetivo antes de confirmar un movimiento (PROMPT.md
         // Prompt 18: primero se elige la parte, recien despues se habilita el ataque).
-        if (!isPlayerTurn || playerHasChosen)
+        if (IsPlayerActionLocked)
             return;
 
         if (enemyBodyPartsRuntime == null || index < 0 || index >= enemyBodyPartsRuntime.Count)
@@ -101,6 +124,96 @@ public class CombatManager : MonoBehaviour
 
         if (battleUI != null)
             battleUI.SetMoveSelectionLocked(false);
+    }
+
+    /// <summary>
+    /// Rotacion de UVGmon activo (Prompt 6). Solo valido durante el turno del jugador,
+    /// antes de haber elegido ya una accion (mismo guard que HandleBodyPartClicked/
+    /// IsValidMoveIndex -- bloquea automaticamente durante QTE y durante el turno
+    /// enemigo, porque isPlayerTurn ya es false en ambos casos). Un cambio exitoso
+    /// consume el turno completo: no ataca, no usa inventario, no permite una segunda
+    /// accion -- ver PlayerTurn().
+    /// </summary>
+    private void HandleTeamMemberClicked(int partyIndex)
+    {
+        if (IsPlayerActionLocked)
+            return;
+
+        if (PlayerParty.Instance == null)
+            return;
+
+        IReadOnlyList<CreatureRuntime> party = PlayerParty.Instance.Party;
+
+        if (partyIndex < 0 || partyIndex >= party.Count)
+            return;
+
+        // Ya es el activo: no hay nada que cambiar, y no se consume el turno.
+        if (partyIndex == 0)
+            return;
+
+        CreatureRuntime target = party[partyIndex];
+
+        // No se puede cambiar a un UVGmon que no puede combatir (regla ya usada por
+        // PlayerParty.HasUsableCreature: vidaActual <= 0).
+        if (target == null || target.CurrentHP <= 0)
+            return;
+
+        PlayerParty.Instance.SetLeadCreature(partyIndex);
+        playerRuntime = PlayerParty.Instance.GetLeadCreature();
+
+        if (battleUI != null)
+        {
+            battleUI.BindCreatures(playerRuntime, enemyRuntime);
+
+            selectedMoveIndex = 0;
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
+
+            battleUI.RefreshTeamTab();
+            battleUI.ShowBattleMessage($"Go, {playerRuntime.data.creatureName}!");
+            battleUI.ShowAttacksTab();
+        }
+
+        nonAttackActionResolved = true;
+        playerHasChosen = true;
+    }
+
+    /// <summary>
+    /// Usar un objeto de inventario durante el turno del jugador (Prompt 7). Misma
+    /// guardia que ataque/cambio de UVGmon (IsPlayerActionLocked). Solo objetos
+    /// Healing con un ItemEffect asignado son usables aqui -- exactamente la misma regla
+    /// que ya aplica InventoryController.HandleItemActionRequest fuera de combate (no se
+    /// modifica esa logica, solo se replica la condicion en este nuevo punto de entrada).
+    /// El objetivo es siempre el UVGmon activo: a diferencia del menu fuera de combate,
+    /// en batalla no hay una segunda pestana de seleccion de objetivo -- se asume que
+    /// "usar un objeto" en pleno combate cura a quien esta peleando.
+    /// </summary>
+    private void HandleInventoryItemClicked(int inventoryIndex)
+    {
+        if (IsPlayerActionLocked)
+            return;
+
+        if (inventoryData == null || playerRuntime == null)
+            return;
+
+        InventoryItem slot = inventoryData.GetItemAt(inventoryIndex);
+
+        if (slot.IsEmpty || slot.item.Category != ItemCategory.Healing || slot.item.Effect == null)
+            return;
+
+        string itemName = slot.item.Name;
+
+        slot.item.Effect.Apply(playerRuntime);
+        inventoryData.RemoveItem(inventoryIndex, 1);
+
+        if (battleUI != null)
+        {
+            battleUI.UpdateHP(playerRuntime, enemyRuntime);
+            battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} used {itemName}!");
+            battleUI.ShowAttacksTab();
+        }
+
+        nonAttackActionResolved = true;
+        playerHasChosen = true;
     }
 
     private void SelectBodyPartTarget(int index)
@@ -130,7 +243,12 @@ public class CombatManager : MonoBehaviour
 
     private bool IsValidMoveIndex(int index)
     {
-        if (!isPlayerTurn || playerRuntime == null || playerRuntime.Moves == null)
+        // IsPlayerActionLocked (en vez de solo "!isPlayerTurn") tambien bloquea un
+        // segundo clic sobre otra opcion de movimiento en el mismo frame en que ya se
+        // eligio uno (playerHasChosen=true pero isPlayerTurn todavia no bajo a false --
+        // PlayerTurn() recien lo hace al reanudar la corutina) -- sin esto, un doble clic
+        // muy rapido podia pisar selectedMove con otro movimiento (Prompt 7, prueba 7).
+        if (IsPlayerActionLocked || playerRuntime == null || playerRuntime.Moves == null)
             return false;
 
         // El enemigo tiene extremidades atacables: hay que confirmar un objetivo
@@ -244,6 +362,7 @@ public class CombatManager : MonoBehaviour
         isPlayerTurn = true;
         playerHasChosen = false;
         bodyPartConfirmedThisTurn = false;
+        nonAttackActionResolved = false;
 
         if (battleUI != null)
         {
@@ -263,6 +382,17 @@ public class CombatManager : MonoBehaviour
         yield return new WaitUntil(() => playerHasChosen);
 
         isPlayerTurn = false;
+
+        // Cambio de UVGmon (Prompt 6) o uso de objeto (Prompt 7): ya se resolvio por
+        // completo en HandleTeamMemberClicked/HandleInventoryItemClicked (efecto
+        // aplicado, UI actualizada). El turno se consume aqui sin ejecutar
+        // ataque/QTE/dano -- va directo a EnemyTurn().
+        if (nonAttackActionResolved)
+        {
+            nonAttackActionResolved = false;
+            yield return new WaitForSeconds(0.6f);
+            yield break;
+        }
 
         if (selectedMove == null || selectedMove.effect == null)
         {
