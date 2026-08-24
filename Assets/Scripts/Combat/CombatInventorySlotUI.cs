@@ -22,6 +22,7 @@ public class CombatInventorySlotUI : MonoBehaviour, IPointerClickHandler
     /// <summary>Indice REAL en InventorySO (no la posicion visual en la lista -- los slots
     /// vacios se omiten al pintar, asi que ambos pueden diferir).</summary>
     public int InventoryIndex { get; private set; }
+    private bool isInteractable = true;
 
     public void SetData(Sprite sprite, string itemName, int quantity, int inventoryIndex)
     {
@@ -42,6 +43,21 @@ public class CombatInventorySlotUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         OnClicked?.Invoke(this);
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        isInteractable = interactable;
+
+        if (icon != null)
+        {
+            Color color = icon.color;
+            color.a = interactable ? 1f : 0.45f;
+            icon.color = color;
+        }
     }
 }

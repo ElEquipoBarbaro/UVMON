@@ -53,6 +53,7 @@ public class BattleUIManager : MonoBehaviour
 
     private readonly List<MoveOptionUI> moveOptionSlots = new List<MoveOptionUI>();
     private bool moveSelectionLocked;
+    private bool playerInputEnabled;
     private IReadOnlyList<MoveData> lastRenderedMoves;
 
     /// <summary>El jugador paso el cursor sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
@@ -83,7 +84,10 @@ public class BattleUIManager : MonoBehaviour
             enemyBodyPartsView.OnPartClicked += HandleBodyPartClicked;
 
         if (combatTeamUI != null)
+        {
             combatTeamUI.OnCreatureSelected += HandleTeamMemberClicked;
+            combatTeamUI.OnCancelled += HandleTeamSelectionCancelled;
+        }
 
         if (combatInventoryUI != null)
             combatInventoryUI.OnItemSelected += HandleInventoryItemClicked;
@@ -96,6 +100,8 @@ public class BattleUIManager : MonoBehaviour
 
         if (teamTabButton != null)
             teamTabButton.onClick.AddListener(ShowTeamTab);
+
+        SetPlayerInputEnabled(false);
     }
 
     private void OnDestroy()
@@ -104,7 +110,10 @@ public class BattleUIManager : MonoBehaviour
             enemyBodyPartsView.OnPartClicked -= HandleBodyPartClicked;
 
         if (combatTeamUI != null)
+        {
             combatTeamUI.OnCreatureSelected -= HandleTeamMemberClicked;
+            combatTeamUI.OnCancelled -= HandleTeamSelectionCancelled;
+        }
 
         if (combatInventoryUI != null)
             combatInventoryUI.OnItemSelected -= HandleInventoryItemClicked;
@@ -127,6 +136,9 @@ public class BattleUIManager : MonoBehaviour
     {
         CurrentTab = tab;
 
+        bool inventoryWasActive = inventoryPanel != null && inventoryPanel.activeSelf;
+        bool teamWasActive = teamPanel != null && teamPanel.activeSelf;
+
         if (attacksPanel != null) attacksPanel.SetActive(tab == CombatTab.Attacks);
         if (inventoryPanel != null) inventoryPanel.SetActive(tab == CombatTab.Inventory);
         if (teamPanel != null) teamPanel.SetActive(tab == CombatTab.Team);
@@ -134,6 +146,17 @@ public class BattleUIManager : MonoBehaviour
         SetTabButtonColor(attacksTabButton, tab == CombatTab.Attacks);
         SetTabButtonColor(inventoryTabButton, tab == CombatTab.Inventory);
         SetTabButtonColor(teamTabButton, tab == CombatTab.Team);
+
+        // OnEnable ya refresca un panel que acaba de activarse. Solo forzar Refresh
+        // cuando el usuario pulsa de nuevo la pestana que ya estaba visible, evitando
+        // destruir/crear dos juegos de slots en el mismo frame.
+        if (tab == CombatTab.Inventory && inventoryWasActive && combatInventoryUI != null)
+            combatInventoryUI.Refresh();
+
+        if (tab == CombatTab.Team && teamWasActive && combatTeamUI != null)
+            combatTeamUI.Refresh();
+        else if (combatTeamUI != null)
+            combatTeamUI.CancelSelection();
 
         OnTabChanged?.Invoke(tab);
     }
@@ -156,6 +179,11 @@ public class BattleUIManager : MonoBehaviour
     private void HandleTeamMemberClicked(int partyIndex)
     {
         OnTeamMemberClicked?.Invoke(partyIndex);
+    }
+
+    private void HandleTeamSelectionCancelled()
+    {
+        ShowAttacksTab();
     }
 
     private void HandleInventoryItemClicked(int inventoryIndex)
@@ -203,7 +231,30 @@ public class BattleUIManager : MonoBehaviour
         moveSelectionLocked = locked;
 
         foreach (MoveOptionUI slot in moveOptionSlots)
-            slot.SetInteractable(!locked);
+            slot.SetInteractable(playerInputEnabled && !locked);
+    }
+
+    public void SetPlayerInputEnabled(bool enabled)
+    {
+        playerInputEnabled = enabled;
+
+        if (attacksTabButton != null)
+            attacksTabButton.interactable = enabled;
+
+        if (inventoryTabButton != null)
+            inventoryTabButton.interactable = enabled;
+
+        if (teamTabButton != null)
+            teamTabButton.interactable = enabled;
+
+        foreach (MoveOptionUI slot in moveOptionSlots)
+            slot.SetInteractable(enabled && !moveSelectionLocked);
+
+        if (combatInventoryUI != null)
+            combatInventoryUI.SetInputEnabled(enabled);
+
+        if (combatTeamUI != null)
+            combatTeamUI.SetInputEnabled(enabled);
     }
 
     public void MarkEnemyBodyPartDamaged(int index, Sprite damagedSprite)
@@ -238,10 +289,13 @@ public class BattleUIManager : MonoBehaviour
 
         SetTab(CombatTab.Attacks);
         RefreshTeamTab();
+        SetPlayerInputEnabled(false);
     }
 
     public void HideBattleUI()
     {
+        SetPlayerInputEnabled(false);
+
         if (battleUI != null) battleUI.SetActive(false);
         if (overworldUI != null) overworldUI.SetActive(true);
         if (playerObject != null) playerObject.SetActive(true);
@@ -355,7 +409,7 @@ public class BattleUIManager : MonoBehaviour
             slot.SetIndex(i);
             slot.SetText(moves[i].moveName);
             slot.SetHighlighted(false);
-            slot.SetInteractable(!moveSelectionLocked);
+            slot.SetInteractable(playerInputEnabled && !moveSelectionLocked);
             slot.OnHoverEnter += HandleMoveOptionHoverEnter;
             slot.OnClicked += HandleMoveOptionClicked;
             moveOptionSlots.Add(slot);

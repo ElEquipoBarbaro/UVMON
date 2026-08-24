@@ -57,14 +57,52 @@ public class PlayerParty : MonoBehaviour
         return party[0];
     }
 
-    public void SetLeadCreature(int index)
+    public bool SetLeadCreature(int index)
     {
         if (index < 0 || index >= party.Count)
-            return;
+            return false;
+
+        if (party[index] == null)
+            return false;
+
+        if (index == 0)
+            return true;
 
         CreatureRuntime selected = party[index];
         party.RemoveAt(index);
         party.Insert(0, selected);
+
+        return true;
+    }
+
+    public bool IsUsableCreatureIndex(int index)
+    {
+        return index >= 0 &&
+               index < party.Count &&
+               party[index] != null &&
+               party[index].CurrentHP > 0;
+    }
+
+    public int FindFirstUsableCreatureIndex(int startIndex = 0)
+    {
+        if (party.Count == 0)
+            return -1;
+
+        int firstIndex = Mathf.Clamp(startIndex, 0, party.Count);
+
+        for (int i = firstIndex; i < party.Count; i++)
+        {
+            if (IsUsableCreatureIndex(i))
+                return i;
+        }
+
+        for (int i = 0; i < firstIndex; i++)
+        {
+            if (IsUsableCreatureIndex(i))
+                return i;
+        }
+
+        return -1;
     }
 
     public void AddCreature(CreatureData creatureData, int level = 1)
@@ -87,7 +125,7 @@ public class PlayerParty : MonoBehaviour
     {
         foreach (CreatureRuntime creature in party)
         {
-            if (creature.CurrentHP > 0)
+            if (creature != null && creature.CurrentHP > 0)
                 return true;
         }
 
@@ -98,7 +136,8 @@ public class PlayerParty : MonoBehaviour
     {
         foreach (CreatureRuntime creature in party)
         {
-            creature.Heal(creature.MaxHP);
+            if (creature != null)
+                creature.Heal(creature.MaxHP);
         }
     }
 }

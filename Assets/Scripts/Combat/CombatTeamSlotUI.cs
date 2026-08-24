@@ -21,14 +21,32 @@ public class CombatTeamSlotUI : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Image hpFillImage;
     [SerializeField] private GameObject activeMarker;
     [SerializeField] private Image faintedOverlay;
+    [SerializeField] private Image background;
+    [SerializeField] private Color normalColor = new Color(0f, 0f, 0f, 0.35f);
+    [SerializeField] private Color selectedColor = new Color(0.2f, 0.65f, 1f, 0.65f);
+    [SerializeField] private Color lockedColor = new Color(0f, 0f, 0f, 0.18f);
 
     public CreatureRuntime Creature { get; private set; }
     public int PartyIndex { get; private set; }
+
+    private bool isSelected;
+    private bool isInteractable = true;
+
+    private void Awake()
+    {
+        if (background == null)
+            background = GetComponent<Image>();
+
+        RefreshBackground();
+    }
 
     public void SetData(CreatureRuntime creature, int partyIndex, bool isActive)
     {
         Creature = creature;
         PartyIndex = partyIndex;
+
+        if (creature == null || creature.data == null)
+            return;
 
         if (icon != null)
         {
@@ -55,10 +73,37 @@ public class CombatTeamSlotUI : MonoBehaviour, IPointerClickHandler
 
         if (faintedOverlay != null)
             faintedOverlay.enabled = creature.CurrentHP <= 0;
+
+        SetSelected(false);
+    }
+
+    public void SetSelected(bool selected)
+    {
+        isSelected = selected;
+        RefreshBackground();
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        isInteractable = interactable;
+        RefreshBackground();
+    }
+
+    private void RefreshBackground()
+    {
+        if (background == null)
+            return;
+
+        background.color = !isInteractable
+            ? lockedColor
+            : (isSelected ? selectedColor : normalColor);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!isInteractable)
+            return;
+
         OnClicked?.Invoke(this);
     }
 }

@@ -20,6 +20,7 @@ public class CombatInventoryUI : MonoBehaviour
     [SerializeField] private GameObject emptyStateLabel;
 
     private readonly List<CombatInventorySlotUI> spawnedSlots = new List<CombatInventorySlotUI>();
+    private bool inputEnabled;
 
     /// <summary>El jugador hizo clic sobre un slot de inventario no vacio (Prompt 7).
     /// Indice REAL en InventorySO. CombatManager decide si es usable ahora mismo.</summary>
@@ -86,6 +87,7 @@ public class CombatInventoryUI : MonoBehaviour
                 CombatInventorySlotUI slot = Instantiate(slotPrefab, contentContainer);
                 slot.gameObject.SetActive(true);
                 slot.SetData(invItem.item.ItemImage, invItem.item.Name, invItem.quantity, entry.Key);
+                slot.SetInteractable(inputEnabled);
                 slot.OnClicked += HandleSlotClicked;
                 spawnedSlots.Add(slot);
             }
@@ -97,6 +99,17 @@ public class CombatInventoryUI : MonoBehaviour
 
     private void HandleSlotClicked(CombatInventorySlotUI slot)
     {
+        if (!inputEnabled)
+            return;
+
         OnItemSelected?.Invoke(slot.InventoryIndex);
+    }
+
+    public void SetInputEnabled(bool enabled)
+    {
+        inputEnabled = enabled;
+
+        foreach (CombatInventorySlotUI slot in spawnedSlots)
+            slot.SetInteractable(enabled);
     }
 }
