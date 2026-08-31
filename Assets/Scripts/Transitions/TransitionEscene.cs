@@ -12,7 +12,7 @@ public class TransitionEscene : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag(playerTag)) return;
+        if (!collision.CompareTag(playerTag) || TransitionManager.IsTransitioning) return;
 
         if (string.IsNullOrEmpty(targetSceneName))
         {
@@ -20,9 +20,8 @@ public class TransitionEscene : MonoBehaviour
             return;
         }
 
-        if (logActions) Debug.Log($"TransitionEscene: Cargando '{targetSceneName}'");
-
-        SceneManager.LoadScene(targetSceneName);
+        if (logActions) Debug.Log("TransitionEscene: Transicionando a '" + targetSceneName + "'");
+        TransitionManager.LoadScene(targetSceneName);
     }
 
     private void OnDrawGizmos()

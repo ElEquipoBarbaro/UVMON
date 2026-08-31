@@ -98,13 +98,13 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (pauseAudio) AudioListener.pause = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        TransitionManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void MainMenu()
     {
         SetPaused(false); // Limpia pausa antes de cambiar
-        SceneManager.LoadScene(mainMenuSceneName);
+        TransitionManager.LoadScene(mainMenuSceneName);
     }
 
     public void Quit()
