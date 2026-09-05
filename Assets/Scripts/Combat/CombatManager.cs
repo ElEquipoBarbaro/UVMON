@@ -8,11 +8,16 @@ public class CombatManager : MonoBehaviour
 
     private CreatureRuntime playerRuntime;
     private CreatureRuntime enemyRuntime;
+    private PlayerParty currentPlayerParty;
     private EnemyTrainer currentEnemyTrainer;
 
     [Header("Battle Systems")]
     [SerializeField] private BattleUIManager battleUI;
     [SerializeField] private BattleAnimationPlayer battleAnimationPlayer;
+
+    [Header("Creature Switch")]
+    [SerializeField, Min(0f)] private float switchOutDuration = 0.3f;
+    [SerializeField, Min(0f)] private float switchInDuration = 0.35f;
 
     [Header("QTE")]
     [SerializeField] private QTEController qteController;
@@ -42,6 +47,13 @@ public class CombatManager : MonoBehaviour
     /// PlayerTurn() lo usa para saltarse por completo el camino de ataque (QTE/dano) y
     /// terminar el turno directamente, sin imprimir "Nothing happened."</summary>
     private bool nonAttackActionResolved;
+    private int pendingSwitchPartyIndex = -1;
+
+    private enum CreatureSwitchReason
+    {
+        Voluntary,
+        Fainted
+    }
 
     private bool HasEnemyBodyParts => enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0;
 
@@ -139,42 +151,49 @@ public class CombatManager : MonoBehaviour
         if (IsPlayerActionLocked)
             return;
 
-        if (PlayerParty.Instance == null)
+        if (currentPlayerParty == null)
+        {
+            RejectTeamSwitch("No se encontro el equipo del jugador.");
             return;
+        }
 
-        IReadOnlyList<CreatureRuntime> party = PlayerParty.Instance.Party;
+        IReadOnlyList<CreatureRuntime> party = currentPlayerParty.Party;
 
         if (partyIndex < 0 || partyIndex >= party.Count)
+        {
+            RejectTeamSwitch("La seleccion ya no es valida.");
             return;
+        }
 
-        // Ya es el activo: no hay nada que cambiar, y no se consume el turno.
         if (partyIndex == 0)
+        {
+            RejectTeamSwitch("Ese UVGmon ya esta en combate.");
             return;
+        }
 
         CreatureRuntime target = party[partyIndex];
 
-        // No se puede cambiar a un UVGmon que no puede combatir (regla ya usada por
-        // PlayerParty.HasUsableCreature: vidaActual <= 0).
         if (target == null || target.CurrentHP <= 0)
-            return;
-
-        PlayerParty.Instance.SetLeadCreature(partyIndex);
-        playerRuntime = PlayerParty.Instance.GetLeadCreature();
-
-        if (battleUI != null)
         {
-            battleUI.BindCreatures(playerRuntime, enemyRuntime);
-
-            selectedMoveIndex = 0;
-            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
-
-            battleUI.RefreshTeamTab();
-            battleUI.ShowBattleMessage($"Go, {playerRuntime.data.creatureName}!");
-            battleUI.ShowAttacksTab();
+            RejectTeamSwitch("Ese UVGmon esta derrotado y no puede combatir.");
+            return;
         }
 
-        nonAttackActionResolved = true;
+        pendingSwitchPartyIndex = partyIndex;
         playerHasChosen = true;
+
+        if (battleUI != null)
+            battleUI.SetPlayerInputEnabled(false);
+    }
+
+    private void RejectTeamSwitch(string message)
+    {
+        if (battleUI == null)
+            return;
+
+        battleUI.ShowBattleMessage(message);
+        battleUI.RefreshTeamTab();
+        battleUI.SetPlayerInputEnabled(isPlayerTurn && !playerHasChosen);
     }
 
     /// <summary>
@@ -195,6 +214,9 @@ public class CombatManager : MonoBehaviour
         if (inventoryData == null || playerRuntime == null)
             return;
 
+        if (inventoryIndex < 0 || inventoryIndex >= inventoryData.Size)
+            return;
+
         InventoryItem slot = inventoryData.GetItemAt(inventoryIndex);
 
         if (slot.IsEmpty || slot.item.Category != ItemCategory.Healing || slot.item.Effect == null)
@@ -202,8 +224,23 @@ public class CombatManager : MonoBehaviour
 
         string itemName = slot.item.Name;
 
-        slot.item.Effect.Apply(playerRuntime);
-        inventoryData.RemoveItem(inventoryIndex, 1);
+        if (battleUI != null)
+            battleUI.SetPlayerInputEnabled(false);
+
+        try
+        {
+            slot.item.Effect.Apply(playerRuntime);
+            inventoryData.RemoveItem(inventoryIndex, 1);
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogException(exception);
+
+            if (battleUI != null)
+                battleUI.SetPlayerInputEnabled(true);
+
+            return;
+        }
 
         if (battleUI != null)
         {
@@ -272,7 +309,13 @@ public class CombatManager : MonoBehaviour
         if (battleLoopCoroutine != null)
             return;
 
-        playerRuntime = playerParty.GetLeadCreature();
+        currentPlayerParty = playerParty;
+
+        int firstUsableIndex = currentPlayerParty.FindFirstUsableCreatureIndex();
+        if (firstUsableIndex > 0)
+            currentPlayerParty.SetLeadCreature(firstUsableIndex);
+
+        playerRuntime = currentPlayerParty.GetLeadCreature();
         enemyRuntime = enemyTrainer.GetLeadCreature();
         currentEnemyTrainer = enemyTrainer;
 
@@ -286,6 +329,8 @@ public class CombatManager : MonoBehaviour
         playerHasChosen = false;
         isPlayerTurn = false;
         selectedMove = null;
+        pendingSwitchPartyIndex = -1;
+        nonAttackActionResolved = false;
 
         enemyBodyPartsRuntime = BuildBodyPartsRuntime(enemyRuntime.data);
         selectedBodyPartIndex = 0;
@@ -355,107 +400,144 @@ public class CombatManager : MonoBehaviour
     {
         selectedMove = move;
         playerHasChosen = true;
+
+        if (battleUI != null)
+            battleUI.SetPlayerInputEnabled(false);
     }
 
     private IEnumerator PlayerTurn()
     {
-        isPlayerTurn = true;
-        playerHasChosen = false;
-        bodyPartConfirmedThisTurn = false;
-        nonAttackActionResolved = false;
-
-        if (battleUI != null)
+        while (true)
         {
-            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
-
-            if (HasEnemyBodyParts)
-            {
-                battleUI.ClearEnemyBodyPartSelection();
-                battleUI.SetMoveSelectionLocked(true);
-            }
-            else
-            {
-                battleUI.SetMoveSelectionLocked(false);
-            }
-        }
-
-        yield return new WaitUntil(() => playerHasChosen);
-
-        isPlayerTurn = false;
-
-        // Cambio de UVGmon (Prompt 6) o uso de objeto (Prompt 7): ya se resolvio por
-        // completo en HandleTeamMemberClicked/HandleInventoryItemClicked (efecto
-        // aplicado, UI actualizada). El turno se consume aqui sin ejecutar
-        // ataque/QTE/dano -- va directo a EnemyTurn().
-        if (nonAttackActionResolved)
-        {
+            isPlayerTurn = true;
+            playerHasChosen = false;
+            bodyPartConfirmedThisTurn = false;
             nonAttackActionResolved = false;
-            yield return new WaitForSeconds(0.6f);
-            yield break;
-        }
+            pendingSwitchPartyIndex = -1;
+            selectedMove = null;
 
-        if (selectedMove == null || selectedMove.effect == null)
-        {
             if (battleUI != null)
-                battleUI.ShowBattleMessage("Nothing happened.");
-
-            yield return new WaitForSeconds(0.8f);
-            yield break;
-        }
-
-        bool attackSucceeds = true;
-
-        if (qteController != null)
-        {
-            bool qteResult = true;
-
-            if (selectedMove.qteParallel != null && selectedMove.qteParallel.Length > 0)
             {
-                yield return qteController.RunQTEParallel(selectedMove.qteParallel, result => qteResult = result);
-            }
-            else
-            {
-                IReadOnlyList<QTEData> qteChain = (selectedMove.qteSequence != null && selectedMove.qteSequence.Length > 0)
-                    ? selectedMove.qteSequence
-                    : (qteData != null ? new QTEData[] { qteData } : null);
+                battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
 
-                if (qteChain != null)
-                    yield return qteController.RunQTEChain(qteChain, result => qteResult = result);
+                if (HasEnemyBodyParts)
+                {
+                    battleUI.ClearEnemyBodyPartSelection();
+                    battleUI.SetMoveSelectionLocked(true);
+                }
+                else
+                {
+                    battleUI.SetMoveSelectionLocked(false);
+                }
+
+                battleUI.SetPlayerInputEnabled(true);
             }
 
-            attackSucceeds = qteResult;
-        }
+            yield return new WaitUntil(() => playerHasChosen);
 
-        if (!attackSucceeds)
-        {
+            isPlayerTurn = false;
+
+            if (battleUI != null)
+                battleUI.SetPlayerInputEnabled(false);
+
+            if (pendingSwitchPartyIndex >= 0)
+            {
+                int targetIndex = pendingSwitchPartyIndex;
+                pendingSwitchPartyIndex = -1;
+
+                bool switchCompleted = false;
+                yield return SwitchPlayerCreature(
+                    targetIndex,
+                    CreatureSwitchReason.Voluntary,
+                    playTransition: true,
+                    onComplete: result => switchCompleted = result
+                );
+
+                if (!switchCompleted)
+                {
+                    if (battleUI != null)
+                        battleUI.ShowBattleMessage("No se pudo realizar el cambio.");
+
+                    continue;
+                }
+
+                yield return new WaitForSeconds(0.35f);
+                yield break;
+            }
+
+            // El objeto ya fue aplicado por el handler. Termina el turno sin pasar por
+            // QTE/ataque, igual que antes, pero con la entrada bloqueada visualmente.
+            if (nonAttackActionResolved)
+            {
+                nonAttackActionResolved = false;
+                yield return new WaitForSeconds(0.6f);
+                yield break;
+            }
+
+            if (selectedMove == null || selectedMove.effect == null)
+            {
+                if (battleUI != null)
+                    battleUI.ShowBattleMessage("Nothing happened.");
+
+                yield return new WaitForSeconds(0.8f);
+                yield break;
+            }
+
+            bool attackSucceeds = true;
+
+            if (qteController != null)
+            {
+                bool qteResult = true;
+
+                if (selectedMove.qteParallel != null && selectedMove.qteParallel.Length > 0)
+                {
+                    yield return qteController.RunQTEParallel(selectedMove.qteParallel, result => qteResult = result);
+                }
+                else
+                {
+                    IReadOnlyList<QTEData> qteChain = (selectedMove.qteSequence != null && selectedMove.qteSequence.Length > 0)
+                        ? selectedMove.qteSequence
+                        : (qteData != null ? new QTEData[] { qteData } : null);
+
+                    if (qteChain != null)
+                        yield return qteController.RunQTEChain(qteChain, result => qteResult = result);
+                }
+
+                attackSucceeds = qteResult;
+            }
+
+            if (!attackSucceeds)
+            {
+                if (battleAnimationPlayer != null && battleUI != null)
+                    battleAnimationPlayer.PlayMissIndicator(battleUI.EnemyView);
+
+                if (battleUI != null)
+                    battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName}'s attack missed!");
+
+                yield return new WaitForSeconds(0.8f);
+                yield break;
+            }
+
             if (battleAnimationPlayer != null && battleUI != null)
-                battleAnimationPlayer.PlayMissIndicator(battleUI.EnemyView);
+            {
+                yield return battleAnimationPlayer.PlayMoveAnimation(
+                    selectedMove.animationData,
+                    battleUI.PlayerView,
+                    battleUI.EnemyView
+                );
+            }
+
+            if (enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0)
+                yield return ExecuteBodyPartAttack(selectedMove);
+            else
+                yield return selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
 
             if (battleUI != null)
-                battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName}'s attack missed!");
+                battleUI.UpdateHP(playerRuntime, enemyRuntime);
 
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.35f);
             yield break;
         }
-
-        if (battleAnimationPlayer != null && battleUI != null)
-        {
-            yield return battleAnimationPlayer.PlayMoveAnimation(
-                selectedMove.animationData,
-                battleUI.PlayerView,
-                battleUI.EnemyView
-            );
-        }
-
-        if (enemyBodyPartsRuntime != null && enemyBodyPartsRuntime.Count > 0)
-            yield return ExecuteBodyPartAttack(selectedMove);
-        else
-            yield return selectedMove.effect.Execute(playerRuntime, enemyRuntime, selectedMove);
-
-        if (battleUI != null)
-            battleUI.UpdateHP(playerRuntime, enemyRuntime);
-
-        yield return new WaitForSeconds(0.35f);
     }
 
     /// <summary>
@@ -557,6 +639,81 @@ public class CombatManager : MonoBehaviour
         return -1;
     }
 
+    private IEnumerator SwitchPlayerCreature(
+        int partyIndex,
+        CreatureSwitchReason reason,
+        bool playTransition,
+        System.Action<bool> onComplete)
+    {
+        if (currentPlayerParty == null ||
+            partyIndex <= 0 ||
+            partyIndex >= currentPlayerParty.Party.Count ||
+            !currentPlayerParty.IsUsableCreatureIndex(partyIndex))
+        {
+            onComplete?.Invoke(false);
+            yield break;
+        }
+
+        CreatureRuntime outgoing = playerRuntime;
+        CreatureRuntime incoming = currentPlayerParty.Party[partyIndex];
+
+        if (incoming == null || ReferenceEquals(incoming, outgoing))
+        {
+            onComplete?.Invoke(false);
+            yield break;
+        }
+
+        if (battleUI != null)
+        {
+            battleUI.SetPlayerInputEnabled(false);
+
+            if (reason == CreatureSwitchReason.Voluntary && outgoing != null)
+                battleUI.ShowBattleMessage($"{outgoing.data.creatureName}, regresa!");
+        }
+
+        if (playTransition && battleUI != null && battleUI.PlayerView != null)
+            yield return battleUI.PlayerView.PlaySwitchOut(switchOutDuration);
+
+        // Revalidar justo antes de mutar el orden. Si algo externo cambio el equipo o
+        // la vida durante la animacion, el turno no se consume y la vista anterior se
+        // restaura en lugar de dejar el HUD bloqueado.
+        if (partyIndex >= currentPlayerParty.Party.Count ||
+            !ReferenceEquals(currentPlayerParty.Party[partyIndex], incoming) ||
+            !currentPlayerParty.IsUsableCreatureIndex(partyIndex) ||
+            !currentPlayerParty.SetLeadCreature(partyIndex))
+        {
+            if (battleUI != null && outgoing != null)
+            {
+                battleUI.BindCreatures(outgoing, enemyRuntime);
+
+                if (playTransition && battleUI.PlayerView != null)
+                    yield return battleUI.PlayerView.PlaySwitchIn(switchInDuration);
+            }
+
+            onComplete?.Invoke(false);
+            yield break;
+        }
+
+        playerRuntime = currentPlayerParty.GetLeadCreature();
+        selectedMove = null;
+        selectedMoveIndex = 0;
+
+        if (battleUI != null)
+        {
+            battleUI.BindCreatures(playerRuntime, enemyRuntime);
+            battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
+            battleUI.RefreshTeamTab();
+            battleUI.ShowBattleMessage($"Adelante, {playerRuntime.data.creatureName}!");
+
+            if (playTransition && battleUI.PlayerView != null)
+                yield return battleUI.PlayerView.PlaySwitchIn(switchInDuration);
+
+            battleUI.ShowAttacksTab();
+        }
+
+        onComplete?.Invoke(true);
+    }
+
     private IEnumerator EnemyTurn()
     {
         if (enemyRuntime.Moves == null || enemyRuntime.Moves.Count == 0)
@@ -583,18 +740,82 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator BattleLoop()
     {
-        while (playerRuntime.CurrentHP > 0 && enemyRuntime.CurrentHP > 0)
+        while (enemyRuntime != null &&
+               enemyRuntime.CurrentHP > 0 &&
+               currentPlayerParty != null &&
+               currentPlayerParty.HasUsableCreature())
         {
+            if (playerRuntime == null || playerRuntime.CurrentHP <= 0)
+            {
+                bool replacedBeforeTurn = false;
+                yield return ReplaceFaintedPlayer(result => replacedBeforeTurn = result);
+
+                if (!replacedBeforeTurn)
+                    break;
+            }
+
             yield return PlayerTurn();
-            if (enemyRuntime.CurrentHP <= 0 || playerRuntime.CurrentHP <= 0)
+
+            if (enemyRuntime.CurrentHP <= 0)
                 break;
 
+            // Cubre efectos futuros de retroceso/estado. La sustitucion forzada no
+            // concede un ataque enemigo extra: tras cambiar se inicia una ronda nueva.
+            if (playerRuntime == null || playerRuntime.CurrentHP <= 0)
+            {
+                bool replacedAfterPlayerAction = false;
+                yield return ReplaceFaintedPlayer(result => replacedAfterPlayerAction = result);
+
+                if (!replacedAfterPlayerAction)
+                    break;
+
+                continue;
+            }
+
             yield return EnemyTurn();
+
+            if (playerRuntime == null || playerRuntime.CurrentHP <= 0)
+            {
+                bool replacedAfterEnemyAction = false;
+                yield return ReplaceFaintedPlayer(result => replacedAfterEnemyAction = result);
+
+                if (!replacedAfterEnemyAction)
+                    break;
+            }
         }
 
         yield return EndBattleSequence();
 
+        if (battleUI != null)
+            battleUI.SetPlayerInputEnabled(false);
+
         battleLoopCoroutine = null;
+    }
+
+    private IEnumerator ReplaceFaintedPlayer(System.Action<bool> onComplete)
+    {
+        if (currentPlayerParty == null)
+        {
+            onComplete?.Invoke(false);
+            yield break;
+        }
+
+        int replacementIndex = currentPlayerParty.FindFirstUsableCreatureIndex(1);
+        if (replacementIndex <= 0)
+        {
+            onComplete?.Invoke(false);
+            yield break;
+        }
+
+        bool switched = false;
+        yield return SwitchPlayerCreature(
+            replacementIndex,
+            CreatureSwitchReason.Fainted,
+            playTransition: true,
+            onComplete: result => switched = result
+        );
+
+        onComplete?.Invoke(switched);
     }
 
     private IEnumerator EndBattleSequence()
@@ -623,10 +844,13 @@ public class CombatManager : MonoBehaviour
                     currentEnemyTrainer = null;
                 }
             }
-            else if (playerRuntime.CurrentHP <= 0)
+            else if (currentPlayerParty == null || !currentPlayerParty.HasUsableCreature())
             {
-                battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} fainted!");
-                yield return new WaitForSeconds(1f);
+                if (playerRuntime != null)
+                {
+                    battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} fainted!");
+                    yield return new WaitForSeconds(1f);
+                }
 
                 battleUI.ShowBattleMessage("You lost the battle!");
                 yield return new WaitForSeconds(1f);
@@ -661,7 +885,7 @@ public class CombatManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
-        if (result.success && PlayerParty.Instance != null)
-            PlayerParty.Instance.AddCreature(enemyRuntime.data, enemyRuntime.Level);
+        if (result.success && currentPlayerParty != null)
+            currentPlayerParty.AddCreature(enemyRuntime.data, enemyRuntime.Level);
     }
 }

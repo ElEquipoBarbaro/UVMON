@@ -20,6 +20,7 @@ public class CreatureBattleView : MonoBehaviour
     [SerializeField] private float hitFlashMaxAlpha = 0.85f;
 
     private Vector2 restingAnchoredPosition;
+    private Vector3 restingLocalScale;
     private Coroutine hitFlashRoutine;
 
     private void Awake()
@@ -31,7 +32,10 @@ public class CreatureBattleView : MonoBehaviour
             creatureImage = GetComponent<Image>();
 
         if (visualRoot != null)
+        {
             restingAnchoredPosition = visualRoot.anchoredPosition;
+            restingLocalScale = visualRoot.localScale;
+        }
 
         if (flashOverlayImage != null)
         {
@@ -51,9 +55,12 @@ public class CreatureBattleView : MonoBehaviour
         if (flashOverlayImage != null)
             flashOverlayImage.sprite = HitFlashEffect.GetOrCreateWhiteSprite(sprite);
 
-        // Una nueva batalla reutiliza el mismo GameObject: si la anterior termino con un
-        // fundido (ver FadeOut), hay que restaurar la opacidad para la proxima criatura.
+        // Una nueva criatura reutiliza la misma vista. Restaurar cualquier estado que
+        // pudiera haber dejado un fundido de captura o una transicion de cambio.
         SetAlpha(1f);
+
+        if (visualRoot != null)
+            visualRoot.localScale = restingLocalScale;
     }
 
     public void SetAlpha(float alpha)
@@ -88,6 +95,80 @@ public class CreatureBattleView : MonoBehaviour
         }
 
         SetAlpha(0f);
+    }
+
+    public IEnumerator PlaySwitchOut(float duration)
+    {
+        if (creatureImage == null)
+            yield break;
+
+        Vector3 startScale = visualRoot != null ? visualRoot.localScale : Vector3.one;
+        Vector3 endScale = restingLocalScale * 0.8f;
+
+        if (duration <= 0f)
+        {
+            SetAlpha(0f);
+            if (visualRoot != null)
+                visualRoot.localScale = endScale;
+            yield break;
+        }
+
+        float elapsed = 0f;
+        float startAlpha = creatureImage.color.a;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+            SetAlpha(Mathf.Lerp(startAlpha, 0f, t));
+
+            if (visualRoot != null)
+                visualRoot.localScale = Vector3.Lerp(startScale, endScale, t);
+
+            yield return null;
+        }
+
+        SetAlpha(0f);
+        if (visualRoot != null)
+            visualRoot.localScale = endScale;
+    }
+
+    public IEnumerator PlaySwitchIn(float duration)
+    {
+        if (creatureImage == null)
+            yield break;
+
+        Vector3 startScale = restingLocalScale * 0.8f;
+        SetAlpha(0f);
+
+        if (visualRoot != null)
+            visualRoot.localScale = startScale;
+
+        if (duration <= 0f)
+        {
+            SetAlpha(1f);
+            if (visualRoot != null)
+                visualRoot.localScale = restingLocalScale;
+            yield break;
+        }
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+            SetAlpha(t);
+
+            if (visualRoot != null)
+                visualRoot.localScale = Vector3.Lerp(startScale, restingLocalScale, t);
+
+            yield return null;
+        }
+
+        SetAlpha(1f);
+        if (visualRoot != null)
+            visualRoot.localScale = restingLocalScale;
     }
 
     /// <summary>
