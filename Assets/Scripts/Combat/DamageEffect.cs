@@ -37,23 +37,23 @@ public class DamageEffect : MoveEffect
 
         if (ui != null)
         {
-            ui.ShowBattleMessage($"{user.data.creatureName} used {move.moveName}!");
+            ui.ShowBattleMessage($"¡{user.data.creatureName} usó {move.moveName}!");
             yield return new WaitForSeconds(0.9f);
 
             if (isCrit)
             {
-                ui.ShowBattleMessage("Critical hit!");
+                ui.ShowBattleMessage("¡Golpe crítico! El impacto fue devastador.");
                 yield return new WaitForSeconds(0.8f);
             }
 
             if (typeMultiplier > 1f)
             {
-                ui.ShowBattleMessage("It's super effective!");
+                ui.ShowBattleMessage("¡Es muy eficaz! El ataque golpeó su punto débil.");
                 yield return new WaitForSeconds(0.8f);
             }
             else if (typeMultiplier < 1f)
             {
-                ui.ShowBattleMessage("It's not very effective...");
+                ui.ShowBattleMessage("No fue muy eficaz... El rival resistió el impacto.");
                 yield return new WaitForSeconds(0.8f);
             }
         }
@@ -68,12 +68,12 @@ public class DamageEffect : MoveEffect
 
         if (ui != null)
         {
-            ui.ShowBattleMessage($"{target.data.creatureName} took {damage} damage!");
+            ui.ShowBattleMessage($"¡{target.data.creatureName} recibió {damage} puntos de daño!");
             yield return new WaitForSeconds(0.9f);
 
             if (target.CurrentHP <= 0)
             {
-                ui.ShowBattleMessage($"{target.data.creatureName} fainted!");
+                ui.ShowBattleMessage($"¡{target.data.creatureName} quedó debilitado!");
                 yield return new WaitForSeconds(1f);
             }
         }

@@ -11,18 +11,22 @@ using UnityEngine.UI;
 /// que UIInventoryItem/PokemonSlotUI. La validacion real (¿es turno del jugador? ¿el
 /// objeto es realmente usable?) vive en CombatManager.
 /// </summary>
-public class CombatInventorySlotUI : MonoBehaviour, IPointerClickHandler
+public class CombatInventorySlotUI : MonoBehaviour, IPointerClickHandler,
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI quantityText;
 
     public event Action<CombatInventorySlotUI> OnClicked;
+    public event Action<CombatInventorySlotUI> OnDragStarted;
+    public event Action<CombatInventorySlotUI> OnDragEnded;
 
     /// <summary>Indice REAL en InventorySO (no la posicion visual en la lista -- los slots
     /// vacios se omiten al pintar, asi que ambos pueden diferir).</summary>
     public int InventoryIndex { get; private set; }
     private bool isInteractable = true;
+    private bool isDragging;
 
     public void SetData(Sprite sprite, string itemName, int quantity, int inventoryIndex)
     {
@@ -47,6 +51,30 @@ public class CombatInventorySlotUI : MonoBehaviour, IPointerClickHandler
             return;
 
         OnClicked?.Invoke(this);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (!isInteractable || eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        isDragging = true;
+        OnDragStarted?.Invoke(this);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        // MouseFollower actualiza su posicion cada frame. Esta interfaz mantiene
+        // activo el ciclo BeginDrag/EndDrag del EventSystem.
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (!isDragging)
+            return;
+
+        isDragging = false;
+        OnDragEnded?.Invoke(this);
     }
 
     public void SetInteractable(bool interactable)
