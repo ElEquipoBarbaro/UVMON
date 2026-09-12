@@ -1,0 +1,94 @@
+name: Build y publicar (WebGL)
+
+# Cada push a master compila el juego y lo publica en GitHub Pages.
+# Tambien se puede lanzar a mano desde la pestana Actions.
+# Configuracion inicial y detalles: docs/PUBLICAR.md
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita que dos publicaciones se pisen entre si
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Compilar WebGL
+    runs-on: ubuntu-latest
+    steps:
+      # La imagen de Unity pesa ~15 GB y el runner viene justo de espacio
+      - name: Liberar espacio en el runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force || true
+          df -h /
+
+      - name: Descargar el repo
+        uses: actions/checkout@v4
+
+      # Acelera builds siguientes: sin cache, Unity reimporta todo cada vez
+      - name: Cache de Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-
+            Library-
+
+      - name: Compilar con Unity
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: 2021.3.45f2
+          targetPlatform: WebGL
+          buildName: UVMON
+          # Numera cada build solo: 1.0.1, 1.0.2, 1.0.3...
+          # (sin esto usa 'Semantic', que exige tags de git y falla)
+          versioning: Custom
+          version: 1.0.${{ github.run_number }}
+
+      # Unity corre como root dentro del contenedor y deja el build sin permisos
+      - name: Corregir permisos del build
+        run: sudo chown -R $USER:$USER build
+
+      # Se busca el index.html en vez de asumir la ruta, por si GameCI la cambia
+      - name: Localizar el build
+        id: sitio
+        run: |
+          index=$(find build -name index.html | head -1)
+          if [ -z "$index" ]; then
+            echo "::error::No se genero el build: no aparece ningun index.html en build/"
+            find build -maxdepth 3 || true
+            exit 1
+          fi
+          dir=$(dirname "$index")
+          echo "Build encontrado en: $dir"
+          echo "path=$dir" >> "$GITHUB_OUTPUT"
+
+      - name: Preparar el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.sitio.outputs.path }}
+
+  deploy:
+    name: Publicar en GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Desplegar
+        id: deployment
+        uses: actions/deploy-pages@v4
