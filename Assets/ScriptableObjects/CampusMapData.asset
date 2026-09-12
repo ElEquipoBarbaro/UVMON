@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05fb046d9f20c674ca5e515a5c6b5f01, type: 3}
+  m_Name: CampusMapData
+  m_EditorClassIdentifier: 
+  mapImage: {fileID: 0}
+  points:
+  - title: Jardin del Conocimiento
+    description: El corazon del campus. Aqui empieza tu aventura UVMON.
+    image: {fileID: 0}
+    normalizedPosition: {x: 0.35, y: 0.55}
+    markerIcon: {fileID: 0}
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    visible: 1
+  - title: Biblioteca
+    description: Silencio absoluto... o casi. Buen lugar para recuperar energia.
+    image: {fileID: 0}
+    normalizedPosition: {x: 0.6, y: 0.7}
+    markerIcon: {fileID: 0}
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    visible: 1
+  - title: Edificio CIT
+    description: Salones y laboratorios de ingenieria.
+    image: {fileID: 0}
+    normalizedPosition: {x: 0.72, y: 0.4}
+    markerIcon: {fileID: 0}
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    visible: 1
+  - title: Cafeteria
+    description: Donde todos se juntan entre clases.
+    image: {fileID: 0}
+    normalizedPosition: {x: 0.45, y: 0.28}
+    markerIcon: {fileID: 0}
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    visible: 1
