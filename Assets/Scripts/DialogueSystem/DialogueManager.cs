@@ -17,12 +17,30 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Image characterPhoto;
     [SerializeField] private TextMeshProUGUI characterName;
     [SerializeField] private TextMeshProUGUI dialogArea;
-
+    private Button advanceButton;
     private void Awake()
     {
         Instance = this;
+
+        advanceButton = dialogBox != null
+            ? dialogBox.GetComponentInChildren<Button>(true)
+            : null;
+
+        if (advanceButton != null)
+            advanceButton.onClick.AddListener(RequestAdvance);
+
         HideDialogBox();
     }
+
+    private void OnDestroy()
+    {
+        if (advanceButton != null)
+            advanceButton.onClick.RemoveListener(RequestAdvance);
+
+        if (Instance == this)
+            Instance = null;
+    }
+
 
     public void StartDialogue(DialogueRound dialogue)
     {

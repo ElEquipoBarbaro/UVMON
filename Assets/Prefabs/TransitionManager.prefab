@@ -191,8 +191,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74b27b252020da43997d61a98ef46de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundCanvasGroup: {fileID: 0}
-  fadeDuration: 0.4
+  closeDuration: 0.8
+  revealDuration: 0.7
+  coveredHoldDuration: 0.12
+  tileColumns: 9
+  tileRows: 6
+  leafCount: 8
+  backdropColor: {r: 0.063, g: 0.165, b: 0.227, a: 1}
+  tileTint: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8620992641152669966
 GameObject:
   m_ObjectHideFlags: 0

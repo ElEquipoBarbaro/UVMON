@@ -36,7 +36,9 @@ public class UIInventoryPage : MonoBehaviour
 
     private void Awake()
     {
-        Hide();
+        // El estado visible lo controla InventoryController. Desactivar esta misma
+        // página durante Awake hacía que la primera llamada a Show() terminara
+        // apagándola de nuevo cuando el GameObject todavía no había sido inicializado.
         mouseFollower.Toggle(false);
         itemDescription.ResetDescription();
         itemContextMenu.Hide();

@@ -18,8 +18,8 @@ public class TransitionManager : MonoBehaviour
     [SerializeField, Range(2, 16)] private int leafCount = 8;
 
     [Header("Palette")]
-    [SerializeField] private Color backdropColor = new Color(0.005f, 0.055f, 0.035f, 1f);
-    [SerializeField] private Color tileTint = new Color(0.72f, 1f, 0.82f, 1f);
+    [SerializeField] private Color backdropColor = new Color(0.063f, 0.165f, 0.227f, 1f);
+    [SerializeField] private Color tileTint = Color.white;
 
     private const string SpriteResourcePath = "TransitionSprites/";
 
@@ -108,10 +108,10 @@ public class TransitionManager : MonoBehaviour
     {
         if (overlayCanvasGroup != null) return;
 
-        Sprite diamondSprite = Resources.Load<Sprite>(SpriteResourcePath + "emerald_diamond");
-        Sprite leafSprite = Resources.Load<Sprite>(SpriteResourcePath + "emerald_leaf");
-        Sprite streakSprite = Resources.Load<Sprite>(SpriteResourcePath + "emerald_streak");
-        Sprite coreSprite = Resources.Load<Sprite>(SpriteResourcePath + "emerald_core");
+        Sprite diamondSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_diamond");
+        Sprite leafSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_leaf");
+        Sprite streakSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_streak");
+        Sprite coreSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_core");
 
         GameObject canvasObject = new GameObject(
             "EmeraldTransitionCanvas",
