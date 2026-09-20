@@ -74,14 +74,25 @@ public class PauseManager : MonoBehaviour
         SetPaused(!isPaused);
     }
 
-    private void SetPaused(bool value)
+private void SetPaused(bool value)
     {
         isPaused = value;
 
         if (logActions) Debug.Log("Paused = " + isPaused);
 
         if (pauseOverlay != null)
+        {
             pauseOverlay.SetActive(isPaused);
+
+            if (isPaused)
+            {
+                UnityEngine.UI.Button firstButton =
+                    pauseOverlay.GetComponentInChildren<UnityEngine.UI.Button>(true);
+
+                if (UnityEngine.EventSystems.EventSystem.current != null && firstButton != null)
+                    UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(firstButton.gameObject);
+            }
+        }
 
         Time.timeScale = isPaused ? 0f : 1f;
 

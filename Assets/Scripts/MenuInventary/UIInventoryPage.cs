@@ -34,47 +34,71 @@ public class UIInventoryPage : MonoBehaviour
     [SerializeField]
     private ItemContextMenu itemContextMenu;
 
-    private void Awake()
+private void Awake()
     {
-        // El estado visible lo controla InventoryController. Desactivar esta misma
-        // página durante Awake hacía que la primera llamada a Show() terminara
-        // apagándola de nuevo cuando el GameObject todavía no había sido inicializado.
-        mouseFollower.Toggle(false);
-        itemDescription.ResetDescription();
-        itemContextMenu.Hide();
-        itemContextMenu.OnUseClicked += HandleUseItem;
-    }
-    public void InitializeInventoryUI(int inventorysize)
-        {
-            for (int i = 0; i < inventorysize; i++)
-{
-    UIInventoryItem uiItem =
-        Instantiate(itemPrefab, contentPanel);
-    uiItem.transform.localScale = Vector3.one;
-    uiItem.transform.localPosition = Vector3.zero;
-    listOfUIItems.Add(uiItem);
-    uiItem.OnItemClicked += HandleItemSelection;
-    uiItem.OnItemBeginDrag += HandleBeginDrag;
-    uiItem.OnItemDroppedOn += HandleSwap;
-    uiItem.OnItemEndDrag += HandleEndDrag;
-    uiItem.OnRightMouseBtnClick += HandleShowItemActions;
-}
-        }
-
-    public void UpdateData(int itemIndex,
-            Sprite itemImage, int itemQuantity)
-        {
-            if (listOfUIItems.Count > itemIndex)
-            {
-                listOfUIItems[itemIndex].SetData(itemImage, itemQuantity);
-            }
-        }
-
-     private void ResetDraggedItem()
-        {
+        if (mouseFollower != null)
             mouseFollower.Toggle(false);
-            currentlyDraggedItemIndex = -1;
+
+        if (itemDescription != null)
+            itemDescription.ResetDescription();
+
+        if (itemContextMenu != null)
+        {
+            itemContextMenu.Hide();
+            itemContextMenu.OnUseClicked -= HandleUseItem;
+            itemContextMenu.OnUseClicked += HandleUseItem;
         }
+    }
+
+private void OnDestroy()
+    {
+        if (itemContextMenu != null)
+            itemContextMenu.OnUseClicked -= HandleUseItem;
+
+        ClearInventoryItems();
+    }
+
+public void InitializeInventoryUI(int inventorysize)
+    {
+        ClearInventoryItems();
+
+        if (itemPrefab == null || contentPanel == null)
+        {
+            Debug.LogError("No se puede inicializar el inventario: faltan el prefab o el panel de contenido.", this);
+            return;
+        }
+
+        for (int i = 0; i < inventorysize; i++)
+        {
+            UIInventoryItem uiItem = Instantiate(itemPrefab, contentPanel);
+            uiItem.transform.localScale = Vector3.one;
+            uiItem.transform.localPosition = Vector3.zero;
+            listOfUIItems.Add(uiItem);
+            uiItem.OnItemClicked += HandleItemSelection;
+            uiItem.OnItemBeginDrag += HandleBeginDrag;
+            uiItem.OnItemDroppedOn += HandleSwap;
+            uiItem.OnItemEndDrag += HandleEndDrag;
+            uiItem.OnRightMouseBtnClick += HandleShowItemActions;
+        }
+    }
+
+public void UpdateData(int itemIndex, Sprite itemImage, int itemQuantity)
+    {
+        if (itemIndex < 0 || itemIndex >= listOfUIItems.Count)
+            return;
+
+        UIInventoryItem item = listOfUIItems[itemIndex];
+        if (item != null)
+            item.SetData(itemImage, itemQuantity);
+    }
+
+private void ResetDraggedItem()
+    {
+        if (mouseFollower != null)
+            mouseFollower.Toggle(false);
+
+        currentlyDraggedItemIndex = -1;
+    }
 
       private void HandleShowItemActions(UIInventoryItem inventoryItemUI)
         {
@@ -132,14 +156,16 @@ public class UIInventoryPage : MonoBehaviour
             mouseFollower.Toggle(true);
             mouseFollower.SetData(sprite, quantity);
         }
-        internal void ResetAllItems()
+internal void ResetAllItems()
+    {
+        listOfUIItems.RemoveAll(item => item == null);
+
+        foreach (UIInventoryItem item in listOfUIItems)
         {
-            foreach (var item in listOfUIItems)
-            {
-                item.ResetData();
-                item.Deselect();
-            }
+            item.ResetData();
+            item.Deselect();
         }
+    }
 
 
         private void HandleItemSelection(UIInventoryItem inventoryItemUI)
@@ -153,13 +179,16 @@ public class UIInventoryPage : MonoBehaviour
 
         }
 
-        internal void UpdateDescription(int itemIndex, 
-        Sprite itemImage, string name, string description)
-        {
+internal void UpdateDescription(int itemIndex, Sprite itemImage, string name, string description)
+    {
+        if (itemDescription != null)
             itemDescription.SetDescription(itemImage, name, description);
-            DeselectAllItems();
+
+        DeselectAllItems();
+
+        if (itemIndex >= 0 && itemIndex < listOfUIItems.Count && listOfUIItems[itemIndex] != null)
             listOfUIItems[itemIndex].Select();
-        }
+    }
 
     public void Show()
         {
@@ -173,13 +202,13 @@ public class UIInventoryPage : MonoBehaviour
             DeselectAllItems();
         }
 
-    private void DeselectAllItems()
-        {
-            foreach (UIInventoryItem item in listOfUIItems)
-            {
-                item.Deselect();
-            }
-        }
+private void DeselectAllItems()
+    {
+        listOfUIItems.RemoveAll(item => item == null);
+
+        foreach (UIInventoryItem item in listOfUIItems)
+            item.Deselect();
+    }
 
     public void Hide()
         {
@@ -189,4 +218,28 @@ public class UIInventoryPage : MonoBehaviour
             itemContextMenu.Hide();
 
         }
+
+
+private void ClearInventoryItems()
+    {
+        foreach (UIInventoryItem item in listOfUIItems)
+        {
+            if (item == null)
+                continue;
+
+            UnsubscribeFromItem(item);
+            Destroy(item.gameObject);
+        }
+
+        listOfUIItems.Clear();
+    }
+
+    private void UnsubscribeFromItem(UIInventoryItem item)
+    {
+        item.OnItemClicked -= HandleItemSelection;
+        item.OnItemBeginDrag -= HandleBeginDrag;
+        item.OnItemDroppedOn -= HandleSwap;
+        item.OnItemEndDrag -= HandleEndDrag;
+        item.OnRightMouseBtnClick -= HandleShowItemActions;
+    }
 }

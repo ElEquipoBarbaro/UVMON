@@ -1,0 +1,510 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class TransitionManager : MonoBehaviour
+{
+    [Header("Timing")]
+    [SerializeField, Min(0.1f)] private float closeDuration = 0.8f;
+    [SerializeField, Min(0.1f)] private float revealDuration = 0.7f;
+    
+
+    private const string SpriteResourcePath = "TransitionSprites/";
+[SerializeField, Min(0f)] private float coveredHoldDuration = 0.4f;
+
+    private CanvasGroup overlayCanvasGroup;
+    private Image backdropImage;
+    private Image coreImage;
+    private RectTransform spinnerRect;
+    private readonly List<Image> spinnerSegments = new List<Image>();
+    private TMP_Text loadingLabel;
+    private Image loadingLineAccent;
+    private float loadingAnimationTime;
+    private string pendingScene;
+    private bool isTransitioning;
+
+    public static TransitionManager Instance { get; private set; }
+    public static bool IsTransitioning
+    {
+        get { return Instance != null && Instance.isTransitioning; }
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        EnsureInstance();
+    }
+
+    private static void EnsureInstance()
+    {
+        if (Instance != null) return;
+
+        TransitionManager existing = FindObjectOfType<TransitionManager>();
+        if (existing != null)
+        {
+            Instance = existing;
+            return;
+        }
+
+        GameObject managerObject = new GameObject("TransitionManager");
+        managerObject.AddComponent<TransitionManager>();
+    }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        CreateTransitionCanvas();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    public static void LoadScene(string sceneName)
+    {
+        EnsureInstance();
+        Instance.GoToScene(sceneName);
+    }
+
+    public void GoToScene(string sceneName)
+    {
+        if (isTransitioning) return;
+
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("TransitionManager: No se proporciono una escena de destino.");
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        {
+            Debug.LogError("TransitionManager: La escena '" + sceneName + "' no esta incluida en Build Settings.");
+            return;
+        }
+
+        pendingScene = sceneName;
+        StartCoroutine(PlayTransition());
+    }
+
+private void CreateTransitionCanvas()
+    {
+        if (overlayCanvasGroup != null) return;
+
+        Sprite backgroundSprite = Resources.Load<Sprite>(
+            SpriteResourcePath + "lc_transition_background_pixel");
+
+        GameObject canvasObject = new GameObject(
+            "LiquidCrystalTransitionCanvas",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster),
+            typeof(CanvasGroup));
+
+        canvasObject.transform.SetParent(transform, false);
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = short.MaxValue;
+
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        overlayCanvasGroup = canvasObject.GetComponent<CanvasGroup>();
+        overlayCanvasGroup.alpha = 0f;
+        overlayCanvasGroup.blocksRaycasts = false;
+        overlayCanvasGroup.interactable = false;
+        overlayCanvasGroup.ignoreParentGroups = true;
+
+        RectTransform canvasRect = canvasObject.GetComponent<RectTransform>();
+
+        backdropImage = CreateImage(
+            "PixelAeroBackground",
+            canvasRect,
+            backgroundSprite,
+            Color.white);
+        StretchToParent(backdropImage.rectTransform);
+        backdropImage.preserveAspect = false;
+
+        Image wash = CreateImage(
+            "DeepBlueWash",
+            canvasRect,
+            null,
+            new Color(0.016f, 0.106f, 0.204f, 0.28f));
+        StretchToParent(wash.rectTransform);
+
+        TMP_FontAsset displayFont = Resources.Load<TMP_FontAsset>(
+            "Fonts & Materials/Electronic Highway Sign SDF");
+        TMP_FontAsset headingFont = Resources.Load<TMP_FontAsset>(
+            "Fonts & Materials/Oswald Bold SDF");
+        TMP_FontAsset bodyFont = TMP_Settings.defaultFontAsset;
+
+        TMP_Text brand = CreateText(
+            "Brand",
+            canvasRect,
+            "UVGMon",
+            displayFont,
+            72f,
+            FontStyles.Normal,
+            new Color(0.95f, 0.98f, 1f, 1f));
+        brand.rectTransform.anchorMin = brand.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        brand.rectTransform.anchoredPosition = new Vector2(0f, 385f);
+        brand.rectTransform.sizeDelta = new Vector2(580f, 112f);
+
+        Image spinnerBackdrop = CreateImage(
+            "SpinnerRingBackdrop",
+            canvasRect,
+            null,
+            new Color(0.02f, 0.133f, 0.235f, 0.47f));
+        spinnerBackdrop.rectTransform.anchorMin =
+            spinnerBackdrop.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        spinnerBackdrop.rectTransform.anchoredPosition = new Vector2(0f, -15f);
+        spinnerBackdrop.rectTransform.sizeDelta = new Vector2(144f, 144f);
+
+        GameObject spinnerObject = new GameObject("LoadingSpinner", typeof(RectTransform));
+        spinnerRect = spinnerObject.GetComponent<RectTransform>();
+        spinnerRect.SetParent(canvasRect, false);
+        spinnerRect.anchorMin = spinnerRect.anchorMax = new Vector2(0.5f, 0.5f);
+        spinnerRect.anchoredPosition = new Vector2(0f, -15f);
+        spinnerRect.sizeDelta = new Vector2(160f, 160f);
+
+        spinnerSegments.Clear();
+        for (int i = 0; i < 12; i++)
+        {
+            float angle = i * 30f;
+            float radians = angle * Mathf.Deg2Rad;
+            Image segment = CreateImage(
+                "Segment_" + i,
+                spinnerRect,
+                null,
+                Color.Lerp(
+                    new Color(0.49f, 0.906f, 1f, 1f),
+                    new Color(0.282f, 0.816f, 0.557f, 1f),
+                    i / 11f));
+
+            RectTransform segmentRect = segment.rectTransform;
+            segmentRect.anchorMin = segmentRect.anchorMax = new Vector2(0.5f, 0.5f);
+            segmentRect.sizeDelta = new Vector2(13f, 31f);
+            segmentRect.anchoredPosition = new Vector2(
+                Mathf.Sin(radians) * 58f,
+                Mathf.Cos(radians) * 58f);
+            segmentRect.localEulerAngles = new Vector3(0f, 0f, -angle);
+            spinnerSegments.Add(segment);
+        }
+
+        coreImage = CreateImage(
+            "SpinnerCore",
+            canvasRect,
+            null,
+            new Color(0.973f, 0.984f, 0.988f, 0.88f));
+        coreImage.rectTransform.anchorMin =
+            coreImage.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        coreImage.rectTransform.anchoredPosition = new Vector2(0f, -15f);
+        coreImage.rectTransform.sizeDelta = new Vector2(54f, 54f);
+
+        Image coreDiamond = CreateImage(
+            "CoreDiamond",
+            coreImage.rectTransform,
+            null,
+            new Color(0.282f, 0.816f, 0.557f, 1f));
+        coreDiamond.rectTransform.anchorMin =
+            coreDiamond.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        coreDiamond.rectTransform.sizeDelta = new Vector2(24f, 24f);
+        coreDiamond.rectTransform.localEulerAngles = new Vector3(0f, 0f, 45f);
+
+        loadingLabel = CreateText(
+            "LoadingLabel",
+            canvasRect,
+            "Cargando...",
+            headingFont,
+            42f,
+            FontStyles.Bold,
+            Color.white);
+        loadingLabel.rectTransform.anchorMin =
+            loadingLabel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLabel.rectTransform.anchoredPosition = new Vector2(0f, -137f);
+        loadingLabel.rectTransform.sizeDelta = new Vector2(520f, 66f);
+
+        TMP_Text hint = CreateText(
+            "LoadingHint",
+            canvasRect,
+            "Preparando el próximo destino",
+            bodyFont,
+            22f,
+            FontStyles.Normal,
+            new Color(0.82f, 0.92f, 0.98f, 0.95f));
+        hint.rectTransform.anchorMin =
+            hint.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        hint.rectTransform.anchoredPosition = new Vector2(0f, -194f);
+        hint.rectTransform.sizeDelta = new Vector2(560f, 40f);
+
+        Image loadingLine = CreateImage(
+            "LoadingLine",
+            canvasRect,
+            null,
+            new Color(0.49f, 0.906f, 1f, 0.59f));
+        loadingLine.rectTransform.anchorMin =
+            loadingLine.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLine.rectTransform.anchoredPosition = new Vector2(0f, -239f);
+        loadingLine.rectTransform.sizeDelta = new Vector2(390f, 4f);
+
+        loadingLineAccent = CreateImage(
+            "LoadingLineAccent",
+            loadingLine.rectTransform,
+            null,
+            new Color(0.282f, 0.816f, 0.557f, 0.94f));
+        loadingLineAccent.rectTransform.anchorMin =
+            loadingLineAccent.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLineAccent.rectTransform.anchoredPosition = new Vector2(-145f, 0f);
+        loadingLineAccent.rectTransform.sizeDelta = new Vector2(100f, 8f);
+
+        TMP_Text footer = CreateText(
+            "TransitionFooter",
+            canvasRect,
+            "La aventura continúa",
+            bodyFont,
+            20f,
+            FontStyles.Normal,
+            new Color(0.80f, 0.92f, 0.98f, 0.86f));
+        footer.rectTransform.anchorMin =
+            footer.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        footer.rectTransform.anchoredPosition = new Vector2(0f, -455f);
+        footer.rectTransform.sizeDelta = new Vector2(520f, 34f);
+
+        ResetVisuals();
+    }
+
+
+
+
+
+
+
+private IEnumerator PlayTransition()
+    {
+        isTransitioning = true;
+        loadingAnimationTime = 0f;
+        overlayCanvasGroup.alpha = 0f;
+        overlayCanvasGroup.blocksRaycasts = true;
+
+        yield return Animate(closeDuration, UpdateCloseVisuals);
+
+        AsyncOperation operation = SceneManager.LoadSceneAsync(pendingScene);
+        while (!operation.isDone)
+        {
+            AdvanceLoadingVisuals(Time.unscaledDeltaTime);
+            yield return null;
+        }
+
+        float holdElapsed = 0f;
+        while (holdElapsed < coveredHoldDuration)
+        {
+            holdElapsed += Time.unscaledDeltaTime;
+            AdvanceLoadingVisuals(Time.unscaledDeltaTime);
+            yield return null;
+        }
+
+        yield return Animate(revealDuration, UpdateRevealVisuals);
+
+        ResetVisuals();
+        overlayCanvasGroup.blocksRaycasts = false;
+        pendingScene = null;
+        isTransitioning = false;
+    }
+
+private void UpdateCloseVisuals(float progress)
+    {
+        float eased = Smooth(progress);
+        overlayCanvasGroup.alpha = eased;
+
+        if (spinnerRect != null)
+        {
+            spinnerRect.localEulerAngles = new Vector3(0f, 0f, -90f * eased);
+            spinnerRect.localScale = Vector3.one * Mathf.Lerp(0.88f, 1f, eased);
+        }
+
+        for (int i = 0; i < spinnerSegments.Count; i++)
+        {
+            Color color = spinnerSegments[i].color;
+            color.a = Mathf.Lerp(0.18f, 1f, Mathf.Clamp01(progress * 1.3f - i * 0.025f));
+            spinnerSegments[i].color = color;
+        }
+
+        if (loadingLabel != null)
+            loadingLabel.text = "Cargando" + new string('.', 1 + Mathf.FloorToInt(progress * 5f) % 3);
+    }
+
+private void UpdateRevealVisuals(float progress)
+    {
+        AdvanceLoadingVisuals(Time.unscaledDeltaTime);
+        overlayCanvasGroup.alpha = 1f - Smooth(progress);
+
+        if (spinnerRect != null)
+            spinnerRect.localScale = Vector3.one * Mathf.Lerp(1f, 0.92f, Smooth(progress));
+    }
+
+    private IEnumerator Animate(float duration, Action<float> update)
+    {
+        if (duration <= 0f)
+        {
+            update(1f);
+            yield break;
+        }
+
+        float elapsed = 0f;
+        update(0f);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            update(Mathf.Clamp01(elapsed / duration));
+            yield return null;
+        }
+
+        update(1f);
+    }
+
+private void ResetVisuals()
+    {
+        loadingAnimationTime = 0f;
+
+        if (overlayCanvasGroup != null)
+            overlayCanvasGroup.alpha = 0f;
+
+        if (spinnerRect != null)
+        {
+            spinnerRect.localEulerAngles = Vector3.zero;
+            spinnerRect.localScale = Vector3.one;
+        }
+
+        for (int i = 0; i < spinnerSegments.Count; i++)
+        {
+            Color color = spinnerSegments[i].color;
+            color.a = 0.28f;
+            spinnerSegments[i].color = color;
+        }
+
+        if (loadingLabel != null)
+            loadingLabel.text = "Cargando...";
+
+        if (loadingLineAccent != null)
+            loadingLineAccent.rectTransform.anchoredPosition = new Vector2(-145f, 0f);
+    }
+
+private void AdvanceLoadingVisuals(float deltaTime)
+    {
+        loadingAnimationTime += Mathf.Max(0f, deltaTime);
+
+        if (spinnerRect != null)
+            spinnerRect.Rotate(0f, 0f, -125f * deltaTime);
+
+        for (int i = 0; i < spinnerSegments.Count; i++)
+        {
+            Image segment = spinnerSegments[i];
+            float phase = loadingAnimationTime * 2.8f - i * 0.42f;
+            float glow = Mathf.InverseLerp(-1f, 1f, Mathf.Sin(phase));
+            Color color = segment.color;
+            color.a = Mathf.Lerp(0.28f, 1f, glow);
+            segment.color = color;
+        }
+
+        if (loadingLabel != null)
+        {
+            int dotCount = 1 + Mathf.FloorToInt(loadingAnimationTime * 1.8f) % 3;
+            loadingLabel.text = "Cargando" + new string('.', dotCount);
+        }
+
+        if (loadingLineAccent != null)
+        {
+            float travel = Mathf.PingPong(loadingAnimationTime * 190f, 290f);
+            loadingLineAccent.rectTransform.anchoredPosition =
+                new Vector2(-145f + travel, 0f);
+        }
+    }
+
+
+    private static RectTransform CreateLayer(string name, RectTransform parent)
+    {
+        GameObject layerObject = new GameObject(name, typeof(RectTransform));
+        RectTransform layer = layerObject.GetComponent<RectTransform>();
+        layer.SetParent(parent, false);
+        StretchToParent(layer);
+        return layer;
+    }
+
+    private static Image CreateImage(string name, RectTransform parent, Sprite sprite, Color color)
+    {
+        GameObject imageObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        RectTransform rect = imageObject.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+
+        Image image = imageObject.GetComponent<Image>();
+        image.sprite = sprite;
+        image.color = color;
+        image.raycastTarget = false;
+        return image;
+    }
+
+private static TMP_Text CreateText(
+        string name,
+        RectTransform parent,
+        string value,
+        TMP_FontAsset font,
+        float fontSize,
+        FontStyles style,
+        Color color)
+    {
+        GameObject textObject = new GameObject(
+            name,
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(TextMeshProUGUI));
+
+        RectTransform rect = textObject.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+
+        TMP_Text text = textObject.GetComponent<TMP_Text>();
+        text.text = value;
+        text.font = font != null ? font : TMP_Settings.defaultFontAsset;
+        text.fontSize = fontSize;
+        text.fontStyle = style;
+        text.color = color;
+        text.alignment = TextAlignmentOptions.Center;
+        text.enableWordWrapping = false;
+        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.raycastTarget = false;
+        return text;
+    }
+
+
+    private static void StretchToParent(RectTransform rect)
+    {
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+    }
+
+
+
+    private static float Smooth(float value)
+    {
+        value = Mathf.Clamp01(value);
+        return value * value * (3f - 2f * value);
+    }
+}

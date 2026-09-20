@@ -46,6 +46,9 @@ public class BattleUIManager : MonoBehaviour
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private TextMeshProUGUI enemyHPText;
+    [SerializeField] private Image playerHPFillImage;
+    [SerializeField] private Image enemyHPFillImage;
+    [SerializeField] private TextMeshProUGUI enemyNameLevelText;
     [SerializeField] private TextMeshProUGUI battleMessageText;
 
     [Tooltip("Nombre + nivel del UVGmon activo (Prompt 8: panel 'UVGmon activo' del mockup objetivo). Se actualiza junto con el sprite/HP en BindCreatures.")]
@@ -84,6 +87,8 @@ public class BattleUIManager : MonoBehaviour
 
     private void Awake()
     {
+        ResolveCrystalHUDReferences();
+
         if (enemyBodyPartsView != null)
             enemyBodyPartsView.OnPartClicked += HandleBodyPartClicked;
 
@@ -184,14 +189,24 @@ public class BattleUIManager : MonoBehaviour
         OnTabChanged?.Invoke(tab);
     }
 
-    private void SetTabButtonColor(Button button, bool active)
+private void SetTabButtonColor(Button button, bool active)
     {
         if (button == null)
             return;
 
         Image img = button.targetGraphic as Image;
-        if (img != null)
-            img.color = active ? tabActiveColor : tabInactiveColor;
+        if (img == null)
+            return;
+
+        Color baseColor = button == attacksTabButton
+            ? new Color(0.533f, 0.949f, 0.765f, 1f)
+            : button == inventoryTabButton
+                ? new Color(0.600f, 0.886f, 0.976f, 1f)
+                : new Color(0.776f, 0.910f, 0.957f, 1f);
+
+        img.color = active
+            ? baseColor
+            : Color.Lerp(baseColor, new Color(0.973f, 0.984f, 0.988f, 1f), 0.38f);
     }
 
     private void HandleBodyPartClicked(int index)
@@ -366,7 +381,7 @@ public class BattleUIManager : MonoBehaviour
         SetupEnemyBodyParts(null);
     }
 
-    public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
+public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
     {
         if (playerCreatureView != null && playerRuntime != null)
             playerCreatureView.SetSprite(playerRuntime.data.backSprite);
@@ -381,24 +396,81 @@ public class BattleUIManager : MonoBehaviour
             enemyCreatureView.CacheRestingPosition();
 
         if (playerNameLevelText != null && playerRuntime != null)
-            playerNameLevelText.text = $"{playerRuntime.data.creatureName}  Lv.{playerRuntime.Level}";
+            playerNameLevelText.text = $"{playerRuntime.data.creatureName}  Nv. {playerRuntime.Level}";
+
+        if (enemyNameLevelText != null && enemyRuntime != null)
+            enemyNameLevelText.text = $"{enemyRuntime.data.creatureName}  Nv. {enemyRuntime.Level}";
 
         UpdateHP(playerRuntime, enemyRuntime);
     }
 
-    public void UpdateHP(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
+public void UpdateHP(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
     {
-        if (playerRuntime != null && playerHPText != null)
-            playerHPText.text = $"HP: {playerRuntime.CurrentHP}/{playerRuntime.MaxHP}";
+        if (playerRuntime != null)
+        {
+            if (playerHPText != null)
+                playerHPText.text = $"{playerRuntime.CurrentHP}/{playerRuntime.MaxHP}";
 
-        if (enemyRuntime != null && enemyHPText != null)
-            enemyHPText.text = $"HP: {enemyRuntime.CurrentHP}/{enemyRuntime.MaxHP}";
+            UpdateHPBar(playerHPFillImage, playerRuntime.CurrentHP, playerRuntime.MaxHP);
+        }
 
-        // La pestana Equipo lee PlayerParty en vivo (sin copia propia); cualquier cambio de
-        // vida del jugador debe reflejarse ahi tambien, este visible o no en este momento
-        // (si esta oculta, OnEnable() la refresca igual al volver a mostrarla).
+        if (enemyRuntime != null)
+        {
+            if (enemyHPText != null)
+                enemyHPText.text = $"{enemyRuntime.CurrentHP}/{enemyRuntime.MaxHP}";
+
+            UpdateHPBar(enemyHPFillImage, enemyRuntime.CurrentHP, enemyRuntime.MaxHP);
+        }
+
         RefreshTeamTab();
     }
+
+private void ResolveCrystalHUDReferences()
+    {
+        if (battleUI == null)
+            return;
+
+        Transform root = battleUI.transform;
+
+        if (playerHPFillImage == null)
+        {
+            Transform fill = root.Find("PixelCampusPlayerStatus/HPTrack/HPFill");
+            if (fill != null)
+                playerHPFillImage = fill.GetComponent<Image>();
+        }
+
+        if (enemyHPFillImage == null)
+        {
+            Transform fill = root.Find("PixelCampusEnemyStatus/HPTrack/HPFill");
+            if (fill != null)
+                enemyHPFillImage = fill.GetComponent<Image>();
+        }
+
+        if (enemyNameLevelText == null)
+        {
+            Transform label = root.Find("PixelCampusEnemyStatus/EnemyNameLevel");
+            if (label != null)
+                enemyNameLevelText = label.GetComponent<TextMeshProUGUI>();
+        }
+    }
+
+    private static void UpdateHPBar(Image fillImage, int currentHP, int maxHP)
+    {
+        if (fillImage == null)
+            return;
+
+        float ratio = maxHP > 0
+            ? Mathf.Clamp01((float)currentHP / maxHP)
+            : 0f;
+
+        fillImage.fillAmount = ratio;
+        fillImage.color = ratio > 0.5f
+            ? new Color(0.282f, 0.816f, 0.557f, 1f)
+            : ratio > 0.2f
+                ? new Color(0.976f, 0.733f, 0.282f, 1f)
+                : new Color(0.933f, 0.286f, 0.302f, 1f);
+    }
+
 
     /// <summary>Fuerza una relectura del equipo real en la pestana Equipo (Prompt 5/6):
     /// cambio de vida, cambio de UVGmon activo, inicio de combate, etc.</summary>
@@ -466,7 +538,7 @@ public class BattleUIManager : MonoBehaviour
             MoveOptionUI slot = Instantiate(moveOptionPrefab, moveOptionsContainer);
             slot.gameObject.SetActive(true);
             slot.SetIndex(i);
-            slot.SetText(moves[i].moveName);
+            slot.SetMove(moves[i]);
             slot.SetHighlighted(false);
             slot.SetInteractable(playerInputEnabled && !moveSelectionLocked);
             slot.OnHoverEnter += HandleMoveOptionHoverEnter;

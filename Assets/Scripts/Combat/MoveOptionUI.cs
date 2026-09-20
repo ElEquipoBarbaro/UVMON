@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] private TextMeshProUGUI label;
+    [SerializeField] private TextMeshProUGUI metaLabel;
     [SerializeField] private Image background;
 
     [SerializeField] private Color idleColor = new Color(1f, 1f, 1f, 0.08f);
@@ -34,6 +35,23 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (label != null)
             label.text = text;
     }
+
+public void SetMove(MoveData move)
+    {
+        if (move == null)
+        {
+            SetText(string.Empty);
+            if (metaLabel != null)
+                metaLabel.text = string.Empty;
+            return;
+        }
+
+        SetText(move.moveName);
+
+        if (metaLabel != null)
+            metaLabel.text = $"{move.moveType} · Potencia {move.power}";
+    }
+
 
     // El fondo se mantiene siempre habilitado (es el mismo Image que recibe el
     // raycast de hover/clic); resaltar solo cambia su color, para no perder el
@@ -88,5 +106,26 @@ public class MoveOptionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             return;
 
         OnClicked?.Invoke(this);
+    }
+
+
+private void Awake()
+    {
+        if (background == null)
+            background = GetComponent<Image>();
+
+        if (label == null)
+        {
+            Transform labelTransform = transform.Find("Label");
+            if (labelTransform != null)
+                label = labelTransform.GetComponent<TextMeshProUGUI>();
+        }
+
+        if (metaLabel == null)
+        {
+            Transform metaTransform = transform.Find("MetaLabel");
+            if (metaTransform != null)
+                metaLabel = metaTransform.GetComponent<TextMeshProUGUI>();
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -10,26 +11,20 @@ public class TransitionManager : MonoBehaviour
     [Header("Timing")]
     [SerializeField, Min(0.1f)] private float closeDuration = 0.8f;
     [SerializeField, Min(0.1f)] private float revealDuration = 0.7f;
-    [SerializeField, Min(0f)] private float coveredHoldDuration = 0.12f;
-
-    [Header("Mosaic")]
-    [SerializeField, Range(4, 16)] private int tileColumns = 9;
-    [SerializeField, Range(3, 10)] private int tileRows = 6;
-    [SerializeField, Range(2, 16)] private int leafCount = 8;
-
-    [Header("Palette")]
-    [SerializeField] private Color backdropColor = new Color(0.063f, 0.165f, 0.227f, 1f);
-    [SerializeField] private Color tileTint = Color.white;
+    
 
     private const string SpriteResourcePath = "TransitionSprites/";
-
-    private readonly List<Image> tileImages = new List<Image>();
-    private readonly List<Image> leafImages = new List<Image>();
-    private readonly List<Image> streakImages = new List<Image>();
+[SerializeField, Min(0f)] private float coveredHoldDuration = 0.4f;
 
     private CanvasGroup overlayCanvasGroup;
     private Image backdropImage;
     private Image coreImage;
+    private RectTransform spinnerRect;
+    private readonly List<Image> spinnerSegments = new List<Image>();
+    private TMP_Text loadingLabel;
+    private Image loadingLineAccent;
+    private float loadingAnimationTime;
+    private int lastDotCount = -1;
     private string pendingScene;
     private bool isTransitioning;
 
@@ -78,6 +73,15 @@ public class TransitionManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
+private void Update()
+    {
+        if (!isTransitioning || overlayCanvasGroup == null || overlayCanvasGroup.alpha < 0.99f)
+            return;
+
+        AdvanceLoadingVisuals(Time.unscaledDeltaTime);
+    }
+
+
     public static void LoadScene(string sceneName)
     {
         EnsureInstance();
@@ -104,17 +108,15 @@ public class TransitionManager : MonoBehaviour
         StartCoroutine(PlayTransition());
     }
 
-    private void CreateTransitionCanvas()
+private void CreateTransitionCanvas()
     {
         if (overlayCanvasGroup != null) return;
 
-        Sprite diamondSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_diamond");
-        Sprite leafSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_leaf");
-        Sprite streakSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_streak");
-        Sprite coreSprite = Resources.Load<Sprite>(SpriteResourcePath + "pixel_campus_core");
+        Sprite backgroundSprite = Resources.Load<Sprite>(
+            SpriteResourcePath + "lc_transition_background_pixel");
 
         GameObject canvasObject = new GameObject(
-            "EmeraldTransitionCanvas",
+            "LiquidCrystalTransitionCanvas",
             typeof(RectTransform),
             typeof(Canvas),
             typeof(CanvasScaler),
@@ -140,191 +142,255 @@ public class TransitionManager : MonoBehaviour
 
         RectTransform canvasRect = canvasObject.GetComponent<RectTransform>();
 
-        backdropImage = CreateImage("Backdrop", canvasRect, null, backdropColor);
+        backdropImage = CreateImage(
+            "PixelAeroBackground",
+            canvasRect,
+            backgroundSprite,
+            Color.white);
         StretchToParent(backdropImage.rectTransform);
+        backdropImage.preserveAspect = false;
 
-        RectTransform tileLayer = CreateLayer("DiamondMosaic", canvasRect);
-        RectTransform accentLayer = CreateLayer("EnergyAccents", canvasRect);
+        Image wash = CreateImage(
+            "DeepBlueWash",
+            canvasRect,
+            null,
+            new Color(0.016f, 0.106f, 0.204f, 0.28f));
+        StretchToParent(wash.rectTransform);
 
-        CreateDiamondMosaic(tileLayer, diamondSprite);
-        CreateLeaves(accentLayer, leafSprite);
-        CreateStreaks(accentLayer, streakSprite);
+        TMP_FontAsset displayFont = Resources.Load<TMP_FontAsset>(
+            "Fonts & Materials/Electronic Highway Sign SDF");
+        TMP_FontAsset headingFont = Resources.Load<TMP_FontAsset>(
+            "Fonts & Materials/Oswald Bold SDF");
+        TMP_FontAsset bodyFont = TMP_Settings.defaultFontAsset;
 
-        coreImage = CreateImage("EmeraldCore", accentLayer, coreSprite, Color.white);
-        RectTransform coreRect = coreImage.rectTransform;
-        coreRect.anchorMin = new Vector2(0.5f, 0.5f);
-        coreRect.anchorMax = new Vector2(0.5f, 0.5f);
-        coreRect.pivot = new Vector2(0.5f, 0.5f);
-        coreRect.sizeDelta = new Vector2(330f, 330f);
+        TMP_Text brand = CreateText(
+            "Brand",
+            canvasRect,
+            "UVGMon",
+            displayFont,
+            72f,
+            FontStyles.Normal,
+            new Color(0.95f, 0.98f, 1f, 1f));
+        brand.rectTransform.anchorMin = brand.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        brand.rectTransform.anchoredPosition = new Vector2(0f, 385f);
+        brand.rectTransform.sizeDelta = new Vector2(580f, 112f);
+
+        Image spinnerBackdrop = CreateImage(
+            "SpinnerRingBackdrop",
+            canvasRect,
+            null,
+            new Color(0.02f, 0.133f, 0.235f, 0.47f));
+        spinnerBackdrop.rectTransform.anchorMin =
+            spinnerBackdrop.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        spinnerBackdrop.rectTransform.anchoredPosition = new Vector2(0f, -15f);
+        spinnerBackdrop.rectTransform.sizeDelta = new Vector2(144f, 144f);
+
+        GameObject spinnerObject = new GameObject("LoadingSpinner", typeof(RectTransform));
+        spinnerRect = spinnerObject.GetComponent<RectTransform>();
+        spinnerRect.SetParent(canvasRect, false);
+        spinnerRect.anchorMin = spinnerRect.anchorMax = new Vector2(0.5f, 0.5f);
+        spinnerRect.anchoredPosition = new Vector2(0f, -15f);
+        spinnerRect.sizeDelta = new Vector2(160f, 160f);
+
+        spinnerSegments.Clear();
+        for (int i = 0; i < 12; i++)
+        {
+            float angle = i * 30f;
+            float radians = angle * Mathf.Deg2Rad;
+            Image segment = CreateImage(
+                "Segment_" + i,
+                spinnerRect,
+                null,
+                Color.Lerp(
+                    new Color(0.49f, 0.906f, 1f, 1f),
+                    new Color(0.282f, 0.816f, 0.557f, 1f),
+                    i / 11f));
+
+            RectTransform segmentRect = segment.rectTransform;
+            segmentRect.anchorMin = segmentRect.anchorMax = new Vector2(0.5f, 0.5f);
+            segmentRect.sizeDelta = new Vector2(13f, 31f);
+            segmentRect.anchoredPosition = new Vector2(
+                Mathf.Sin(radians) * 58f,
+                Mathf.Cos(radians) * 58f);
+            segmentRect.localEulerAngles = new Vector3(0f, 0f, -angle);
+            spinnerSegments.Add(segment);
+        }
+
+        coreImage = CreateImage(
+            "SpinnerCore",
+            canvasRect,
+            null,
+            new Color(0.973f, 0.984f, 0.988f, 0.88f));
+        coreImage.rectTransform.anchorMin =
+            coreImage.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        coreImage.rectTransform.anchoredPosition = new Vector2(0f, -15f);
+        coreImage.rectTransform.sizeDelta = new Vector2(54f, 54f);
+
+        Image coreDiamond = CreateImage(
+            "CoreDiamond",
+            coreImage.rectTransform,
+            null,
+            new Color(0.282f, 0.816f, 0.557f, 1f));
+        coreDiamond.rectTransform.anchorMin =
+            coreDiamond.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        coreDiamond.rectTransform.sizeDelta = new Vector2(24f, 24f);
+        coreDiamond.rectTransform.localEulerAngles = new Vector3(0f, 0f, 45f);
+
+        loadingLabel = CreateText(
+            "LoadingLabel",
+            canvasRect,
+            "Cargando...",
+            headingFont,
+            42f,
+            FontStyles.Bold,
+            Color.white);
+        loadingLabel.rectTransform.anchorMin =
+            loadingLabel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLabel.rectTransform.anchoredPosition = new Vector2(0f, -137f);
+        loadingLabel.rectTransform.sizeDelta = new Vector2(520f, 66f);
+
+        TMP_Text hint = CreateText(
+            "LoadingHint",
+            canvasRect,
+            "Preparando el próximo destino",
+            bodyFont,
+            22f,
+            FontStyles.Normal,
+            new Color(0.82f, 0.92f, 0.98f, 0.95f));
+        hint.rectTransform.anchorMin =
+            hint.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        hint.rectTransform.anchoredPosition = new Vector2(0f, -194f);
+        hint.rectTransform.sizeDelta = new Vector2(560f, 40f);
+
+        Image loadingLine = CreateImage(
+            "LoadingLine",
+            canvasRect,
+            null,
+            new Color(0.49f, 0.906f, 1f, 0.59f));
+        loadingLine.rectTransform.anchorMin =
+            loadingLine.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLine.rectTransform.anchoredPosition = new Vector2(0f, -239f);
+        loadingLine.rectTransform.sizeDelta = new Vector2(390f, 4f);
+
+        loadingLineAccent = CreateImage(
+            "LoadingLineAccent",
+            loadingLine.rectTransform,
+            null,
+            new Color(0.282f, 0.816f, 0.557f, 0.94f));
+        loadingLineAccent.rectTransform.anchorMin =
+            loadingLineAccent.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        loadingLineAccent.rectTransform.anchoredPosition = new Vector2(-145f, 0f);
+        loadingLineAccent.rectTransform.sizeDelta = new Vector2(100f, 8f);
+
+        TMP_Text footer = CreateText(
+            "TransitionFooter",
+            canvasRect,
+            "La aventura continúa",
+            bodyFont,
+            20f,
+            FontStyles.Normal,
+            new Color(0.80f, 0.92f, 0.98f, 0.86f));
+        footer.rectTransform.anchorMin =
+            footer.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        footer.rectTransform.anchoredPosition = new Vector2(0f, -455f);
+        footer.rectTransform.sizeDelta = new Vector2(520f, 34f);
 
         ResetVisuals();
     }
 
-    private void CreateDiamondMosaic(RectTransform parent, Sprite sprite)
-    {
-        tileImages.Clear();
 
-        for (int row = 0; row < tileRows; row++)
-        {
-            for (int column = 0; column < tileColumns; column++)
-            {
-                Image tile = CreateImage(
-                    "Diamond_" + row + "_" + column,
-                    parent,
-                    sprite,
-                    tileTint);
 
-                RectTransform rect = tile.rectTransform;
-                rect.anchorMin = new Vector2((float)column / tileColumns, (float)row / tileRows);
-                rect.anchorMax = new Vector2((float)(column + 1) / tileColumns, (float)(row + 1) / tileRows);
-                rect.offsetMin = new Vector2(-28f, -28f);
-                rect.offsetMax = new Vector2(28f, 28f);
-                rect.pivot = new Vector2(0.5f, 0.5f);
-                rect.localScale = Vector3.zero;
-                tile.preserveAspect = false;
-                tileImages.Add(tile);
-            }
-        }
-    }
 
-    private void CreateLeaves(RectTransform parent, Sprite sprite)
-    {
-        leafImages.Clear();
 
-        for (int i = 0; i < leafCount; i++)
-        {
-            Image leaf = CreateImage("EnergyLeaf_" + i, parent, sprite, Color.white);
-            RectTransform rect = leaf.rectTransform;
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(330f, 220f);
-            rect.localEulerAngles = new Vector3(0f, 0f, -8f + (i % 4) * 5f);
-            leaf.preserveAspect = true;
-            leafImages.Add(leaf);
-        }
-    }
 
-    private void CreateStreaks(RectTransform parent, Sprite sprite)
-    {
-        streakImages.Clear();
 
-        for (int i = 0; i < 2; i++)
-        {
-            Image streak = CreateImage("EnergyStreak_" + i, parent, sprite, Color.white);
-            RectTransform rect = streak.rectTransform;
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(1450f, 320f);
-            rect.anchoredPosition = new Vector2(0f, i == 0 ? -220f : 220f);
-            rect.localEulerAngles = new Vector3(0f, 0f, i == 0 ? -4f : 5f);
-            streak.preserveAspect = true;
-            streakImages.Add(streak);
-        }
-    }
-
-    private IEnumerator PlayTransition()
+private IEnumerator PlayTransition()
     {
         isTransitioning = true;
-        overlayCanvasGroup.alpha = 1f;
+        loadingAnimationTime = 0f;
+        lastDotCount = -1;
+        overlayCanvasGroup.alpha = 0f;
         overlayCanvasGroup.blocksRaycasts = true;
 
+        yield return null;
         yield return Animate(closeDuration, UpdateCloseVisuals);
 
+        ThreadPriority previousPriority = Application.backgroundLoadingPriority;
+        Application.backgroundLoadingPriority = ThreadPriority.Low;
+
         AsyncOperation operation = SceneManager.LoadSceneAsync(pendingScene);
-        while (!operation.isDone) yield return null;
+        if (operation == null)
+        {
+            Application.backgroundLoadingPriority = previousPriority;
+            Debug.LogError("TransitionManager: no se pudo iniciar la carga de '" + pendingScene + "'.");
+            ResetVisuals();
+            overlayCanvasGroup.blocksRaycasts = false;
+            pendingScene = null;
+            isTransitioning = false;
+            yield break;
+        }
 
+        operation.priority = -1;
+        operation.allowSceneActivation = false;
+
+        float coveredElapsed = 0f;
+        while (operation.progress < 0.9f || coveredElapsed < coveredHoldDuration)
+        {
+            coveredElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        // Activa la escena sólo después de completar la carga y de dibujar
+        // un último frame cubierto. Así el trabajo pesado no coincide con el fade.
+        yield return new WaitForEndOfFrame();
+        operation.allowSceneActivation = true;
+
+        while (!operation.isDone)
+            yield return null;
+
+        Application.backgroundLoadingPriority = previousPriority;
+
+        // Da tiempo a que Canvas, cámaras y scripts de la escena se estabilicen
+        // antes de revelar el destino.
         yield return null;
         yield return null;
-
-        if (coveredHoldDuration > 0f)
-            yield return Animate(coveredHoldDuration, delegate { });
 
         yield return Animate(revealDuration, UpdateRevealVisuals);
 
         ResetVisuals();
         overlayCanvasGroup.blocksRaycasts = false;
-        overlayCanvasGroup.alpha = 0f;
         pendingScene = null;
         isTransitioning = false;
     }
 
-    private void UpdateCloseVisuals(float progress)
+private void UpdateCloseVisuals(float progress)
     {
         float eased = Smooth(progress);
-        SetAlpha(backdropImage, Mathf.Clamp01(progress * 1.45f));
+        overlayCanvasGroup.alpha = eased;
 
-        int diagonalLength = Mathf.Max(1, tileColumns + tileRows - 2);
-        for (int i = 0; i < tileImages.Count; i++)
+        if (spinnerRect != null)
         {
-            int row = i / tileColumns;
-            int column = i % tileColumns;
-            float delay = ((float)(row + column) / diagonalLength) * 0.32f;
-            float local = Mathf.Clamp01((progress - delay) / (1f - delay));
-            tileImages[i].rectTransform.localScale = Vector3.one * (Smooth(local) * 1.62f);
-            SetAlpha(tileImages[i], local);
+            spinnerRect.localEulerAngles = new Vector3(0f, 0f, -90f * eased);
+            spinnerRect.localScale = Vector3.one * Mathf.Lerp(0.88f, 1f, eased);
         }
 
-        for (int i = 0; i < leafImages.Count; i++)
+        for (int i = 0; i < spinnerSegments.Count; i++)
         {
-            float lane = leafImages.Count == 1 ? 0.5f : (float)i / (leafImages.Count - 1);
-            Vector2 start = new Vector2(-1250f - i * 70f, Mathf.Lerp(-500f, 500f, lane));
-            Vector2 end = new Vector2(1250f + i * 55f, start.y + Mathf.Sin(i * 1.7f) * 150f);
-            leafImages[i].rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, end, eased);
-            leafImages[i].rectTransform.localScale = Vector3.one * Mathf.Lerp(0.55f, 1.15f, Mathf.Sin(progress * Mathf.PI));
-            SetAlpha(leafImages[i], Mathf.Sin(progress * Mathf.PI) * 0.95f);
+            Color color = spinnerSegments[i].color;
+            color.a = Mathf.Lerp(0.18f, 1f, Mathf.Clamp01(progress * 1.3f - i * 0.025f));
+            spinnerSegments[i].color = color;
         }
 
-        for (int i = 0; i < streakImages.Count; i++)
-        {
-            float local = Mathf.Clamp01((progress - 0.1f - i * 0.08f) / 0.55f);
-            streakImages[i].rectTransform.localScale = new Vector3(Smooth(local), 1f, 1f);
-            SetAlpha(streakImages[i], Mathf.Sin(local * Mathf.PI) * 0.9f);
-        }
-
-        coreImage.rectTransform.localScale = Vector3.one * Mathf.Lerp(0f, 1.08f, Smooth(Mathf.Clamp01((progress - 0.42f) / 0.58f)));
-        coreImage.rectTransform.localEulerAngles = new Vector3(0f, 0f, progress * 110f);
-        SetAlpha(coreImage, Mathf.Clamp01((progress - 0.35f) / 0.45f));
+        int dotCount = 1 + Mathf.FloorToInt(progress * 5f) % 3;
+        UpdateLoadingLabel(dotCount);
     }
 
-    private void UpdateRevealVisuals(float progress)
+private void UpdateRevealVisuals(float progress)
     {
-        int diagonalLength = Mathf.Max(1, tileColumns + tileRows - 2);
+        overlayCanvasGroup.alpha = 1f - Smooth(progress);
 
-        for (int i = 0; i < tileImages.Count; i++)
-        {
-            int row = i / tileColumns;
-            int column = i % tileColumns;
-            float reverseDiagonal = (float)((tileRows - 1 - row) + (tileColumns - 1 - column)) / diagonalLength;
-            float delay = reverseDiagonal * 0.28f;
-            float local = Mathf.Clamp01((progress - delay) / (1f - delay));
-            tileImages[i].rectTransform.localScale = Vector3.one * Mathf.Lerp(1.62f, 0f, Smooth(local));
-            SetAlpha(tileImages[i], 1f - local);
-        }
-
-        SetAlpha(backdropImage, 1f - Smooth(Mathf.Clamp01((progress - 0.48f) / 0.52f)));
-
-        for (int i = 0; i < leafImages.Count; i++)
-        {
-            float lane = leafImages.Count == 1 ? 0.5f : (float)i / (leafImages.Count - 1);
-            Vector2 start = new Vector2(1050f + i * 50f, Mathf.Lerp(500f, -500f, lane));
-            Vector2 end = new Vector2(-1300f - i * 70f, start.y + Mathf.Cos(i * 1.3f) * 130f);
-            leafImages[i].rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, end, Smooth(progress));
-            leafImages[i].rectTransform.localScale = Vector3.one * Mathf.Lerp(1.1f, 0.45f, progress);
-            SetAlpha(leafImages[i], Mathf.Sin(progress * Mathf.PI) * 0.8f);
-        }
-
-        coreImage.rectTransform.localScale = Vector3.one * Mathf.Lerp(1.08f, 2.25f, Smooth(progress));
-        coreImage.rectTransform.localEulerAngles = new Vector3(0f, 0f, 110f + progress * 150f);
-        SetAlpha(coreImage, 1f - progress);
-
-        for (int i = 0; i < streakImages.Count; i++)
-        {
-            float flash = Mathf.Sin(Mathf.Clamp01(progress * 1.7f) * Mathf.PI);
-            streakImages[i].rectTransform.localScale = new Vector3(Mathf.Lerp(1f, 1.35f, progress), 1f, 1f);
-            SetAlpha(streakImages[i], flash * 0.55f);
-        }
+        if (spinnerRect != null)
+            spinnerRect.localScale = Vector3.one * Mathf.Lerp(1f, 0.92f, Smooth(progress));
     }
 
     private IEnumerator Animate(float duration, Action<float> update)
@@ -348,34 +414,71 @@ public class TransitionManager : MonoBehaviour
         update(1f);
     }
 
-    private void ResetVisuals()
+private void ResetVisuals()
     {
-        if (backdropImage != null) SetAlpha(backdropImage, 0f);
+        loadingAnimationTime = 0f;
+        lastDotCount = -1;
 
-        for (int i = 0; i < tileImages.Count; i++)
+        if (overlayCanvasGroup != null)
+            overlayCanvasGroup.alpha = 0f;
+
+        if (spinnerRect != null)
         {
-            tileImages[i].rectTransform.localScale = Vector3.zero;
-            SetAlpha(tileImages[i], 0f);
+            spinnerRect.localEulerAngles = Vector3.zero;
+            spinnerRect.localScale = Vector3.one;
         }
 
-        for (int i = 0; i < leafImages.Count; i++)
+        for (int i = 0; i < spinnerSegments.Count; i++)
         {
-            leafImages[i].rectTransform.localScale = Vector3.zero;
-            SetAlpha(leafImages[i], 0f);
+            Color color = spinnerSegments[i].color;
+            color.a = 0.28f;
+            spinnerSegments[i].color = color;
         }
 
-        for (int i = 0; i < streakImages.Count; i++)
+        UpdateLoadingLabel(3);
+
+        if (loadingLineAccent != null)
+            loadingLineAccent.rectTransform.anchoredPosition = new Vector2(-145f, 0f);
+    }
+
+private void AdvanceLoadingVisuals(float deltaTime)
+    {
+        loadingAnimationTime += Mathf.Max(0f, deltaTime);
+
+        if (spinnerRect != null)
+            spinnerRect.Rotate(0f, 0f, -125f * deltaTime);
+
+        for (int i = 0; i < spinnerSegments.Count; i++)
         {
-            streakImages[i].rectTransform.localScale = Vector3.zero;
-            SetAlpha(streakImages[i], 0f);
+            Image segment = spinnerSegments[i];
+            float phase = loadingAnimationTime * 2.8f - i * 0.42f;
+            float glow = Mathf.InverseLerp(-1f, 1f, Mathf.Sin(phase));
+            Color color = segment.color;
+            color.a = Mathf.Lerp(0.28f, 1f, glow);
+            segment.color = color;
         }
 
-        if (coreImage != null)
+        int dotCount = 1 + Mathf.FloorToInt(loadingAnimationTime * 1.8f) % 3;
+        UpdateLoadingLabel(dotCount);
+
+        if (loadingLineAccent != null)
         {
-            coreImage.rectTransform.localScale = Vector3.zero;
-            SetAlpha(coreImage, 0f);
+            float travel = Mathf.PingPong(loadingAnimationTime * 190f, 290f);
+            loadingLineAccent.rectTransform.anchoredPosition =
+                new Vector2(-145f + travel, 0f);
         }
     }
+
+private void UpdateLoadingLabel(int dotCount)
+    {
+        if (loadingLabel == null || dotCount == lastDotCount)
+            return;
+
+        lastDotCount = dotCount;
+        loadingLabel.text = "Cargando" + new string('.', dotCount);
+    }
+
+
 
     private static RectTransform CreateLayer(string name, RectTransform parent)
     {
@@ -399,6 +502,38 @@ public class TransitionManager : MonoBehaviour
         return image;
     }
 
+private static TMP_Text CreateText(
+        string name,
+        RectTransform parent,
+        string value,
+        TMP_FontAsset font,
+        float fontSize,
+        FontStyles style,
+        Color color)
+    {
+        GameObject textObject = new GameObject(
+            name,
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(TextMeshProUGUI));
+
+        RectTransform rect = textObject.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+
+        TMP_Text text = textObject.GetComponent<TMP_Text>();
+        text.text = value;
+        text.font = font != null ? font : TMP_Settings.defaultFontAsset;
+        text.fontSize = fontSize;
+        text.fontStyle = style;
+        text.color = color;
+        text.alignment = TextAlignmentOptions.Center;
+        text.enableWordWrapping = false;
+        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.raycastTarget = false;
+        return text;
+    }
+
+
     private static void StretchToParent(RectTransform rect)
     {
         rect.anchorMin = Vector2.zero;
@@ -408,12 +543,7 @@ public class TransitionManager : MonoBehaviour
         rect.pivot = new Vector2(0.5f, 0.5f);
     }
 
-    private static void SetAlpha(Image image, float alpha)
-    {
-        Color color = image.color;
-        color.a = Mathf.Clamp01(alpha);
-        image.color = color;
-    }
+
 
     private static float Smooth(float value)
     {
