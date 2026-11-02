@@ -100,6 +100,7 @@ public class CombatManager : MonoBehaviour
             battleUI.OnBodyPartClicked += HandleBodyPartClicked;
             battleUI.OnTeamMemberClicked += HandleTeamMemberClicked;
             battleUI.OnInventoryItemClicked += HandleInventoryItemClicked;
+            battleUI.OnInventoryItemDropped += HandleInventoryItemClicked;
         }
     }
 
@@ -112,6 +113,7 @@ public class CombatManager : MonoBehaviour
             battleUI.OnBodyPartClicked -= HandleBodyPartClicked;
             battleUI.OnTeamMemberClicked -= HandleTeamMemberClicked;
             battleUI.OnInventoryItemClicked -= HandleInventoryItemClicked;
+            battleUI.OnInventoryItemDropped -= HandleInventoryItemClicked;
         }
 
         // Evita que Instance quede apuntando a un objeto destruido si este era el
@@ -214,15 +216,34 @@ public class CombatManager : MonoBehaviour
         if (inventoryData == null || playerRuntime == null)
             return;
 
-        if (inventoryIndex < 0 || inventoryIndex >= inventoryData.Size)
+        if (!inventoryData.TryGetItemAt(inventoryIndex, out InventoryItem slot))
+        {
+            RejectInventoryItem("Ese objeto ya no está disponible.");
             return;
-
-        InventoryItem slot = inventoryData.GetItemAt(inventoryIndex);
-
-        if (slot.IsEmpty || slot.item.Category != ItemCategory.Healing || slot.item.Effect == null)
-            return;
+        }
 
         string itemName = slot.item.Name;
+        string creatureName = playerRuntime.data.creatureName;
+
+        if (slot.item.Category != ItemCategory.Healing || slot.item.Effect == null)
+        {
+            RejectInventoryItem($"{itemName} no puede utilizarse durante el combate.");
+            return;
+        }
+
+        if (playerRuntime.CurrentHP <= 0)
+        {
+            RejectInventoryItem($"{creatureName} está debilitado; {itemName} no puede reanimarlo.");
+            return;
+        }
+
+        if (playerRuntime.CurrentHP >= playerRuntime.MaxHP)
+        {
+            RejectInventoryItem($"{creatureName} ya tiene todos sus PS.");
+            return;
+        }
+
+        int hpBefore = playerRuntime.CurrentHP;
 
         if (battleUI != null)
             battleUI.SetPlayerInputEnabled(false);
@@ -230,28 +251,43 @@ public class CombatManager : MonoBehaviour
         try
         {
             slot.item.Effect.Apply(playerRuntime);
-            inventoryData.RemoveItem(inventoryIndex, 1);
         }
         catch (System.Exception exception)
         {
             Debug.LogException(exception);
-
-            if (battleUI != null)
-                battleUI.SetPlayerInputEnabled(true);
-
+            RejectInventoryItem($"No se pudo usar {itemName}. Inténtalo de nuevo.");
             return;
         }
+
+        int healedAmount = playerRuntime.CurrentHP - hpBefore;
+        if (healedAmount <= 0)
+        {
+            RejectInventoryItem($"{itemName} no produjo ningún efecto.");
+            return;
+        }
+
+        inventoryData.RemoveItem(inventoryIndex, 1);
 
         if (battleUI != null)
         {
             battleUI.UpdateHP(playerRuntime, enemyRuntime);
-            battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} used {itemName}!");
+            battleUI.ShowBattleMessage($"¡{creatureName} usó {itemName}! Recuperó {healedAmount} PS.");
             battleUI.ShowAttacksTab();
         }
 
         nonAttackActionResolved = true;
         playerHasChosen = true;
     }
+
+    private void RejectInventoryItem(string message)
+    {
+        if (battleUI == null)
+            return;
+
+        battleUI.ShowBattleMessage(message);
+        battleUI.SetPlayerInputEnabled(isPlayerTurn && !playerHasChosen);
+    }
+
 
     private void SelectBodyPartTarget(int index)
     {
@@ -341,7 +377,7 @@ public class CombatManager : MonoBehaviour
             battleUI.ShowBattleUI();
             battleUI.BindCreatures(playerRuntime, enemyRuntime);
             battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
-            battleUI.ShowBattleMessage($"A wild {enemyRuntime.data.creatureName} appeared!");
+            battleUI.ShowBattleMessage($"¡Un {enemyRuntime.data.creatureName} salvaje apareció!");
 
             battleUI.SetupEnemyBodyParts(enemyBodyPartsRuntime);
 
@@ -477,7 +513,7 @@ public class CombatManager : MonoBehaviour
             if (selectedMove == null || selectedMove.effect == null)
             {
                 if (battleUI != null)
-                    battleUI.ShowBattleMessage("Nothing happened.");
+                    battleUI.ShowBattleMessage("La acción no produjo ningún efecto.");
 
                 yield return new WaitForSeconds(0.8f);
                 yield break;
@@ -512,7 +548,7 @@ public class CombatManager : MonoBehaviour
                     battleAnimationPlayer.PlayMissIndicator(battleUI.EnemyView);
 
                 if (battleUI != null)
-                    battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName}'s attack missed!");
+                    battleUI.ShowBattleMessage($"¡{playerRuntime.data.creatureName} falló! El ataque no alcanzó al rival.");
 
                 yield return new WaitForSeconds(0.8f);
                 yield break;
@@ -557,7 +593,7 @@ public class CombatManager : MonoBehaviour
 
         if (battleUI != null)
         {
-            battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} used {move.moveName}!");
+            battleUI.ShowBattleMessage($"¡{playerRuntime.data.creatureName} usó {move.moveName} contra {target.NombreParte}!");
             yield return new WaitForSeconds(0.6f);
         }
 
@@ -579,7 +615,7 @@ public class CombatManager : MonoBehaviour
 
             if (battleUI != null)
             {
-                battleUI.ShowBattleMessage($"Attack missed {target.NombreParte}!");
+                battleUI.ShowBattleMessage($"¡El ataque no logró impactar en {target.NombreParte}!");
                 yield return new WaitForSeconds(0.8f);
             }
 
@@ -588,7 +624,7 @@ public class CombatManager : MonoBehaviour
 
         if (result.esCritico && battleUI != null)
         {
-            battleUI.ShowBattleMessage("Critical hit!");
+            battleUI.ShowBattleMessage("¡Golpe crítico! El impacto fue devastador.");
             yield return new WaitForSeconds(0.8f);
         }
 
@@ -604,7 +640,7 @@ public class CombatManager : MonoBehaviour
 
         if (battleUI != null)
         {
-            battleUI.ShowBattleMessage($"{target.NombreParte} took {result.danoFinalEntero} damage! ({target.VidaActual}/{target.VidaMaxima} HP)");
+            battleUI.ShowBattleMessage($"¡{target.NombreParte} recibió {result.danoFinalEntero} de daño! Resistencia: {target.VidaActual}/{target.VidaMaxima}.");
             yield return new WaitForSeconds(0.8f);
         }
 
@@ -824,7 +860,7 @@ public class CombatManager : MonoBehaviour
         {
             if (enemyRuntime.CurrentHP <= 0 && playerRuntime.CurrentHP > 0)
             {
-                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} fainted!");
+                battleUI.ShowBattleMessage($"¡{enemyRuntime.data.creatureName} quedó debilitado!");
                 yield return new WaitForSeconds(1f);
 
                 playerRuntime.GainXP(enemyRuntime.data.xpYield);
@@ -835,7 +871,7 @@ public class CombatManager : MonoBehaviour
                     yield return RunCaptureSequence();
                 }
 
-                battleUI.ShowBattleMessage("Battle Ended!");
+                battleUI.ShowBattleMessage("¡El combate ha terminado!");
                 yield return new WaitForSeconds(0.8f);
 
                 if (currentEnemyTrainer != null)
@@ -848,16 +884,16 @@ public class CombatManager : MonoBehaviour
             {
                 if (playerRuntime != null)
                 {
-                    battleUI.ShowBattleMessage($"{playerRuntime.data.creatureName} fainted!");
+                    battleUI.ShowBattleMessage($"¡{playerRuntime.data.creatureName} quedó debilitado!");
                     yield return new WaitForSeconds(1f);
                 }
 
-                battleUI.ShowBattleMessage("You lost the battle!");
+                battleUI.ShowBattleMessage("Tu equipo ya no puede continuar. Has perdido el combate.");
                 yield return new WaitForSeconds(1f);
             }
             else
             {
-                battleUI.ShowBattleMessage("Battle Ended!");
+                battleUI.ShowBattleMessage("¡El combate ha terminado!");
                 yield return new WaitForSeconds(0.8f);
             }
 
@@ -876,11 +912,11 @@ public class CombatManager : MonoBehaviour
         if (battleUI != null)
         {
             if (result.success)
-                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} was captured!");
+                battleUI.ShowBattleMessage($"¡{enemyRuntime.data.creatureName} fue capturado!");
             else if (result.failureReason == CaptureFailReason.NoJar)
-                battleUI.ShowBattleMessage("You don't have any capture jars!");
+                battleUI.ShowBattleMessage("No tienes frascos de captura disponibles.");
             else
-                battleUI.ShowBattleMessage($"{enemyRuntime.data.creatureName} broke free!");
+                battleUI.ShowBattleMessage($"¡{enemyRuntime.data.creatureName} escapó del frasco!");
 
             yield return new WaitForSeconds(1f);
         }

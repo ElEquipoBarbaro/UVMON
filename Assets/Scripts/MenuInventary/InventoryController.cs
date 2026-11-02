@@ -7,17 +7,38 @@ public class InventoryController : MonoBehaviour
 {
 
 
-    private void PrepareUI()
+private void PrepareUI()
+    {
+        if (inventoryUI == null || inventoryData == null)
         {
-            inventoryUI.InitializeInventoryUI(inventoryData.Size);
-            inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
-            inventoryUI.OnSwapItems += HandleSwapItems;
-            inventoryUI.OnStartDragging += HandleDragging;
-            inventoryUI.OnItemActionRequested += HandleItemActionRequest;
+            Debug.LogError("InventoryController necesita referencias válidas al inventario y a su UI.", this);
+            return;
+        }
 
+        inventoryUI.InitializeInventoryUI(inventoryData.Size);
+
+        inventoryUI.OnDescriptionRequested -= HandleDescriptionRequest;
+        inventoryUI.OnSwapItems -= HandleSwapItems;
+        inventoryUI.OnStartDragging -= HandleDragging;
+        inventoryUI.OnItemActionRequested -= HandleItemActionRequest;
+
+        inventoryUI.OnDescriptionRequested += HandleDescriptionRequest;
+        inventoryUI.OnSwapItems += HandleSwapItems;
+        inventoryUI.OnStartDragging += HandleDragging;
+        inventoryUI.OnItemActionRequested += HandleItemActionRequest;
+
+        if (itemsTabButton != null)
+        {
+            itemsTabButton.onClick.RemoveListener(ShowItemsTab);
             itemsTabButton.onClick.AddListener(ShowItemsTab);
+        }
+
+        if (pokemonTabButton != null)
+        {
+            pokemonTabButton.onClick.RemoveListener(ShowPokemonTab);
             pokemonTabButton.onClick.AddListener(ShowPokemonTab);
         }
+    }
 
 
 
@@ -51,32 +72,70 @@ public class InventoryController : MonoBehaviour
 
         }
 
-    private void PrepareInventoryData()
+private void OnDestroy()
     {
+        if (inventoryData != null)
+            inventoryData.OnInventoryUpdated -= UpdateInventoryUI;
+
+        if (inventoryUI != null)
+        {
+            inventoryUI.OnDescriptionRequested -= HandleDescriptionRequest;
+            inventoryUI.OnSwapItems -= HandleSwapItems;
+            inventoryUI.OnStartDragging -= HandleDragging;
+            inventoryUI.OnItemActionRequested -= HandleItemActionRequest;
+        }
+
+        if (itemsTabButton != null)
+            itemsTabButton.onClick.RemoveListener(ShowItemsTab);
+
+        if (pokemonTabButton != null)
+            pokemonTabButton.onClick.RemoveListener(ShowPokemonTab);
+    }
+
+
+private void PrepareInventoryData()
+    {
+        if (inventoryData == null)
+            return;
+
         inventoryData.Initialize();
-        inventoryData.OnInventoryUpdated+=UpdateInventoryUI;
-        foreach ( var item in initialItems)
+
+        // InventorySO persiste entre escenas. Eliminar antes de agregar hace que
+        // la suscripción sea idempotente y evita callbacks hacia UI destruidas.
+        inventoryData.OnInventoryUpdated -= UpdateInventoryUI;
+        inventoryData.OnInventoryUpdated += UpdateInventoryUI;
+
+        foreach (InventoryItem item in initialItems)
         {
             if (item.IsEmpty)
-            {
                 continue;
 
-            }
             inventoryData.AddItem(item.item, item.quantity);
-
         }
     }
     // para inicializar todo
 
-     private void UpdateInventoryUI(Dictionary<int, InventoryItem> inventoryState)
+private void UpdateInventoryUI(Dictionary<int, InventoryItem> inventoryState)
+    {
+        if (inventoryUI == null)
+            return;
+
+        inventoryUI.ResetAllItems();
+
+        if (inventoryState == null)
+            return;
+
+        foreach (KeyValuePair<int, InventoryItem> item in inventoryState)
         {
-            inventoryUI.ResetAllItems();
-            foreach (var item in inventoryState)
-            {
-                inventoryUI.UpdateData(item.Key, item.Value.item.ItemImage,
-                    item.Value.quantity);
-            }
+            if (item.Value.IsEmpty || item.Value.item == null)
+                continue;
+
+            inventoryUI.UpdateData(
+                item.Key,
+                item.Value.item.ItemImage,
+                item.Value.quantity);
         }
+    }
     private void HandleDescriptionRequest(int itemIndex)
     {
         InventoryItem inventoryItem = inventoryData.GetItemAt(itemIndex);
@@ -139,17 +198,19 @@ public class InventoryController : MonoBehaviour
         pokemonTab.Refresh();
     }
 
-    private void ShowItemsTab()
+private void ShowItemsTab()
     {
         pokemonTab.Hide();
         inventoryUI.Show();
+        itemsTabButton.Select();
         UpdateInventoryUI(inventoryData.GetCurrentInventoryState());
     }
 
-    private void ShowPokemonTab()
+private void ShowPokemonTab()
     {
         inventoryUI.Hide();
         pokemonTab.Show();
+        pokemonTabButton.Select();
     }
 
     private void OpenMenu()

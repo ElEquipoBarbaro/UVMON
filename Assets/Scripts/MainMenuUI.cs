@@ -27,7 +27,7 @@ public class MainMenuUI : MonoBehaviour
     {
         if (logActions) Debug.Log("MainMenu: Play()");
         Time.timeScale = 1f;
-        SceneManager.LoadScene(gameSceneName);
+        TransitionManager.LoadScene(gameSceneName);
     }
 
     public void OpenOptions()

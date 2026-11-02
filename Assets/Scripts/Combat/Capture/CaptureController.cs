@@ -296,7 +296,7 @@ public class CaptureController : MonoBehaviour
             indicatorImage.color = finalColor;
 
         if (resultText != null)
-            resultText.text = success ? "¡CAPTURADO!" : "¡ESCAPO!";
+            resultText.text = success ? "¡CAPTURADO!" : "¡ESCAPÓ!";
 
         yield return new WaitForSeconds(0.9f);
 

@@ -19,6 +19,7 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private GameObject attacksPanel;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private CombatInventoryUI combatInventoryUI;
+    [SerializeField] private CombatItemDropTarget playerItemDropTarget;
     [SerializeField] private GameObject teamPanel;
     [SerializeField] private CombatTeamUI combatTeamUI;
     [SerializeField] private Color tabActiveColor = new Color(1f, 1f, 1f, 1f);
@@ -39,9 +40,15 @@ public class BattleUIManager : MonoBehaviour
     /// Indice real en InventorySO.</summary>
     public event Action<int> OnInventoryItemClicked;
 
+    /// <summary>Un objeto arrastrado fue soltado sobre el UVGmon activo.</summary>
+    public event Action<int> OnInventoryItemDropped;
+
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerHPText;
     [SerializeField] private TextMeshProUGUI enemyHPText;
+    [SerializeField] private Image playerHPFillImage;
+    [SerializeField] private Image enemyHPFillImage;
+    [SerializeField] private TextMeshProUGUI enemyNameLevelText;
     [SerializeField] private TextMeshProUGUI battleMessageText;
 
     [Tooltip("Nombre + nivel del UVGmon activo (Prompt 8: panel 'UVGmon activo' del mockup objetivo). Se actualiza junto con el sprite/HP en BindCreatures.")]
@@ -80,6 +87,8 @@ public class BattleUIManager : MonoBehaviour
 
     private void Awake()
     {
+        ResolveCrystalHUDReferences();
+
         if (enemyBodyPartsView != null)
             enemyBodyPartsView.OnPartClicked += HandleBodyPartClicked;
 
@@ -90,7 +99,17 @@ public class BattleUIManager : MonoBehaviour
         }
 
         if (combatInventoryUI != null)
+        {
             combatInventoryUI.OnItemSelected += HandleInventoryItemClicked;
+            combatInventoryUI.OnItemDragStarted += HandleInventoryItemDragStarted;
+            combatInventoryUI.OnItemDragEnded += HandleInventoryItemDragEnded;
+        }
+
+        if (playerItemDropTarget != null)
+        {
+            playerItemDropTarget.OnItemDropped += HandlePlayerItemDropped;
+            playerItemDropTarget.SetDropEnabled(false);
+        }
 
         if (attacksTabButton != null)
             attacksTabButton.onClick.AddListener(ShowAttacksTab);
@@ -116,7 +135,14 @@ public class BattleUIManager : MonoBehaviour
         }
 
         if (combatInventoryUI != null)
+        {
             combatInventoryUI.OnItemSelected -= HandleInventoryItemClicked;
+            combatInventoryUI.OnItemDragStarted -= HandleInventoryItemDragStarted;
+            combatInventoryUI.OnItemDragEnded -= HandleInventoryItemDragEnded;
+        }
+
+        if (playerItemDropTarget != null)
+            playerItemDropTarget.OnItemDropped -= HandlePlayerItemDropped;
 
         if (attacksTabButton != null)
             attacksTabButton.onClick.RemoveListener(ShowAttacksTab);
@@ -139,6 +165,9 @@ public class BattleUIManager : MonoBehaviour
         bool inventoryWasActive = inventoryPanel != null && inventoryPanel.activeSelf;
         bool teamWasActive = teamPanel != null && teamPanel.activeSelf;
 
+        if (tab != CombatTab.Inventory && combatInventoryUI != null)
+            combatInventoryUI.CancelDrag();
+
         if (attacksPanel != null) attacksPanel.SetActive(tab == CombatTab.Attacks);
         if (inventoryPanel != null) inventoryPanel.SetActive(tab == CombatTab.Inventory);
         if (teamPanel != null) teamPanel.SetActive(tab == CombatTab.Team);
@@ -148,8 +177,7 @@ public class BattleUIManager : MonoBehaviour
         SetTabButtonColor(teamTabButton, tab == CombatTab.Team);
 
         // OnEnable ya refresca un panel que acaba de activarse. Solo forzar Refresh
-        // cuando el usuario pulsa de nuevo la pestana que ya estaba visible, evitando
-        // destruir/crear dos juegos de slots en el mismo frame.
+        // cuando el usuario pulsa de nuevo la pestana que ya estaba visible.
         if (tab == CombatTab.Inventory && inventoryWasActive && combatInventoryUI != null)
             combatInventoryUI.Refresh();
 
@@ -161,14 +189,24 @@ public class BattleUIManager : MonoBehaviour
         OnTabChanged?.Invoke(tab);
     }
 
-    private void SetTabButtonColor(Button button, bool active)
+private void SetTabButtonColor(Button button, bool active)
     {
         if (button == null)
             return;
 
         Image img = button.targetGraphic as Image;
-        if (img != null)
-            img.color = active ? tabActiveColor : tabInactiveColor;
+        if (img == null)
+            return;
+
+        Color baseColor = button == attacksTabButton
+            ? new Color(0.533f, 0.949f, 0.765f, 1f)
+            : button == inventoryTabButton
+                ? new Color(0.600f, 0.886f, 0.976f, 1f)
+                : new Color(0.776f, 0.910f, 0.957f, 1f);
+
+        img.color = active
+            ? baseColor
+            : Color.Lerp(baseColor, new Color(0.973f, 0.984f, 0.988f, 1f), 0.38f);
     }
 
     private void HandleBodyPartClicked(int index)
@@ -189,6 +227,42 @@ public class BattleUIManager : MonoBehaviour
     private void HandleInventoryItemClicked(int inventoryIndex)
     {
         OnInventoryItemClicked?.Invoke(inventoryIndex);
+    }
+
+    private void HandleInventoryItemDragStarted(int inventoryIndex)
+    {
+        if (!playerInputEnabled)
+        {
+            combatInventoryUI?.CancelDrag();
+            return;
+        }
+
+        if (playerItemDropTarget != null)
+            playerItemDropTarget.SetDropEnabled(true);
+    }
+
+    private void HandleInventoryItemDragEnded()
+    {
+        if (playerItemDropTarget != null)
+            playerItemDropTarget.SetDropEnabled(false);
+    }
+
+    private void HandlePlayerItemDropped()
+    {
+        if (combatInventoryUI == null)
+            return;
+
+        if (!playerInputEnabled)
+        {
+            combatInventoryUI.CancelDrag();
+            return;
+        }
+
+        // Limpiar el drag antes de consumir: RemoveItem repinta el inventario y
+        // destruye el slot que origino el evento.
+        int inventoryIndex = combatInventoryUI.CompleteDrag();
+        if (inventoryIndex >= 0)
+            OnInventoryItemDropped?.Invoke(inventoryIndex);
     }
 
     public void SetupEnemyBodyParts(IReadOnlyList<BodyPart> parts)
@@ -307,7 +381,7 @@ public class BattleUIManager : MonoBehaviour
         SetupEnemyBodyParts(null);
     }
 
-    public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
+public void BindCreatures(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
     {
         if (playerCreatureView != null && playerRuntime != null)
             playerCreatureView.SetSprite(playerRuntime.data.backSprite);
@@ -322,24 +396,81 @@ public class BattleUIManager : MonoBehaviour
             enemyCreatureView.CacheRestingPosition();
 
         if (playerNameLevelText != null && playerRuntime != null)
-            playerNameLevelText.text = $"{playerRuntime.data.creatureName}  Lv.{playerRuntime.Level}";
+            playerNameLevelText.text = $"{playerRuntime.data.creatureName}  Nv. {playerRuntime.Level}";
+
+        if (enemyNameLevelText != null && enemyRuntime != null)
+            enemyNameLevelText.text = $"{enemyRuntime.data.creatureName}  Nv. {enemyRuntime.Level}";
 
         UpdateHP(playerRuntime, enemyRuntime);
     }
 
-    public void UpdateHP(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
+public void UpdateHP(CreatureRuntime playerRuntime, CreatureRuntime enemyRuntime)
     {
-        if (playerRuntime != null && playerHPText != null)
-            playerHPText.text = $"HP: {playerRuntime.CurrentHP}/{playerRuntime.MaxHP}";
+        if (playerRuntime != null)
+        {
+            if (playerHPText != null)
+                playerHPText.text = $"{playerRuntime.CurrentHP}/{playerRuntime.MaxHP}";
 
-        if (enemyRuntime != null && enemyHPText != null)
-            enemyHPText.text = $"HP: {enemyRuntime.CurrentHP}/{enemyRuntime.MaxHP}";
+            UpdateHPBar(playerHPFillImage, playerRuntime.CurrentHP, playerRuntime.MaxHP);
+        }
 
-        // La pestana Equipo lee PlayerParty en vivo (sin copia propia); cualquier cambio de
-        // vida del jugador debe reflejarse ahi tambien, este visible o no en este momento
-        // (si esta oculta, OnEnable() la refresca igual al volver a mostrarla).
+        if (enemyRuntime != null)
+        {
+            if (enemyHPText != null)
+                enemyHPText.text = $"{enemyRuntime.CurrentHP}/{enemyRuntime.MaxHP}";
+
+            UpdateHPBar(enemyHPFillImage, enemyRuntime.CurrentHP, enemyRuntime.MaxHP);
+        }
+
         RefreshTeamTab();
     }
+
+private void ResolveCrystalHUDReferences()
+    {
+        if (battleUI == null)
+            return;
+
+        Transform root = battleUI.transform;
+
+        if (playerHPFillImage == null)
+        {
+            Transform fill = root.Find("PixelCampusPlayerStatus/HPTrack/HPFill");
+            if (fill != null)
+                playerHPFillImage = fill.GetComponent<Image>();
+        }
+
+        if (enemyHPFillImage == null)
+        {
+            Transform fill = root.Find("PixelCampusEnemyStatus/HPTrack/HPFill");
+            if (fill != null)
+                enemyHPFillImage = fill.GetComponent<Image>();
+        }
+
+        if (enemyNameLevelText == null)
+        {
+            Transform label = root.Find("PixelCampusEnemyStatus/EnemyNameLevel");
+            if (label != null)
+                enemyNameLevelText = label.GetComponent<TextMeshProUGUI>();
+        }
+    }
+
+    private static void UpdateHPBar(Image fillImage, int currentHP, int maxHP)
+    {
+        if (fillImage == null)
+            return;
+
+        float ratio = maxHP > 0
+            ? Mathf.Clamp01((float)currentHP / maxHP)
+            : 0f;
+
+        fillImage.fillAmount = ratio;
+        fillImage.color = ratio > 0.5f
+            ? new Color(0.282f, 0.816f, 0.557f, 1f)
+            : ratio > 0.2f
+                ? new Color(0.976f, 0.733f, 0.282f, 1f)
+                : new Color(0.933f, 0.286f, 0.302f, 1f);
+    }
+
 
     /// <summary>Fuerza una relectura del equipo real en la pestana Equipo (Prompt 5/6):
     /// cambio de vida, cambio de UVGmon activo, inicio de combate, etc.</summary>
@@ -407,7 +538,7 @@ public class BattleUIManager : MonoBehaviour
             MoveOptionUI slot = Instantiate(moveOptionPrefab, moveOptionsContainer);
             slot.gameObject.SetActive(true);
             slot.SetIndex(i);
-            slot.SetText(moves[i].moveName);
+            slot.SetMove(moves[i]);
             slot.SetHighlighted(false);
             slot.SetInteractable(playerInputEnabled && !moveSelectionLocked);
             slot.OnHoverEnter += HandleMoveOptionHoverEnter;
@@ -428,9 +559,29 @@ public class BattleUIManager : MonoBehaviour
 
     public void ShowBattleMessage(string message)
     {
-        if (battleMessageText != null)
-            battleMessageText.text = message;
+        if (battleMessageText == null)
+            return;
+
+        ConfigureBattleMessageText();
+        battleMessageText.text = message;
     }
+
+    private void ConfigureBattleMessageText()
+    {
+        if (battleMessageText == null)
+            return;
+
+        // Mantener los mensajes en una sola línea evita que crezcan hacia arriba
+        // y se superpongan con los PS del UVGmon aliado. El autoajuste conserva
+        // el tamaño grande para frases cortas y lo reduce solo cuando hace falta.
+        battleMessageText.enableWordWrapping = false;
+        battleMessageText.enableAutoSizing = true;
+        battleMessageText.fontSizeMin = 14f;
+        battleMessageText.fontSizeMax = 26f;
+        battleMessageText.maxVisibleLines = 1;
+        battleMessageText.overflowMode = TextOverflowModes.Ellipsis;
+    }
+
 
     public void ClearBattleMessage()
     {

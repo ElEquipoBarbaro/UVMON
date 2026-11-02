@@ -28,28 +28,44 @@ public class UIInventoryItem : MonoBehaviour, IPointerClickHandler,
         Deselect();
     }
 
-    public void ResetData()
+public void ResetData()
     {
-        itemImage.gameObject.SetActive(false);
         empty = true;
+
+        if (itemImage != null)
+        {
+            itemImage.sprite = null;
+            itemImage.gameObject.SetActive(false);
+        }
+
+        if (quantityTxt != null)
+            quantityTxt.text = string.Empty;
     }
 
-    public void Deselect()
+public void Deselect()
     {
-        borderImage.enabled = false;
+        if (borderImage != null)
+            borderImage.enabled = false;
     }
 
-    public void SetData(Sprite sprite, int quantity)
+public void SetData(Sprite sprite, int quantity)
     {
+        if (itemImage == null)
+            return;
+
         itemImage.gameObject.SetActive(true);
         itemImage.sprite = sprite;
-        quantityTxt.text = quantity + "";
+
+        if (quantityTxt != null)
+            quantityTxt.text = quantity.ToString();
+
         empty = false;
     }
 
-    public void Select()
+public void Select()
     {
-        borderImage.enabled = true;
+        if (borderImage != null)
+            borderImage.enabled = true;
     }
 
     // ✅ IBeginDragHandler

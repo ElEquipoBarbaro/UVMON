@@ -121,6 +121,19 @@ public class InventorySO : ScriptableObject
             return inventoryItems[itemIndex];
         }
 
+    public bool TryGetItemAt(int itemIndex, out InventoryItem item)
+    {
+        if (inventoryItems == null || itemIndex < 0 || itemIndex >= inventoryItems.Count)
+        {
+            item = InventoryItem.GetEmptyItem();
+            return false;
+        }
+
+        item = inventoryItems[itemIndex];
+        return !item.IsEmpty;
+    }
+
+
     public void SwapItems(int itemIndex_1, int itemIndex_2)
     {
         InventoryItem item1 = inventoryItems[itemIndex_1];

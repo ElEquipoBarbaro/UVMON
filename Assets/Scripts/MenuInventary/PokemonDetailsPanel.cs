@@ -10,28 +10,40 @@ public class PokemonDetailsPanel : MonoBehaviour
     private TMP_Text title;
     [SerializeField]
     private TMP_Text stats;
+    [SerializeField]
+    private Image hpFill;
 
     public void Awake()
     {
         ResetDetails();
     }
 
-    public void ResetDetails()
+public void ResetDetails()
     {
         itemImage.gameObject.SetActive(false);
         title.text = "";
         stats.text = "";
+
+        if (hpFill != null)
+            hpFill.fillAmount = 0f;
     }
 
-    public void SetDetails(CreatureRuntime creature)
+public void SetDetails(CreatureRuntime creature)
     {
         itemImage.gameObject.SetActive(true);
         itemImage.sprite = creature.data.frontSprite;
+        itemImage.preserveAspect = true;
         title.text = creature.data.creatureName;
+
+        if (hpFill != null)
+        {
+            float maxHp = Mathf.Max(1f, creature.MaxHP);
+            hpFill.fillAmount = Mathf.Clamp01(creature.CurrentHP / maxHp);
+        }
+
         stats.text =
-            $"HP: {creature.CurrentHP}/{creature.MaxHP}\n" +
-            $"Attack: {creature.Attack}\n" +
-            $"Defense: {creature.Defense}\n" +
-            $"Speed: {creature.Speed}";
+            $"Ataque: {creature.Attack}\n" +
+            $"Defensa: {creature.Defense}\n" +
+            $"Velocidad: {creature.Speed}";
     }
 }

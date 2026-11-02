@@ -93,18 +93,25 @@ public class PauseManager : MonoBehaviour
         SetPaused(!isPaused);
     }
 
-    private void SetPaused(bool value)
+private void SetPaused(bool value)
     {
         isPaused = value;
 
         if (logActions) Debug.Log("Paused = " + isPaused);
 
-        // Al despausar, el mapa no debe quedarse abierto
-        if (!isPaused && mapUI != null && mapUI.IsOpen)
-            mapUI.Close();
-
         if (pauseOverlay != null)
+        {
             pauseOverlay.SetActive(isPaused);
+
+            if (isPaused)
+            {
+                UnityEngine.UI.Button firstButton =
+                    pauseOverlay.GetComponentInChildren<UnityEngine.UI.Button>(true);
+
+                if (UnityEngine.EventSystems.EventSystem.current != null && firstButton != null)
+                    UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(firstButton.gameObject);
+            }
+        }
 
         Time.timeScale = isPaused ? 0f : 1f;
 
@@ -148,13 +155,13 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         if (pauseAudio) AudioListener.pause = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        TransitionManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void MainMenu()
     {
         SetPaused(false); // Limpia pausa antes de cambiar
-        SceneManager.LoadScene(mainMenuSceneName);
+        TransitionManager.LoadScene(mainMenuSceneName);
     }
 
     public void Quit()
