@@ -24,6 +24,7 @@ public class DialogueManager : MonoBehaviour
     private Coroutine activeDialogue;
     private int currentTurnIndex;
     private int totalTurns;
+    private bool startsBattleAfterDialogue;
     private Button advanceButton;
 private void Awake()
     {
@@ -65,7 +66,7 @@ private void Awake()
     }
 
 
-public void StartDialogue(DialogueRound dialogue)
+public void StartDialogue(DialogueRound dialogue, bool startsBattle = false)
     {
         if (dialogue == null || dialogue.DialogueTurnsList == null || dialogue.DialogueTurnsList.Count == 0)
         {
@@ -79,6 +80,7 @@ public void StartDialogue(DialogueRound dialogue)
         dialogueTurnsQueue = new Queue<DialogueTurn>(dialogue.DialogueTurnsList);
         totalTurns = dialogueTurnsQueue.Count;
         currentTurnIndex = 0;
+        startsBattleAfterDialogue = startsBattle;
         activeDialogue = StartCoroutine(DialogueCoroutine());
     }
 
@@ -161,7 +163,11 @@ private void UpdateNavigationState(bool isLastTurn)
             dialogueProgress.text = currentTurnIndex + " / " + totalTurns;
 
         if (advanceButtonLabel != null)
-            advanceButtonLabel.text = isLastTurn ? "Cerrar" : "Siguiente";
+        {
+            advanceButtonLabel.text = isLastTurn
+                ? (startsBattleAfterDialogue ? "Iniciar combate" : "Cerrar")
+                : "Siguiente";
+        }
 
         if (advanceButton != null && advanceButton.targetGraphic != null)
         {

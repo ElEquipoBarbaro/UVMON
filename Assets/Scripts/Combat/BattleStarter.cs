@@ -23,6 +23,12 @@ public class BattleStarter : MonoBehaviour
         if (interactionPending)
             return;
 
+        if (!CanPlayerStartBattle())
+        {
+            Debug.LogWarning("No se puede iniciar el combate: el equipo del jugador no tiene UVGmon con PS.", this);
+            return;
+        }
+
         if (dialogueTrigger == null)
         {
             StartBattle();
@@ -47,6 +53,7 @@ public class BattleStarter : MonoBehaviour
     {
         if (CombatManager.Instance == null) return;
         if (PlayerParty.Instance == null) return;
+        if (!PlayerParty.Instance.HasUsableCreature()) return;
         if (enemyTrainer == null) return;
 
         // Ademas del guard de arriba (dialogo repetido), CombatManager.StartBattle
@@ -56,5 +63,10 @@ public class BattleStarter : MonoBehaviour
             PlayerParty.Instance,
             enemyTrainer
         );
+    }
+
+    private static bool CanPlayerStartBattle()
+    {
+        return PlayerParty.Instance != null && PlayerParty.Instance.HasUsableCreature();
     }
 }

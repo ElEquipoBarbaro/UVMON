@@ -61,6 +61,7 @@ public class BattleUIManager : MonoBehaviour
     private readonly List<MoveOptionUI> moveOptionSlots = new List<MoveOptionUI>();
     private bool moveSelectionLocked;
     private bool playerInputEnabled;
+    private bool playerActionsVisible = true;
     private IReadOnlyList<MoveData> lastRenderedMoves;
 
     /// <summary>El jugador paso el cursor sobre una opcion de ataque (indice en playerRuntime.Moves).</summary>
@@ -168,9 +169,9 @@ public class BattleUIManager : MonoBehaviour
         if (tab != CombatTab.Inventory && combatInventoryUI != null)
             combatInventoryUI.CancelDrag();
 
-        if (attacksPanel != null) attacksPanel.SetActive(tab == CombatTab.Attacks);
-        if (inventoryPanel != null) inventoryPanel.SetActive(tab == CombatTab.Inventory);
-        if (teamPanel != null) teamPanel.SetActive(tab == CombatTab.Team);
+        if (attacksPanel != null) attacksPanel.SetActive(playerActionsVisible && tab == CombatTab.Attacks);
+        if (inventoryPanel != null) inventoryPanel.SetActive(playerActionsVisible && tab == CombatTab.Inventory);
+        if (teamPanel != null) teamPanel.SetActive(playerActionsVisible && tab == CombatTab.Team);
 
         SetTabButtonColor(attacksTabButton, tab == CombatTab.Attacks);
         SetTabButtonColor(inventoryTabButton, tab == CombatTab.Inventory);
@@ -305,7 +306,7 @@ private void SetTabButtonColor(Button button, bool active)
         moveSelectionLocked = locked;
 
         foreach (MoveOptionUI slot in moveOptionSlots)
-            slot.SetInteractable(playerInputEnabled && !locked);
+            slot.SetInteractable(!locked);
     }
 
     public void SetPlayerInputEnabled(bool enabled)
@@ -313,22 +314,63 @@ private void SetTabButtonColor(Button button, bool active)
         playerInputEnabled = enabled;
 
         if (attacksTabButton != null)
-            attacksTabButton.interactable = enabled;
+            attacksTabButton.interactable = true;
 
         if (inventoryTabButton != null)
-            inventoryTabButton.interactable = enabled;
+            inventoryTabButton.interactable = true;
 
         if (teamTabButton != null)
-            teamTabButton.interactable = enabled;
+            teamTabButton.interactable = true;
 
         foreach (MoveOptionUI slot in moveOptionSlots)
-            slot.SetInteractable(enabled && !moveSelectionLocked);
+            slot.SetInteractable(!moveSelectionLocked);
 
         if (combatInventoryUI != null)
-            combatInventoryUI.SetInputEnabled(enabled);
+            combatInventoryUI.SetInputEnabled(true);
 
         if (combatTeamUI != null)
-            combatTeamUI.SetInputEnabled(enabled);
+            combatTeamUI.SetInputEnabled(true);
+    }
+
+    /// <summary>
+    /// Oculta o restaura las acciones de batalla sin cambiar el estado interactable de
+    /// sus controles. CombatManager conserva la autoridad para aceptar o rechazar una
+    /// accion mediante su guardia de turno; visualmente los controles desaparecen
+    /// durante el ataque enemigo y vuelven listos al comenzar el turno del jugador.
+    /// </summary>
+    public void SetPlayerActionsVisible(bool visible)
+    {
+        playerActionsVisible = visible;
+
+        if (!visible)
+        {
+            combatInventoryUI?.CancelDrag();
+            combatTeamUI?.CancelSelection();
+        }
+
+        if (attacksTabButton != null)
+            attacksTabButton.gameObject.SetActive(visible);
+
+        if (inventoryTabButton != null)
+            inventoryTabButton.gameObject.SetActive(visible);
+
+        if (teamTabButton != null)
+            teamTabButton.gameObject.SetActive(visible);
+
+        if (targetIndicatorText != null)
+            targetIndicatorText.gameObject.SetActive(visible);
+
+        if (attacksPanel != null)
+            attacksPanel.SetActive(visible && CurrentTab == CombatTab.Attacks);
+
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(visible && CurrentTab == CombatTab.Inventory);
+
+        if (teamPanel != null)
+            teamPanel.SetActive(visible && CurrentTab == CombatTab.Team);
+
+        if (visible)
+            SetTab(CurrentTab);
     }
 
     public void MarkEnemyBodyPartDamaged(int index, Sprite damagedSprite)
@@ -361,6 +403,7 @@ private void SetTabButtonColor(Button button, bool active)
         if (overworldUI != null) overworldUI.SetActive(false);
         if (playerObject != null) playerObject.SetActive(false);
 
+        SetPlayerActionsVisible(true);
         SetTab(CombatTab.Attacks);
         RefreshTeamTab();
         SetPlayerInputEnabled(false);
@@ -369,6 +412,7 @@ private void SetTabButtonColor(Button button, bool active)
     public void HideBattleUI()
     {
         SetPlayerInputEnabled(false);
+        SetPlayerActionsVisible(true);
 
         if (battleUI != null) battleUI.SetActive(false);
         if (overworldUI != null) overworldUI.SetActive(true);

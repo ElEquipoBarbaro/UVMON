@@ -10,6 +10,6 @@ public class DialogueTrigger : MonoBehaviour
     [ContextMenu("Trigger Dialogue")]
     public void TriggerDialogue()
     {
-        DialogueManager.Instance.StartDialogue(dialogue);
+        DialogueManager.Instance.StartDialogue(dialogue, startsBattle);
     }
 }

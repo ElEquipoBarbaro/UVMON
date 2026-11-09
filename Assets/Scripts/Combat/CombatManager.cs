@@ -337,6 +337,12 @@ public class CombatManager : MonoBehaviour
         if (playerParty == null || enemyTrainer == null)
             return;
 
+        if (!playerParty.HasUsableCreature())
+        {
+            Debug.LogWarning("Battle could not start because the player has no usable creature.", playerParty);
+            return;
+        }
+
         // Ya hay un BattleLoop corriendo (p.ej. un doble trigger de interaccion antes de
         // que la primera batalla arrancara del todo): ignorar la llamada en vez de
         // arrancar un segundo BattleLoop superpuesto que comparta isPlayerTurn/
@@ -427,7 +433,10 @@ public class CombatManager : MonoBehaviour
             return;
 
         if (creature == playerRuntime)
+        {
+            battleUI.SetPlayerActionsVisible(false);
             battleUI.PlayerView?.PlayHitFlash();
+        }
         else if (creature == enemyRuntime)
             battleUI.EnemyView?.PlayHitFlash();
     }
@@ -454,6 +463,7 @@ public class CombatManager : MonoBehaviour
 
             if (battleUI != null)
             {
+                battleUI.SetPlayerActionsVisible(true);
                 battleUI.RenderMoveSelection(playerRuntime.Moves, selectedMoveIndex);
 
                 if (HasEnemyBodyParts)
@@ -752,6 +762,9 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator EnemyTurn()
     {
+        if (battleUI != null)
+            battleUI.SetPlayerActionsVisible(false);
+
         if (enemyRuntime.Moves == null || enemyRuntime.Moves.Count == 0)
             yield break;
 
@@ -858,6 +871,8 @@ public class CombatManager : MonoBehaviour
     {
         if (battleUI != null)
         {
+            battleUI.SetPlayerActionsVisible(false);
+
             if (enemyRuntime.CurrentHP <= 0 && playerRuntime.CurrentHP > 0)
             {
                 battleUI.ShowBattleMessage($"¡{enemyRuntime.data.creatureName} quedó debilitado!");
